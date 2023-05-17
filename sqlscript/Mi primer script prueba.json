@@ -1,0 +1,17 @@
+{
+	"name": "Mi primer script prueba",
+	"properties": {
+		"content": {
+			"query": "--- un comentairo de prueba",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
