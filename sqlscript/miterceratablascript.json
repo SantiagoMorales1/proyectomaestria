@@ -1,0 +1,17 @@
+{
+	"name": "miterceratablascript",
+	"properties": {
+		"content": {
+			"query": "CREATE TABLE [extractos].[miterceratabla]\n(\n    col1 int NOT NULL\n)\nGO\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
