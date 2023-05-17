@@ -1,0 +1,17 @@
+{
+	"name": "Primer Query",
+	"properties": {
+		"content": {
+			"query": "create schema extractos\n\ncreate table extractos.miprimeratabla (\n    id int,\n    nombre varchar(10),\n    fecha date\n)",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
