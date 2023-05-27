@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bfc80fac-7ff4-41e5-8c2c-a9dcf80f335d"
+				"spark.autotune.trackingId": "daaf9827-7be5-45b7-b95e-dcd5ce9c55ae"
 			}
 		},
 		"metadata": {
@@ -50,10 +50,33 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
 				"source": [
-					"#mi primer comentairo de prueba"
+					"import pdfminer\r\n",
+					"from pdfminer.pdfparser import PDFParser\r\n",
+					"from pdfminer.pdfdocument import PDFDocument\r\n",
+					"\r\n",
+					"def return_device_content(cont):\r\n",
+					"    fp = io.BytesIO(cont)\r\n",
+					"    parser = PDFParser(fp)\r\n",
+					"    document = PDFDocument(parser)\r\n",
+					"\r\n",
+					"filesPath=\"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"fileData = sc.binaryFiles(filesPath)\r\n",
+					"file_content = fileData.map(lambda content : content[1])\r\n",
+					"file_content1 = file_content.map(return_device_content)"
 				],
-				"execution_count": null
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -69,9 +92,45 @@
 					}
 				},
 				"source": [
-					"import PyPDF2"
+					"print (filesPath)"
 				],
-				"execution_count": 11
+				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print (fileData)"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"filesPath=\"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\""
+				],
+				"execution_count": null
 			}
 		]
 	}
