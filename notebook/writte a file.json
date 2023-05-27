@@ -1,0 +1,76 @@
+{
+	"name": "writte a file",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "spproymaestria",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "47e0e956-4ac2-4431-8d98-f0506b359080"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Synapse/workspaces/synapseproyectomaestria/bigDataPools/spproymaestria",
+				"name": "spproymaestria",
+				"type": "Spark",
+				"endpoint": "https://synapseproyectomaestria.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spproymaestria",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.3",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from pyspark.sql.types import StructType,StructField, StringType, IntegerType\r\n",
+					"data2 = [(\"James\",\"Smith\",\"Joe\",\"4355\",\"M\",3000),\r\n",
+					"    (\"Michael\",\"Rose\",\"Edward\",\"40288\",\"F\",4000)\r\n",
+					"  ]\r\n",
+					"\r\n",
+					"schema = StructType([ \\\r\n",
+					"    StructField(\"firstname\",StringType(),True), \\\r\n",
+					"    StructField(\"middlename\",StringType(),True), \\\r\n",
+					"    StructField(\"lastname\",StringType(),True), \\\r\n",
+					"    StructField(\"id\", StringType(), True), \\\r\n",
+					"    StructField(\"gender\", StringType(), True), \\\r\n",
+					"    StructField(\"salary\", IntegerType(), True) \\\r\n",
+					"  ])\r\n",
+					" \r\n",
+					"df = spark.createDataFrame(data=data2,schema=schema)\r\n",
+					"\r\n",
+					"df.write.csv(\"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/validate_permissions.csv\")"
+				],
+				"execution_count": 5
+			}
+		]
+	}
+}
