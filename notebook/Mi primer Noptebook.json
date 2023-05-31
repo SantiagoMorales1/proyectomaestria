@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "daaf9827-7be5-45b7-b95e-dcd5ce9c55ae"
+				"spark.autotune.trackingId": "c8afaf03-82dc-4e78-9e06-19dd5eda531e"
 			}
 		},
 		"metadata": {
@@ -92,25 +92,22 @@
 					}
 				},
 				"source": [
-					"print (filesPath)"
-				],
-				"execution_count": 17
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"print (fileData)"
+					"from pyspark.sql import SparkSession\r\n",
+					"\r\n",
+					"# Create Spark session\r\n",
+					"spark = SparkSession.builder.getOrCreate()\r\n",
+					"\r\n",
+					"# Set the password for the PDF file\r\n",
+					"pdf_password = 1233491047\r\n",
+					"\r\n",
+					"# Read the PDF file with password\r\n",
+					"pdf_df = spark.read.format(\"binaryFile\").option(\"password\", pdf_password).load(\"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\")\r\n",
+					"\r\n",
+					"# Extract the content of the PDF file as a string\r\n",
+					"content_df = pdf_df.select(pdf_df.content.cast(\"string\").alias(\"content\"))\r\n",
+					"\r\n",
+					"# Display the extracted content\r\n",
+					"content_df.show(truncate=False)"
 				],
 				"execution_count": 18
 			},
@@ -128,9 +125,10 @@
 					}
 				},
 				"source": [
-					"filesPath=\"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\""
+					"import com.adobe.pdf.PDFDocument\r\n",
+					"import com.adobe.pdf.PDFPage"
 				],
-				"execution_count": null
+				"execution_count": 22
 			}
 		]
 	}
