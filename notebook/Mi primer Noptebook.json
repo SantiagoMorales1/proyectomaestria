@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ba4a9c66-1e9e-41d1-81de-34bbbd4c672a"
+				"spark.autotune.trackingId": "f26fe877-a567-47f4-a296-0c02664ed7dd"
 			}
 		},
 		"metadata": {
@@ -62,43 +62,50 @@
 					}
 				},
 				"source": [
-					"import pdfminer\r\n",
-					"from pdfminer.pdfparser import PDFParser\r\n",
-					"from pdfminer.pdfdocument import PDFDocument\r\n",
-					"\r\n",
-					"def return_device_content(cont):\r\n",
-					"    fp = io.BytesIO(cont)\r\n",
-					"    parser = PDFParser(fp)\r\n",
-					"    document = PDFDocument(parser)\r\n",
-					"\r\n",
-					"filesPath=\"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
-					"fileData = sc.binaryFiles(filesPath)\r\n",
-					"file_content = fileData.map(lambda content : content[1])\r\n",
-					"file_content1 = file_content.map(return_device_content)"
-				],
-				"execution_count": 44
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
 					"from pyspark.sql import SparkSession\r\n",
+					"from io import BytesIO\r\n",
+					"import PyPDF2\r\n",
 					"\r\n",
 					"spark = SparkSession.builder \\\r\n",
 					"    .appName(\"PDF Extraction\") \\\r\n",
-					"    .getOrCreate()"
+					"    .getOrCreate()\r\n",
+					"\r\n",
+					"pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"pdf_password = \"1233491047\"\r\n",
+					"\r\n",
+					"# Read the PDF file as bytes\r\n",
+					"pdf_bytes = spark.read \\\r\n",
+					"    .format(\"binaryFile\") \\\r\n",
+					"    .option(\"path\", pdf_path) \\\r\n",
+					"    .load() \\\r\n",
+					"    .select(\"content\") \\\r\n",
+					"    .collect()[0][0]\r\n",
+					"\r\n",
+					"# Create a BytesIO stream from the PDF bytes\r\n",
+					"pdf_stream = BytesIO(pdf_bytes)\r\n",
+					"pdf_stream.seek(0)  # Ensure the stream is at the beginning\r\n",
+					"\r\n",
+					"# Create a PdfReader object from the PDF stream\r\n",
+					"pdf_reader = PyPDF2.PdfReader(pdf_stream)\r\n",
+					"\r\n",
+					"# Check if the PDF file is encrypted (password-protected)\r\n",
+					"if pdf_reader.is_encrypted:\r\n",
+					"    # Decrypt the PDF file with the provided password\r\n",
+					"    pdf_reader.decrypt(pdf_password)\r\n",
+					"\r\n",
+					"# Extract text from the PDF pages\r\n",
+					"pdf_content = \"\"\r\n",
+					"for page_num in range(len(pdf_reader.pages)):\r\n",
+					"    page = pdf_reader.pages[page_num]\r\n",
+					"    pdf_content += page.extract_text()\r\n",
+					"\r\n",
+					"print(pdf_content)\r\n",
+					"\r\n",
+					"# Perform further processing or analysis on the content\r\n",
+					"# For example, you can save it to a storage location or perform text mining operations.\r\n",
+					""
 				],
-				"execution_count": 80
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -116,44 +123,27 @@
 				"source": [
 					"from pyspark.sql import SparkSession\r\n",
 					"from io import BytesIO\r\n",
-					"from org.apache.tika.config import TikaConfig\r\n",
-					"\r\n",
-					"spark = SparkSession.builder \\\r\n",
-					"    .appName(\"PDF Extraction\") \\\r\n",
-					"    .getOrCreate()\r\n",
-					"\r\n",
-					"pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
-					"pdf_password = \"1233491047\"\r\n",
-					"\r\n",
-					"# Read the PDF file as bytes\r\n",
-					"pdf_bytes = spark.read \\\r\n",
-					"    .format(\"binaryFile\") \\\r\n",
-					"    .option(\"path\", pdf_path) \\\r\n",
-					"    .load() \\\r\n",
-					"    .select(\"content\") \\\r\n",
-					"    .collect()[0][0]\r\n",
-					"\r\n",
-					"# Create a ByteArrayInputStream from the PDF bytes\r\n",
-					"input_stream = BytesIO(pdf_bytes)\r\n",
-					"\r\n",
-					"# Create a TikaConfig object with the password configuration\r\n",
-					"config_map = spark._jvm.java.util.HashMap()\r\n",
-					"config_map.put(\"password\", pdf_password)\r\n",
-					"tika_config = TikaConfig(config_map)\r\n",
-					"\r\n",
-					"# Create an instance of Tika using the TikaConfig\r\n",
-					"tika = spark._jvm.org.apache.tika.Tika(tika_config)\r\n",
-					"\r\n",
-					"# Parse the PDF content to a string\r\n",
-					"pdf_content = tika.parseToString(input_stream)\r\n",
-					"\r\n",
-					"print(pdf_content)\r\n",
-					"\r\n",
-					"# Perform further processing or analysis on the content\r\n",
-					"# For example, you can save it to a storage location or perform text mining operations.\r\n",
-					""
+					"import PyPDF2"
 				],
-				"execution_count": 84
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Import librerias"
+				],
+				"execution_count": 92
 			},
 			{
 				"cell_type": "code",
