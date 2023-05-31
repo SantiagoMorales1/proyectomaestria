@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "dde4a59d-1d05-40b1-8a10-fbc8fd0742d7"
+				"spark.autotune.trackingId": "ba4a9c66-1e9e-41d1-81de-34bbbd4c672a"
 			}
 		},
 		"metadata": {
@@ -98,25 +98,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 47
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"pdf_df = spark.read.text(\"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\")"
-				],
-				"execution_count": 48
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -133,35 +115,45 @@
 				},
 				"source": [
 					"from pyspark.sql import SparkSession\r\n",
+					"from io import BytesIO\r\n",
+					"from org.apache.tika.config import TikaConfig\r\n",
 					"\r\n",
 					"spark = SparkSession.builder \\\r\n",
 					"    .appName(\"PDF Extraction\") \\\r\n",
-					"    .getOrCreate()"
-				],
-				"execution_count": 52
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"from org.apache.tika import Tika\r\n",
+					"    .getOrCreate()\r\n",
 					"\r\n",
 					"pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"pdf_password = \"1233491047\"\r\n",
 					"\r\n",
-					"tika = Tika()\r\n",
-					"pdf_content = tika.parseToString(pdf_path)"
+					"# Read the PDF file as bytes\r\n",
+					"pdf_bytes = spark.read \\\r\n",
+					"    .format(\"binaryFile\") \\\r\n",
+					"    .option(\"path\", pdf_path) \\\r\n",
+					"    .load() \\\r\n",
+					"    .select(\"content\") \\\r\n",
+					"    .collect()[0][0]\r\n",
+					"\r\n",
+					"# Create a ByteArrayInputStream from the PDF bytes\r\n",
+					"input_stream = BytesIO(pdf_bytes)\r\n",
+					"\r\n",
+					"# Create a TikaConfig object with the password configuration\r\n",
+					"config_map = spark._jvm.java.util.HashMap()\r\n",
+					"config_map.put(\"password\", pdf_password)\r\n",
+					"tika_config = TikaConfig(config_map)\r\n",
+					"\r\n",
+					"# Create an instance of Tika using the TikaConfig\r\n",
+					"tika = spark._jvm.org.apache.tika.Tika(tika_config)\r\n",
+					"\r\n",
+					"# Parse the PDF content to a string\r\n",
+					"pdf_content = tika.parseToString(input_stream)\r\n",
+					"\r\n",
+					"print(pdf_content)\r\n",
+					"\r\n",
+					"# Perform further processing or analysis on the content\r\n",
+					"# For example, you can save it to a storage location or perform text mining operations.\r\n",
+					""
 				],
-				"execution_count": 53
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
