@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9e559040-65c4-45a2-95f3-a24dc2adbbf8"
+				"spark.autotune.trackingId": "c110e971-c5c2-4fa9-910d-4c0aebd48d27"
 			}
 		},
 		"metadata": {
@@ -119,27 +119,8 @@
 					}
 				},
 				"source": [
-					"pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
-					"pdf_password = \"1233491047\"\r\n",
+					"#pROCESAMIENTO CON Rapid Miner\r\n",
 					"\r\n",
-					""
-				],
-				"execution_count": 11
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
 					"from pyspark.sql import SparkSession\r\n",
 					"from io import BytesIO\r\n",
 					"from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter\r\n",
