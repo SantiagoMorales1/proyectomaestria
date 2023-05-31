@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f26fe877-a567-47f4-a296-0c02664ed7dd"
+				"spark.autotune.trackingId": "fa766526-0f40-4187-bf06-ff68a2fea745"
 			}
 		},
 		"metadata": {
@@ -66,10 +66,6 @@
 					"from io import BytesIO\r\n",
 					"import PyPDF2\r\n",
 					"\r\n",
-					"spark = SparkSession.builder \\\r\n",
-					"    .appName(\"PDF Extraction\") \\\r\n",
-					"    .getOrCreate()\r\n",
-					"\r\n",
 					"pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 					"pdf_password = \"1233491047\"\r\n",
 					"\r\n",
@@ -105,7 +101,7 @@
 					"# For example, you can save it to a storage location or perform text mining operations.\r\n",
 					""
 				],
-				"execution_count": 90
+				"execution_count": 95
 			},
 			{
 				"cell_type": "code",
@@ -121,9 +117,7 @@
 					}
 				},
 				"source": [
-					"from pyspark.sql import SparkSession\r\n",
-					"from io import BytesIO\r\n",
-					"import PyPDF2"
+					""
 				],
 				"execution_count": null
 			},
@@ -141,7 +135,7 @@
 					}
 				},
 				"source": [
-					"#Import librerias"
+					""
 				],
 				"execution_count": 92
 			},
