@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "82eddb9b-15b0-486d-b361-a5ab560ece90"
+				"spark.autotune.trackingId": "9e559040-65c4-45a2-95f3-a24dc2adbbf8"
 			}
 		},
 		"metadata": {
@@ -62,6 +62,8 @@
 					}
 				},
 				"source": [
+					"#Procesamiento con PyPDF2\r\n",
+					"\r\n",
 					"from pyspark.sql import SparkSession\r\n",
 					"from io import BytesIO\r\n",
 					"import PyPDF2\r\n",
@@ -101,7 +103,7 @@
 					"# For example, you can save it to a storage location or perform text mining operations.\r\n",
 					""
 				],
-				"execution_count": 5
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -119,9 +121,10 @@
 				"source": [
 					"pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 					"pdf_password = \"1233491047\"\r\n",
+					"\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -177,7 +180,7 @@
 					"\r\n",
 					"# Process each page of the PDF file\r\n",
 					"password = pdf_password.encode()\r\n",
-					"pages = PDFPage.get_pages(pdf_stream, check_extractable=True)\r\n",
+					"pages = PDFPage.get_pages(pdf_stream, password=password, check_extractable=True)\r\n",
 					"for page in pages:\r\n",
 					"    interpreter.process_page(page)\r\n",
 					"\r\n",
@@ -190,11 +193,12 @@
 					"\r\n",
 					"print(pdf_content)\r\n",
 					"\r\n",
+					"\r\n",
 					"# Perform further processing or analysis on the content\r\n",
 					"# For example, you can save it to a storage location or perform text mining operations.\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
