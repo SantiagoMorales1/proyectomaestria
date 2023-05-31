@@ -2,13 +2,13 @@
 	"name": "sparkConfiguration1",
 	"properties": {
 		"configs": {
-			"tika": "spark.jars.packages org.apache.tika:tika-parsers:1.24"
+			"spark.jars.packages": "org.apache.tika:tika-parsers:1.26"
 		},
-		"created": "2023-05-30T22:29:08.4480000-05:00",
+		"created": "2023-05-30T23:19:10.1900000-05:00",
 		"createdBy": "brallamsantiago.morales334@comunidadunir.net",
 		"annotations": [],
 		"configMergeRule": {
-			"artifact.currentOperation.tika": "replace"
+			"artifact.currentOperation.spark.jars.packages": "replace"
 		}
 	}
 }
