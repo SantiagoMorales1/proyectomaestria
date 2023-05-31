@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c110e971-c5c2-4fa9-910d-4c0aebd48d27"
+				"spark.autotune.trackingId": "7011ac5e-0cc3-4513-9471-d2db8bb96902"
 			}
 		},
 		"metadata": {
@@ -119,7 +119,7 @@
 					}
 				},
 				"source": [
-					"#pROCESAMIENTO CON Rapid Miner\r\n",
+					"#PROCESAMIENTO CON Rapid Miner\r\n",
 					"\r\n",
 					"from pyspark.sql import SparkSession\r\n",
 					"from io import BytesIO\r\n",
@@ -179,7 +179,7 @@
 					"# For example, you can save it to a storage location or perform text mining operations.\r\n",
 					""
 				],
-				"execution_count": 14
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
