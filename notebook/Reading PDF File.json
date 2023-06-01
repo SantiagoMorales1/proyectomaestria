@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7011ac5e-0cc3-4513-9471-d2db8bb96902"
+				"spark.autotune.trackingId": "9946b79d-25f7-47b6-8f3a-b6d2da810944"
 			}
 		},
 		"metadata": {
@@ -103,7 +103,7 @@
 					"# For example, you can save it to a storage location or perform text mining operations.\r\n",
 					""
 				],
-				"execution_count": 15
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -179,7 +179,7 @@
 					"# For example, you can save it to a storage location or perform text mining operations.\r\n",
 					""
 				],
-				"execution_count": 17
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
