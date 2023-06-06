@@ -1,5 +1,5 @@
 {
-	"name": "Reafing PDF Files - Stage Zone",
+	"name": "Process PDF Files - Stage Zone",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e1cd0711-6b32-450f-bbdc-54273a337888"
+				"spark.autotune.trackingId": "43f6f8fd-293f-402f-bfec-7276f246a064"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,7 @@
 					"import io\r\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -84,7 +84,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -97,7 +97,10 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"tags": [
+						"parameters"
+					]
 				},
 				"source": [
 					"#Capturar variabes\r\n",
@@ -105,7 +108,7 @@
 					"pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 					"pdf_password = \"1233491047\""
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -160,7 +163,7 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -173,16 +176,22 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"tags": []
 				},
 				"source": [
 					"#Generar unarcihvo con la data Cruda\r\n",
 					"\r\n",
+					"#Crear un dataframe con la informaicon extraida\r\n",
+					"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
 					"\r\n",
-					"print(pdf_content)\r\n",
+					"# Creararchivo  Parquet en el contendor\r\n",
+					"container_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"content_df.write.mode(\"overwrite\").parquet(container_path)\r\n",
+					"\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 8
 			}
 		]
 	}
