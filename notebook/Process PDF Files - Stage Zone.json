@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ab9b12b3-7fff-4b70-ae71-3563e7cb1231"
+				"spark.autotune.trackingId": "58a9467a-8bae-46ec-85c3-7350331e9f44"
 			}
 		},
 		"metadata": {
@@ -231,7 +231,7 @@
 					"df_single_partition = pdf_content_df.repartition(1)\r\n",
 					"\r\n",
 					"# Save the DataFrame as a Parquet file\r\n",
-					"df_single_partition.write.mode(\"overwrite\").parquet(path_sink\")"
+					"df_single_partition.write.mode(\"overwrite\").parquet(path_sink)"
 				],
 				"execution_count": null
 			}
