@@ -1,6 +1,9 @@
 {
 	"name": "Reading PDF File - Test Concept",
 	"properties": {
+		"folder": {
+			"name": "SandBoxScripts"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "03071bdd-ef0a-4c94-8f61-4d847e8e74ec"
+				"spark.autotune.trackingId": "b028aaf5-4402-4e7d-bc97-12b32020cdfe"
 			}
 		},
 		"metadata": {
