@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2e060afa-b468-456a-8e5f-9b8682cfae41"
+				"spark.autotune.trackingId": "c0e92b25-e268-4e17-bc98-9ff30838b03f"
 			}
 		},
 		"metadata": {
@@ -180,7 +180,7 @@
 					"tags": []
 				},
 				"source": [
-					"#Generar unarcihvo con la data Cruda\r\n",
+					"#Generar un arcihvo con la data Cruda\r\n",
 					"\r\n",
 					"#Crear un dataframe con la informaicon extraida\r\n",
 					"#content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
