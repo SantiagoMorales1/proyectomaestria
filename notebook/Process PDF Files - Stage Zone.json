@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e1613218-e539-4616-8ff2-b421ee4712a4"
+				"spark.autotune.trackingId": "5950d3f5-371a-42ff-a1ef-609b9771e488"
 			}
 		},
 		"metadata": {
@@ -250,7 +250,7 @@
 				},
 				"source": [
 					"# Delete the file\r\n",
-					"spark._jvm.org.apache.hadoop.fs.FileSystem.get(spark._jsc.hadoopConfiguration()).delete(spark._jvm.org.apache.hadoop.fs.Path(path_sink + \"/\" + \"_SUCCESS\" ), True)"
+					"spark._jvm.org.apache.hadoop.fs.FileSystem.get(spark._jsc.hadoopConfiguration()).delete(spark._jvm.org.apache.hadoop.fs.Path(path_sink), True)"
 				],
 				"execution_count": 25
 			}
