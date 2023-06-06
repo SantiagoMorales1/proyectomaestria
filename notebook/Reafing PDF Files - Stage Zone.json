@@ -1,0 +1,189 @@
+{
+	"name": "Reafing PDF Files - Stage Zone",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "spproymaestria",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "861c4184-4ece-4d80-9afb-011a44658a7b"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Synapse/workspaces/synapseproyectomaestria/bigDataPools/spproymaestria",
+				"name": "spproymaestria",
+				"type": "Spark",
+				"endpoint": "https://synapseproyectomaestria.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spproymaestria",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.3",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"#Importando Librerias\r\n",
+					"\r\n",
+					"from pyspark.sql import SparkSession\r\n",
+					"from io import BytesIO\r\n",
+					"from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter\r\n",
+					"from pdfminer.pdfpage import PDFPage\r\n",
+					"from pdfminer.converter import TextConverter\r\n",
+					"from pdfminer.layout import LAParams\r\n",
+					"import io\r\n",
+					""
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Creando sesion \r\n",
+					"\r\n",
+					"spark = SparkSession.builder \\\r\n",
+					"    .appName(\"PDF Extraction\") \\\r\n",
+					"    .getOrCreate()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Capturar variabes\r\n",
+					"\r\n",
+					"pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"pdf_password = \"1233491047\""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Procesar informacion - Capturar informacion\r\n",
+					"\r\n",
+					"\r\n",
+					"# Leer the PDF file como bytes\r\n",
+					"pdf_bytes = spark.read \\\r\n",
+					"    .format(\"binaryFile\") \\\r\n",
+					"    .option(\"path\", pdf_path) \\\r\n",
+					"    .load() \\\r\n",
+					"    .select(\"content\") \\\r\n",
+					"    .collect()[0][0]\r\n",
+					"\r\n",
+					"# crear un BytesIO stream de the PDF bytes\r\n",
+					"pdf_stream = BytesIO(pdf_bytes)\r\n",
+					"pdf_stream.seek(0)\r\n",
+					"\r\n",
+					"# Crear objeto PDFResourceManager y configurar parametros\r\n",
+					"rsrcmgr = PDFResourceManager()\r\n",
+					"retstr = io.StringIO()\r\n",
+					"\r\n",
+					"# Crear Objeto  TextConverter para las paginas dle PDF\r\n",
+					"laparams = LAParams()\r\n",
+					"device = TextConverter(rsrcmgr, retstr, laparams=laparams)\r\n",
+					"\r\n",
+					"# Crear objeto PDFPageInterpreter\r\n",
+					"interpreter = PDFPageInterpreter(rsrcmgr, device)\r\n",
+					"\r\n",
+					"# Porcesar cada pagina del archivo PDF\r\n",
+					"password = pdf_password.encode()\r\n",
+					"pages = PDFPage.get_pages(pdf_stream, password=password, check_extractable=True)\r\n",
+					"for page in pages:\r\n",
+					"    interpreter.process_page(page)\r\n",
+					"\r\n",
+					"# Obtener el texto extraido del objeto StringIO\r\n",
+					"pdf_content = retstr.getvalue()\r\n",
+					"\r\n",
+					"# Cerrar el objeto StringIO\r\n",
+					"device.close()\r\n",
+					"retstr.close()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Generar unarcihvo con la data Cruda\r\n",
+					"\r\n",
+					"\r\n",
+					"print(pdf_content)\r\n",
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
