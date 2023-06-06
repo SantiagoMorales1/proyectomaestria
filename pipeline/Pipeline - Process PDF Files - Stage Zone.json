@@ -48,7 +48,7 @@
 					},
 					"executorSize": "Small",
 					"conf": {
-						"spark.dynamicAllocation.enabled": true
+						"spark.dynamicAllocation.enabled": false
 					},
 					"driverSize": "Small"
 				}
