@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "82a2ba46-47cb-48ce-8f28-66ba748664f8"
+				"spark.autotune.trackingId": "eb567d31-eb6a-4405-80f6-15df6d4b6085"
 			}
 		},
 		"metadata": {
@@ -50,12 +50,45 @@
 		"cells": [
 			{
 				"cell_type": "code",
+				"metadata": {
+					"collapsed": false
+				},
 				"source": [
 					"\r\n",
-					"df = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166 (1)/part-00000-c30cc4b3-f780-4812-a09a-0a34de41d2f4-c000.snappy.parquet', format='parquet')\r\n",
-					"display(df.limit(10))"
+					"df = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/*.parquet', format='parquet')\r\n",
+					"display(df.limit(10))\r\n",
+					""
 				],
-				"execution_count": 4
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql.functions import split\r\n",
+					"\r\n",
+					"# Assuming you have a DataFrame named 'df' with a column named 'file_name' containing values separated by line breaks\r\n",
+					"\r\n",
+					"# Split the values in the 'file_name' column by line breaks\r\n",
+					"df2 = df.withColumn(\"file_name_list\", split(df[\"contenido\"], \"\\n\"))\r\n",
+					"\r\n",
+					"for row in df2.collect():\r\n",
+					"    file_names_list = row[\"file_name_list\"]\r\n",
+					"    for name in file_names_list:\r\n",
+					"        print(name)\r\n",
+					""
+				],
+				"execution_count": 19
 			}
 		]
 	}
