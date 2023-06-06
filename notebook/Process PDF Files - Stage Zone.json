@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9f5e1ed1-cf9c-4d82-b71d-f242cd44836b"
+				"spark.autotune.trackingId": "31a347c8-ae66-4ce5-834f-b91313ba31a9"
 			}
 		},
 		"metadata": {
@@ -128,9 +128,12 @@
 				"source": [
 					"#Consolidar Variables\r\n",
 					"\r\n",
-					"\r\n",
+					"#Ruta Origen\r\n",
 					"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+pdf_file\r\n",
-					""
+					"\r\n",
+					"#Ruta Destino\r\n",
+					"pdf_file = pdf_file.replace(\".pdf\", \".parquet\")\r\n",
+					"pdf_path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+pdf_file"
 				],
 				"execution_count": 20
 			},
@@ -222,14 +225,14 @@
 					"tags": []
 				},
 				"source": [
-					"#Generar un arcihvo con la data Cruda\r\n",
+					"Generar un arcihvo con la data Cruda\r\n",
 					"\r\n",
-					"#Crear un dataframe con la informaicon extraida\r\n",
-					"#content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
+					"Crear un dataframe con la informaicon extraida\r\n",
+					"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
 					"\r\n",
-					"# Creararchivo  Parquet en el contendor\r\n",
-					"#container_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
-					"#content_df.write.mode(\"overwrite\").parquet(container_path)\r\n",
+					"# Crear archivo  Parquet en el contendor\r\n",
+					"container_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"content_df.write.mode(\"overwrite\").parquet(container_path)\r\n",
 					"\r\n",
 					""
 				],
