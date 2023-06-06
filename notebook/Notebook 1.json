@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "eb567d31-eb6a-4405-80f6-15df6d4b6085"
+				"spark.autotune.trackingId": "d83e9d93-4f23-49ec-a1fb-64c0bddf978b"
 			}
 		},
 		"metadata": {
@@ -80,15 +80,29 @@
 					"# Assuming you have a DataFrame named 'df' with a column named 'file_name' containing values separated by line breaks\r\n",
 					"\r\n",
 					"# Split the values in the 'file_name' column by line breaks\r\n",
-					"df2 = df.withColumn(\"file_name_list\", split(df[\"contenido\"], \"\\n\"))\r\n",
+					"df_with_split = df.withColumn(\"file_name_list\", split(df[\"contenido\"], \"\\n\"))\r\n",
 					"\r\n",
-					"for row in df2.collect():\r\n",
-					"    file_names_list = row[\"file_name_list\"]\r\n",
-					"    for name in file_names_list:\r\n",
-					"        print(name)\r\n",
 					""
 				],
-				"execution_count": 19
+				"execution_count": 24
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_with_split.show(truncate=False)"
+				],
+				"execution_count": 26
 			}
 		]
 	}
