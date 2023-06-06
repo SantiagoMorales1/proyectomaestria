@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9fe24397-4c0c-4477-ba44-d963438beebf"
+				"spark.autotune.trackingId": "5ec1bd7e-692d-460d-b456-fc4d36ad9460"
 			}
 		},
 		"metadata": {
@@ -136,7 +136,7 @@
 					"\r\n",
 					"#Ruta Destino\r\n",
 					"pdf_file = pdf_file.replace(\".pdf\", \".Parquet\")\r\n",
-					"pdf_path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha"
+					"pdf_path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha\"/\"+pdf_file"
 				],
 				"execution_count": null
 			},
@@ -234,7 +234,7 @@
 					"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
 					"uniquefile = content_df.coalesce(1)\r\n",
 					"# Crear archivo  Parquet en el contendor\r\n",
-					"uniquefile.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(pdf_path_sink)\r\n",
+					"df.write.option(\"path\", pdf_path_sink).mode(\"overwrite\").save()\r\n",
 					""
 				],
 				"execution_count": null
