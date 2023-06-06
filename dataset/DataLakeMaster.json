@@ -10,8 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "_SUCCESS",
-				"folderPath": "bsmoralesg@outlook.com/Tarjeta Credito/10012023",
 				"fileSystem": "stagedata"
 			}
 		}
