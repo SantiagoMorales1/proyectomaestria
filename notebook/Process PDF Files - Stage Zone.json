@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "139f8396-70d4-4d9b-912c-7cc86cc793ef"
+				"spark.autotune.trackingId": "1d9ed0f3-6102-4ce9-b045-a64063fe46c3"
 			}
 		},
 		"metadata": {
@@ -136,7 +136,7 @@
 					"\r\n",
 					"#Ruta Destino\r\n",
 					"pdf_file = pdf_file.replace(\".pdf\", \".Parquet\")\r\n",
-					"pdf_path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+pdf_file"
+					"pdf_path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha"
 				],
 				"execution_count": null
 			},
