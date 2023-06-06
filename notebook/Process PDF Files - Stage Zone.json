@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "11966801-841f-4862-a76b-f065cde4b435"
+				"spark.autotune.trackingId": "1d2d229f-d621-4093-909a-b3b759d47dca"
 			}
 		},
 		"metadata": {
@@ -232,9 +232,8 @@
 					"\r\n",
 					"# Crear un dataframe con la informaicon extraida\r\n",
 					"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
-					"\r\n",
+					"df_single_partition = df.coalesce(1)\r\n",
 					"# Crear archivo  Parquet en el contendor\r\n",
-					"#container_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 					"content_df.write.mode(\"overwrite\").parquet(pdf_path_sink)\r\n",
 					""
 				],
