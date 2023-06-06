@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "16121e51-80ac-48b0-8313-568b2fa8a460"
+				"spark.autotune.trackingId": "0da143f2-a5b5-47e2-99e4-cc360a4c77d5"
 			}
 		},
 		"metadata": {
@@ -136,7 +136,7 @@
 					"\r\n",
 					"#Ruta Destino\r\n",
 					"file_name = file_name.replace(\".pdf\", \".Parquet\")\r\n",
-					"pdf_path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha"
+					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha"
 				],
 				"execution_count": null
 			},
@@ -231,7 +231,7 @@
 					"df_single_partition = pdf_content_df.coalesce(1)\r\n",
 					"\r\n",
 					"# Escribir arcihvo parquet y omitir archiov success\r\n",
-					"df_single_partition.write.option(\"spark.sql.parquet.writeLegacyFormat\", \"true\").mode(\"overwrite\").parquet(pdf_path_sink)"
+					"df.write.option(\"spark.sql.parquet.writeLegacyFormat\", \"true\").mode(\"overwrite\").parquet(path_sink + file_name)"
 				],
 				"execution_count": null
 			}
