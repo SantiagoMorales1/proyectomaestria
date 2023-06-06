@@ -241,7 +241,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "30edcf8e-150a-4351-b233-5b463d5d1bd5"
+						"spark.autotune.trackingId": "e89f7307-0bb5-40ca-934b-f7454be6ed04"
 					}
 				},
 				"metadata": {
@@ -836,8 +836,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "_SUCCESS",
-						"folderPath": "bsmoralesg@outlook.com/Tarjeta Credito/10012023",
 						"fileSystem": "stagedata"
 					}
 				}
