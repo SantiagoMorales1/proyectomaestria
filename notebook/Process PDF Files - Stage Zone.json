@@ -1,6 +1,9 @@
 {
 	"name": "Process PDF Files - Stage Zone",
 	"properties": {
+		"folder": {
+			"name": "LecturaScripts"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7ed231a9-3e45-4884-9f13-e5864ad9e367"
+				"spark.autotune.trackingId": "08eb37ac-3993-4e8e-9123-413c9befc2dd"
 			}
 		},
 		"metadata": {
