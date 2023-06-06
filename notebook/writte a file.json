@@ -1,6 +1,9 @@
 {
 	"name": "writte a file",
 	"properties": {
+		"folder": {
+			"name": "SandBoxScripts"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f4f4cf73-904a-40a7-ab2a-f6940f463e3e"
+				"spark.autotune.trackingId": "aabd014b-6f70-4d0c-a1bd-7dea8ca21cc0"
 			}
 		},
 		"metadata": {
