@@ -20,8 +20,24 @@
 						"type": "NotebookReference"
 					},
 					"parameters": {
-						"primerparam": {
-							"value": "test",
+						"pdf_user": {
+							"value": "",
+							"type": "string"
+						},
+						"pdf_type": {
+							"value": "",
+							"type": "string"
+						},
+						"pdf_fecha": {
+							"value": "",
+							"type": "string"
+						},
+						"pdf_file": {
+							"value": "",
+							"type": "string"
+						},
+						"pdf_password": {
+							"value": "",
 							"type": "string"
 						}
 					},
