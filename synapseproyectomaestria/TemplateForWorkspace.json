@@ -77,6 +77,40 @@
 							},
 							"driverSize": "Small"
 						}
+					},
+					{
+						"name": "Delete Success File",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Reafing PDF Files - Stage Zone",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DataLakeMaster",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_SUCCESS",
+								"enablePartitionDiscovery": false
+							}
+						}
 					}
 				],
 				"policy": {
@@ -87,7 +121,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/notebooks/Process PDF Files - Stage Zone')]",
-				"[concat(variables('workspaceId'), '/bigDataPools/spproymaestria')]"
+				"[concat(variables('workspaceId'), '/bigDataPools/spproymaestria')]",
+				"[concat(variables('workspaceId'), '/datasets/DataLakeMaster')]"
 			]
 		},
 		{
@@ -206,7 +241,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "e927be32-ff9b-4c26-989f-6fefe96ccf7b"
+						"spark.autotune.trackingId": "30edcf8e-150a-4351-b233-5b463d5d1bd5"
 					}
 				},
 				"metadata": {
@@ -325,7 +360,7 @@
 							"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name\r\n",
 							"\r\n",
 							"#Ruta Destino\r\n",
-							"file_name = file_name.replace(\".pdf\", \".Parquet\")\r\n",
+							"file_name = file_name.replace(\".pdf\", \".parquet\")\r\n",
 							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha"
 						],
 						"outputs": [],
@@ -420,11 +455,11 @@
 							}
 						},
 						"source": [
-							"# Definir una sola particion\r\n",
-							"df_single_partition = pdf_content_df.coalesce(1)\r\n",
+							"# Repartition DataFrame to a single partition\r\n",
+							"df_single_partition = pdf_content_df.repartition(1)\r\n",
 							"\r\n",
-							"# Escribir arcihvo parquet y omitir archiov success\r\n",
-							"df_single_partition.write.option(\"spark.sql.parquet.writeLegacyFormat\", \"true\").mode(\"overwrite\").parquet(path_sink + file_name)"
+							"# Save the DataFrame as a Parquet file\r\n",
+							"df_single_partition.write.mode(\"overwrite\").parquet(path_sink)"
 						],
 						"outputs": [],
 						"execution_count": null
@@ -786,6 +821,30 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DataLakeMaster')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapseproyectomaestria-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "_SUCCESS",
+						"folderPath": "bsmoralesg@outlook.com/Tarjeta Credito/10012023",
+						"fileSystem": "stagedata"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapseproyectomaestria-WorkspaceDefaultStorage')]"
+			]
 		}
 	]
 }
