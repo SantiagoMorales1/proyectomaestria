@@ -57,7 +57,7 @@
 									"value": "10012023",
 									"type": "string"
 								},
-								"pdf_file": {
+								"file_name": {
 									"value": "Extracto_7358651_202108_TARJETA_VISA_2166 (1).pdf",
 									"type": "string"
 								},
@@ -206,7 +206,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a9cf6f54-9410-4fe5-95c4-55e2cda1afcd"
+						"spark.autotune.trackingId": "7b53bda3-a63f-4b0d-9c2e-bab4189fcf53"
 					}
 				},
 				"metadata": {
@@ -299,7 +299,7 @@
 							"pdf_user = \"\"\r\n",
 							"pdf_type = \"\"\r\n",
 							"pdf_fecha = \"\"\r\n",
-							"pdf_file = \"\"\r\n",
+							"file_name = \"\"\r\n",
 							"pdf_password = \"\""
 						],
 						"outputs": [],
@@ -322,10 +322,10 @@
 							"#Consolidar Variables\r\n",
 							"\r\n",
 							"#Ruta Origen\r\n",
-							"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+pdf_file\r\n",
+							"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name\r\n",
 							"\r\n",
 							"#Ruta Destino\r\n",
-							"pdf_file = pdf_file.replace(\".pdf\", \".Parquet\")\r\n",
+							"file_name = file_name.replace(\".pdf\", \".Parquet\")\r\n",
 							"pdf_path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha"
 						],
 						"outputs": [],
@@ -417,18 +417,33 @@
 								"transient": {
 									"deleting": false
 								}
-							},
-							"tags": []
+							}
 						},
 						"source": [
-							"# Generar un arcihvo con la data Cruda\r\n",
+							"pdf_content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Construct the output file path with the desired filename\r\n",
+							"df_single_partition = pdf_content_df.coalesce(1)\r\n",
 							"\r\n",
-							"# Crear un dataframe con la informaicon extraida\r\n",
-							"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
-							"\r\n",
-							"# Crear archivo  Parquet en el contendor\r\n",
-							"content_df.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(pdf_path_sink)\r\n",
-							""
+							"# Write the DataFrame to the unique Parquet file without generating the success file\r\n",
+							"df_single_partition.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(pdf_path_sink)"
 						],
 						"outputs": [],
 						"execution_count": null
