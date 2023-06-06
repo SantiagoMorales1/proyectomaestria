@@ -206,7 +206,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "08eb37ac-3993-4e8e-9123-413c9befc2dd"
+						"spark.autotune.trackingId": "2115a79d-363a-4b3d-8c77-34b8049e55a9"
 					}
 				},
 				"metadata": {
@@ -231,13 +231,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Importando Librerias\r\n",
 							"\r\n",
@@ -419,9 +421,9 @@
 							"tags": []
 						},
 						"source": [
-							"Generar un arcihvo con la data Cruda\r\n",
+							"# Generar un arcihvo con la data Cruda\r\n",
 							"\r\n",
-							"Crear un dataframe con la informaicon extraida\r\n",
+							"# Crear un dataframe con la informaicon extraida\r\n",
 							"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
 							"\r\n",
 							"# Crear archivo  Parquet en el contendor\r\n",
