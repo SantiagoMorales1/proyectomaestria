@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "08eb37ac-3993-4e8e-9123-413c9befc2dd"
+				"spark.autotune.trackingId": "11966801-841f-4862-a76b-f065cde4b435"
 			}
 		},
 		"metadata": {
@@ -228,9 +228,9 @@
 					"tags": []
 				},
 				"source": [
-					"Generar un arcihvo con la data Cruda\r\n",
+					"# Generar un arcihvo con la data Cruda\r\n",
 					"\r\n",
-					"Crear un dataframe con la informaicon extraida\r\n",
+					"# Crear un dataframe con la informaicon extraida\r\n",
 					"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
 					"\r\n",
 					"# Crear archivo  Parquet en el contendor\r\n",
