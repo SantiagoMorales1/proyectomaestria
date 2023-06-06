@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f7b26774-c868-4ba6-9e44-30bd57d7b7b4"
+				"spark.autotune.trackingId": "bcf17126-f9f2-49fb-9fd9-7ad806634b7e"
 			}
 		},
 		"metadata": {
@@ -110,7 +110,7 @@
 					"pdf_user = \"\"\r\n",
 					"pdf_type = \"\"\r\n",
 					"pdf_fecha = \"\"\r\n",
-					"pdf_file = \"\"\r\n",
+					"file_name = \"\"\r\n",
 					"pdf_password = \"\""
 				],
 				"execution_count": null
@@ -132,10 +132,10 @@
 					"#Consolidar Variables\r\n",
 					"\r\n",
 					"#Ruta Origen\r\n",
-					"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+pdf_file\r\n",
+					"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name\r\n",
 					"\r\n",
 					"#Ruta Destino\r\n",
-					"pdf_file = pdf_file.replace(\".pdf\", \".Parquet\")\r\n",
+					"file_name = file_name.replace(\".pdf\", \".Parquet\")\r\n",
 					"pdf_path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha"
 				],
 				"execution_count": null
@@ -224,18 +224,14 @@
 						"transient": {
 							"deleting": false
 						}
-					},
-					"tags": []
+					}
 				},
 				"source": [
-					"# Generar un arcihvo con la data Cruda\r\n",
+					"# Construct the output file path with the desired filename\r\n",
+					"output_file_path = pdf_path_sink + \"/\" + file_name\r\n",
 					"\r\n",
-					"# Crear un dataframe con la informaicon extraida\r\n",
-					"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
-					"\r\n",
-					"# Crear archivo  Parquet en el contendor\r\n",
-					"content_df.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(pdf_path_sink)\r\n",
-					""
+					"# Write the DataFrame to the unique Parquet file without generating the success file\r\n",
+					"pdf_content.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(output_file_path)"
 				],
 				"execution_count": null
 			}
