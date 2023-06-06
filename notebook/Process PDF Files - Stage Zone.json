@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "da7a75b8-bcb2-41bd-be47-7f39eefd1936"
+				"spark.autotune.trackingId": "89f71280-e8b1-4914-8bf8-a401ea04cd60"
 			}
 		},
 		"metadata": {
@@ -192,24 +192,6 @@
 					"# Cerrar el objeto StringIO\r\n",
 					"device.close()\r\n",
 					"retstr.close()"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"print(pdf_content)"
 				],
 				"execution_count": null
 			},
