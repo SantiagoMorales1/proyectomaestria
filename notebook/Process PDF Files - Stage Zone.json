@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5a0991a2-4dec-48b6-ab20-40a64cf77365"
+				"spark.autotune.trackingId": "7898ceed-f739-4646-b4d5-665cf9a16476"
 			}
 		},
 		"metadata": {
@@ -135,7 +135,7 @@
 					"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name\r\n",
 					"\r\n",
 					"#Ruta Destino\r\n",
-					"file_name = file_name.replace(\".pdf\", \".parquet\")\r\n",
+					"file_name = file_name.replace(\".pdf\", \"\")\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha"
 				],
 				"execution_count": null
