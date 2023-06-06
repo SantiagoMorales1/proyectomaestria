@@ -206,7 +206,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "64f68541-befc-44a4-90bd-1174a870c7d4"
+						"spark.autotune.trackingId": "e927be32-ff9b-4c26-989f-6fefe96ccf7b"
 					}
 				},
 				"metadata": {
@@ -424,7 +424,7 @@
 							"df_single_partition = pdf_content_df.coalesce(1)\r\n",
 							"\r\n",
 							"# Escribir arcihvo parquet y omitir archiov success\r\n",
-							"df.write.option(\"spark.sql.parquet.writeLegacyFormat\", \"true\").mode(\"overwrite\").parquet(path_sink + file_name)"
+							"df_single_partition.write.option(\"spark.sql.parquet.writeLegacyFormat\", \"true\").mode(\"overwrite\").parquet(path_sink + file_name)"
 						],
 						"outputs": [],
 						"execution_count": null
