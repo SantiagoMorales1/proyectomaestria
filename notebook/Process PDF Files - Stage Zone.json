@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "364f1882-8def-4ce8-b3cb-a505b2592c70"
+				"spark.autotune.trackingId": "26bc4ed2-e8b5-4656-b69c-d0ba2cb483ce"
 			}
 		},
 		"metadata": {
@@ -249,7 +249,7 @@
 					"df_single_partition = pdf_content_df.coalesce(1)\r\n",
 					"\r\n",
 					"# Write the DataFrame to the unique Parquet file without generating the success file\r\n",
-					"pdf_content_df.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(output_file_path)"
+					"pdf_content_df.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(pdf_path_sink)"
 				],
 				"execution_count": null
 			}
