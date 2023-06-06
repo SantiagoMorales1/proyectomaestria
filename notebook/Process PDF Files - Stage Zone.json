@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a1efcb6a-430e-4772-bc54-8a82e9b16e94"
+				"spark.autotune.trackingId": "99c3a080-99f9-4a3f-acb4-d41ef625eacf"
 			}
 		},
 		"metadata": {
@@ -104,13 +104,13 @@
 				},
 				"source": [
 					"#Capturar Parametros\r\n",
-					"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
-					"pdf_type = \"Tarjeta Credito\"\r\n",
-					"pdf_fecha = \"10012023\"\r\n",
-					"pdf_file = \"Extracto_7358651_202108_TARJETA_VISA_2166 (1).pdf\"\r\n",
-					"pdf_password = \"1233491047\""
+					"pdf_user = \"\"\r\n",
+					"pdf_type = \"\"\r\n",
+					"pdf_fecha = \"\"\r\n",
+					"pdf_file = \"\"\r\n",
+					"pdf_password = \"\""
 				],
-				"execution_count": 13
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
