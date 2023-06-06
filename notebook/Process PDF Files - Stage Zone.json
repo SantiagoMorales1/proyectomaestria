@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "52e78e91-feb3-465c-8207-aa995f96f446"
+				"spark.autotune.trackingId": "139f8396-70d4-4d9b-912c-7cc86cc793ef"
 			}
 		},
 		"metadata": {
@@ -232,9 +232,9 @@
 					"\r\n",
 					"# Crear un dataframe con la informaicon extraida\r\n",
 					"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
-					"uniquefile = content_df.coalesce(1)\r\n",
+					"\r\n",
 					"# Crear archivo  Parquet en el contendor\r\n",
-					"uniquefile.write.option(\"path\", pdf_path_sink).mode(\"overwrite\").save()\r\n",
+					"content_df.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(pdf_path_sink)\r\n",
 					""
 				],
 				"execution_count": null
