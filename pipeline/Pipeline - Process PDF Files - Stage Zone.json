@@ -16,12 +16,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "Reafing PDF Files - Stage Zone",
+						"referenceName": "Process PDF Files - Stage Zone",
 						"type": "NotebookReference"
 					},
 					"parameters": {
 						"primerparam": {
-							"value": ""
+							"value": "test",
+							"type": "string"
 						}
 					},
 					"snapshot": true,
