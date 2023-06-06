@@ -81,7 +81,7 @@
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
 						"recursive": true,
-						"wildcardFileName": "_SUCCESS",
+						"wildcardFileName": "*_SUCCESS",
 						"enablePartitionDiscovery": false
 					}
 				}
