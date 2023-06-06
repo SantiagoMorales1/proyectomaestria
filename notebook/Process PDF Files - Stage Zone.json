@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c0e92b25-e268-4e17-bc98-9ff30838b03f"
+				"spark.autotune.trackingId": "a1efcb6a-430e-4772-bc54-8a82e9b16e94"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,7 @@
 					"import io\r\n",
 					""
 				],
-				"execution_count": 3
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -84,7 +84,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 4
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -103,12 +103,38 @@
 					]
 				},
 				"source": [
-					"#Capturar variabes\r\n",
-					"\r\n",
-					"pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"#Capturar Parametros\r\n",
+					"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
+					"pdf_type = \"Tarjeta Credito\"\r\n",
+					"pdf_fecha = \"10012023\"\r\n",
+					"pdf_file = \"Extracto_7358651_202108_TARJETA_VISA_2166 (1).pdf\"\r\n",
 					"pdf_password = \"1233491047\""
 				],
-				"execution_count": 9
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Consolidar Variables\r\n",
+					"\r\n",
+					"#pdf_path = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"#@pdf_password\r\n",
+					"\r\n",
+					"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+pdf_file\r\n",
+					""
+				],
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -130,7 +156,7 @@
 					"# Leer the PDF file como bytes\r\n",
 					"pdf_bytes = spark.read \\\r\n",
 					"    .format(\"binaryFile\") \\\r\n",
-					"    .option(\"path\", pdf_path) \\\r\n",
+					"    .option(\"path\", pdf_path_origin) \\\r\n",
 					"    .load() \\\r\n",
 					"    .select(\"content\") \\\r\n",
 					"    .collect()[0][0]\r\n",
@@ -163,7 +189,25 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": 6
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"print(pdf_content)"
+				],
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
