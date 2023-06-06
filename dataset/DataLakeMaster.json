@@ -1,0 +1,17 @@
+{
+	"name": "DataLakeMaster",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "synapseproyectomaestria-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "stagedata"
+			}
+		}
+	}
+}
