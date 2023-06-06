@@ -206,7 +206,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d1b94ebf-4775-4def-89aa-6804089ca988"
+						"spark.autotune.trackingId": "34bb8cfc-f652-40f7-bb42-cc7c3dc6d753"
 					}
 				},
 				"metadata": {
@@ -427,7 +427,7 @@
 							"content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
 							"uniquefile = content_df.coalesce(1)\r\n",
 							"# Crear archivo  Parquet en el contendor\r\n",
-							"df.write.option(\"path\", pdf_path_sink).mode(\"overwrite\").save()\r\n",
+							"uniquefile.write.option(\"path\", pdf_path_sink).mode(\"overwrite\").save()\r\n",
 							""
 						],
 						"outputs": [],
