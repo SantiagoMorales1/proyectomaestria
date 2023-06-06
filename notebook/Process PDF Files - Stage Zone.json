@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bcf17126-f9f2-49fb-9fd9-7ad806634b7e"
+				"spark.autotune.trackingId": "9801f985-e168-402b-a3c1-00ece1ce8876"
 			}
 		},
 		"metadata": {
@@ -227,11 +227,29 @@
 					}
 				},
 				"source": [
+					"pdf_content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
 					"# Construct the output file path with the desired filename\r\n",
 					"output_file_path = pdf_path_sink + \"/\" + file_name\r\n",
 					"\r\n",
 					"# Write the DataFrame to the unique Parquet file without generating the success file\r\n",
-					"pdf_content.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(output_file_path)"
+					"pdf_content_df.write.option(\"spark.sql.sources.writeJobInfo.enabled\", \"false\").mode(\"overwrite\").parquet(output_file_path)"
 				],
 				"execution_count": null
 			}
