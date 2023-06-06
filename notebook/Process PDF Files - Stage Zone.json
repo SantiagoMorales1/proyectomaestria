@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5f3e93b0-ef01-4359-9d62-646fc1c4be82"
+				"spark.autotune.trackingId": "73691082-63ca-4139-9b03-d62ea99987af"
 			}
 		},
 		"metadata": {
@@ -249,13 +249,10 @@
 					}
 				},
 				"source": [
-					"# Delete sucees file\r\n",
-					"success_file_path = path_sink+\"/\"+ \"_SUCCESS\"\r\n",
-					"\r\n",
-					"# Delete the _SUCCESS file\r\n",
-					"dbutils.fs.rm(success_file_path)"
+					"# Delete the file\r\n",
+					"dbutils.fs.rm(\"wasbs://stagefiles@\" + spark.conf.get(\"spark.master\") + path_sink + \"_SUCCESS\" , True)"
 				],
-				"execution_count": null
+				"execution_count": 25
 			}
 		]
 	}
