@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9305da30-4ca6-4a0b-a74b-d660c2551937"
+				"spark.autotune.trackingId": "0c2c99a2-8ecd-4c3b-b0ae-50aba41c68b1"
 			}
 		},
 		"metadata": {
@@ -210,10 +210,10 @@
 				},
 				"source": [
 					"# Crear dataframe\r\n",
-					"pdf_content_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
+					"pdf_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
 					"\r\n",
 					"# crear parquet file\r\n",
-					"df_single_partition.write.mode(\"overwrite\").parquet(path_sink)"
+					"pdf_df.write.mode(\"overwrite\").parquet(path_sink)"
 				],
 				"execution_count": null
 			}
