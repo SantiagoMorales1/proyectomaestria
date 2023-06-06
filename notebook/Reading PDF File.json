@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9946b79d-25f7-47b6-8f3a-b6d2da810944"
+				"spark.autotune.trackingId": "34d950f3-745c-4946-9505-29a5bbda55ea"
 			}
 		},
 		"metadata": {
@@ -59,7 +59,8 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"tags": []
 				},
 				"source": [
 					"#Procesamiento con PyPDF2\r\n",
