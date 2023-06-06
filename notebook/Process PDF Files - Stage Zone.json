@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "462ee3f1-db52-471d-9c2d-15b33b75a293"
+				"spark.autotune.trackingId": "7ed231a9-3e45-4884-9f13-e5864ad9e367"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,7 @@
 					"import io\r\n",
 					""
 				],
-				"execution_count": 9
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -84,7 +84,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 10
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -110,7 +110,7 @@
 					"pdf_file = \"\"\r\n",
 					"pdf_password = \"\""
 				],
-				"execution_count": 18
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -135,7 +135,7 @@
 					"pdf_file = pdf_file.replace(\".pdf\", \".Parquet\")\r\n",
 					"pdf_path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+pdf_file"
 				],
-				"execution_count": 20
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -190,7 +190,7 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": 15
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -208,7 +208,7 @@
 				"source": [
 					"print(pdf_content)"
 				],
-				"execution_count": 17
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -235,7 +235,7 @@
 					"content_df.write.mode(\"overwrite\").parquet(pdf_path_sink)\r\n",
 					""
 				],
-				"execution_count": 8
+				"execution_count": null
 			}
 		]
 	}
