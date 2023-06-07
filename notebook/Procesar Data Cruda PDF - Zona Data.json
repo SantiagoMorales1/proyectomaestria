@@ -1,6 +1,9 @@
 {
 	"name": "Procesar Data Cruda PDF - Zona Data",
 	"properties": {
+		"folder": {
+			"name": "LecturaScripts"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1b46c31f-43f8-4fac-b3ef-8755d6fdf8b9"
+				"spark.autotune.trackingId": "7f21b3bd-1e7f-47bb-bc0a-461fa39753a1"
 			}
 		},
 		"metadata": {
