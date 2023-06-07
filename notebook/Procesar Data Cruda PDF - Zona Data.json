@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7f21b3bd-1e7f-47bb-bc0a-461fa39753a1"
+				"spark.autotune.trackingId": "a7062dd4-ac30-4708-ae59-87ea81728c6b"
 			}
 		},
 		"metadata": {
@@ -85,8 +85,7 @@
 				"source": [
 					"#Obtener Datos para Tarjeta Credito\r\n",
 					"\r\n",
-					"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/*.parquet', format='parquet')\r\n",
-					""
+					"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/*.parquet', format='parquet')"
 				],
 				"execution_count": 66
 			},
