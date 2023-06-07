@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebook": {
-						"referenceName": "Process PDF Files - Stage Zone",
+						"referenceName": "Procesar Archivos PDF - Zona Stage",
 						"type": "NotebookReference"
 					},
 					"parameters": {
