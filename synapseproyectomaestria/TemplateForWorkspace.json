@@ -41,7 +41,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebook": {
-								"referenceName": "Process PDF Files - Stage Zone",
+								"referenceName": "Procesar Archivos PDF - Zona Stage",
 								"type": "NotebookReference"
 							},
 							"parameters": {
@@ -58,7 +58,7 @@
 									"type": "string"
 								},
 								"file_name": {
-									"value": "Extracto_7358651_202108_TARJETA_VISA_2166 (1).pdf",
+									"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
 									"type": "string"
 								},
 								"pdf_password": {
@@ -73,9 +73,12 @@
 							},
 							"executorSize": "Small",
 							"conf": {
-								"spark.dynamicAllocation.enabled": true
+								"spark.dynamicAllocation.enabled": false,
+								"spark.dynamicAllocation.minExecutors": 1,
+								"spark.dynamicAllocation.maxExecutors": 1
 							},
-							"driverSize": "Small"
+							"driverSize": "Small",
+							"numExecutors": 1
 						}
 					},
 					{
@@ -120,9 +123,31 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/notebooks/Process PDF Files - Stage Zone')]",
+				"[concat(variables('workspaceId'), '/notebooks/Procesar Archivos PDF - Zona Stage')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/spproymaestria')]",
 				"[concat(variables('workspaceId'), '/datasets/DataLakeMaster')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DataLakeMaster')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapseproyectomaestria-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "stagedata"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapseproyectomaestria-WorkspaceDefaultStorage')]"
 			]
 		},
 		{
@@ -218,7 +243,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Process PDF Files - Stage Zone')]",
+			"name": "[concat(parameters('workspaceName'), '/Procesar Archivos PDF - Zona Stage')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -241,7 +266,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "4c5d53b5-a22c-4f03-b7dd-7e27635701f0"
+						"spark.autotune.trackingId": "5fc056a0-0d92-4c0c-bed8-8b7a2434d327"
 					}
 				},
 				"metadata": {
@@ -441,6 +466,419 @@
 							"\r\n",
 							"# crear parquet file\r\n",
 							"pdf_df.write.mode(\"overwrite\").parquet(path_sink)"
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Procesar Data Cruda PDF - Zona Data')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "LecturaScripts"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "spproymaestria",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "a7062dd4-ac30-4708-ae59-87ea81728c6b"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Synapse/workspaces/synapseproyectomaestria/bigDataPools/spproymaestria",
+						"name": "spproymaestria",
+						"type": "Spark",
+						"endpoint": "https://synapseproyectomaestria.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spproymaestria",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.3",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"collapsed": false
+						},
+						"source": [
+							"#Importar Librerias Necesarias\r\n",
+							"\r\n",
+							"from pyspark.sql.functions import split\r\n",
+							"from pyspark.sql.functions import col\r\n",
+							"from pyspark.sql.functions import size\r\n",
+							"from pyspark.sql.functions import explode\r\n",
+							"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 192
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"#Obtener Datos para Tarjeta Credito\r\n",
+							"\r\n",
+							"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/*.parquet', format='parquet')"
+						],
+						"outputs": [],
+						"execution_count": 66
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Dividir los valores por salto de linea\r\n",
+							"\r\n",
+							"df_split = df.withColumn(\"contenido\", split(df[\"contenido\"], \"\\n\"))\r\n",
+							"\r\n",
+							"# Transformar la columna array para crear una nueva fila por cada elemento\r\n",
+							"df_fromated = df_split.select(explode(\"contenido\").alias(\"contenido\"))\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 129
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#ObtenerInfomraicon de Cliente\r\n",
+							"\r\n",
+							"Nombre = df_fromated.collect()[1].asDict()[\"contenido\"]\r\n",
+							"Direccion = df_fromated.collect()[3].asDict()[\"contenido\"]\r\n",
+							"Ciudad_1 = df_fromated.collect()[4].asDict()[\"contenido\"]\r\n",
+							"Ciudad_2 = df_fromated.collect()[5].asDict()[\"contenido\"]\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 130
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Obtener Informacion de Prodcuto\r\n",
+							"\r\n",
+							"TipoProducto = 'Tarjeta Credito'\r\n",
+							"CupoTotal =  df_fromated.collect()[54].asDict()[\"contenido\"]\r\n",
+							"NumeroTarjeta = df_fromated.collect()[23].asDict()[\"contenido\"]\r\n",
+							"TasaInteresMVCompra1Mes = df_fromated.collect()[93].asDict()[\"contenido\"]\r\n",
+							"TasaInteresMVCompra2MesOMas = df_fromated.collect()[94].asDict()[\"contenido\"]\r\n",
+							"TasaInteresMVImpuestos = df_fromated.collect()[95].asDict()[\"contenido\"]\r\n",
+							"TasaInteresMVAvances = df_fromated.collect()[96].asDict()[\"contenido\"]\r\n",
+							"TasaInteresMVMora = df_fromated.collect()[97].asDict()[\"contenido\"]\r\n",
+							"TasaInteresEACompra1Mes = df_fromated.collect()[99].asDict()[\"contenido\"]\r\n",
+							"TasaInteresEACompra2MesOMas =df_fromated.collect()[100].asDict()[\"contenido\"]\r\n",
+							"TasaInteresEAImpuestos = df_fromated.collect()[101].asDict()[\"contenido\"]\r\n",
+							"TasaInteresEAAvances = df_fromated.collect()[102].asDict()[\"contenido\"]\r\n",
+							"TasaInteresEAMora = df_fromated.collect()[103].asDict()[\"contenido\"]\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 134
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Definir estructura para Informacion de ID Transaccion\r\n",
+							"\r\n",
+							"schema1 = StructType([\r\n",
+							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+							"    StructField(\"IdTransaccion\", StringType(), nullable=True)\r\n",
+							"])\r\n",
+							"\r\n",
+							"df_idTransacciones = spark.createDataFrame([], schema1)\r\n",
+							"ArrayIdTransacciones = []\r\n",
+							"\r\n",
+							"\r\n",
+							"#Definir estructura para fecha Transaccion\r\n",
+							"\r\n",
+							"schema2 = StructType([\r\n",
+							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+							"    StructField(\"FechaTransaccion\", StringType(), nullable=True)\r\n",
+							"])\r\n",
+							"\r\n",
+							"df_FechaTransacciones = spark.createDataFrame([], schema2)\r\n",
+							"ArrayFechaTransacciones = []\r\n",
+							"\r\n",
+							"\r\n",
+							"#Definir estructura para fecha Descripciones\r\n",
+							"\r\n",
+							"schema3 = StructType([\r\n",
+							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+							"    StructField(\"DescripcionTransaccion\", StringType(), nullable=True)\r\n",
+							"])\r\n",
+							"\r\n",
+							"df_DescripcionTransacciones = spark.createDataFrame([], schema3)\r\n",
+							"ArrayDescripcionTransacciones = []\r\n",
+							"\r\n",
+							"\r\n",
+							"#Definir estructura para Costo transaccion\r\n",
+							"\r\n",
+							"schema4 = StructType([\r\n",
+							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+							"    StructField(\"CostoTransaccion\", DoubleType(), nullable=True)\r\n",
+							"])\r\n",
+							"\r\n",
+							"df_CostoTransacciones = spark.createDataFrame([], schema4)\r\n",
+							"ArrayCostoTransacciones = []\r\n",
+							"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 203
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Obtener informaicon de transacciones\r\n",
+							"\r\n",
+							"obtenerIDDataTranscciones = False\r\n",
+							"obtenerFechaTranscciones = False\r\n",
+							"obtenerDescripcionTranscciones = False\r\n",
+							"obtenerCostoTranscciones = False\r\n",
+							"\r\n",
+							"iteradorIDDataTranscciones = 1\r\n",
+							"iteradorFechaDataTranscciones = 1\r\n",
+							"iteradorDescripcionTranscciones = 1\r\n",
+							"iteradorCostoTranscciones = 1\r\n",
+							"\r\n",
+							"for row in df_fromated.collect():\r\n",
+							"    \r\n",
+							"    if (obtenerIDDataTranscciones == True):\r\n",
+							"        if (row[\"contenido\"] == \"\"):\r\n",
+							"             obtenerIDDataTranscciones = False\r\n",
+							"        else:\r\n",
+							"            ArrayIdTransacciones.append((iteradorIDDataTranscciones, row[\"contenido\"]))\r\n",
+							"            iteradorIDDataTranscciones = iteradorIDDataTranscciones + 1\r\n",
+							"\r\n",
+							"    if (obtenerFechaTranscciones == True):\r\n",
+							"        if (row[\"contenido\"] == \"\"):\r\n",
+							"            obtenerFechaTranscciones = False\r\n",
+							"        else:\r\n",
+							"            ArrayFechaTransacciones.append((iteradorFechaDataTranscciones, row[\"contenido\"]))\r\n",
+							"            iteradorFechaDataTranscciones = iteradorFechaDataTranscciones + 1\r\n",
+							"\r\n",
+							"    if (obtenerDescripcionTranscciones == True):\r\n",
+							"        if (row[\"contenido\"] == \"\" and iteradorDescripcionTranscciones != 1):\r\n",
+							"            obtenerDescripcionTranscciones = False\r\n",
+							"            obtenerCostoTranscciones = True\r\n",
+							"        else:\r\n",
+							"            if row[\"contenido\"] != \"\":\r\n",
+							"                ArrayDescripcionTransacciones.append((iteradorDescripcionTranscciones, row[\"contenido\"]))\r\n",
+							"                iteradorDescripcionTranscciones = iteradorDescripcionTranscciones + 1\r\n",
+							"\r\n",
+							"    if (obtenerCostoTranscciones == True):\r\n",
+							"        if (row[\"contenido\"] == \"\" and iteradorCostoTranscciones != 1):\r\n",
+							"            obtenerCostoTranscciones = False\r\n",
+							"        else:\r\n",
+							"            if row[\"contenido\"] != \"\":\r\n",
+							"                Valor = row[\"contenido\"]\r\n",
+							"                Valor = Valor.replace(\",\", \"\")\r\n",
+							"                if \"-\" in Valor:\r\n",
+							"                    Valor = Valor.replace(\"-\", \"\")                    \r\n",
+							"                    Valor = \"-\"+Valor\r\n",
+							"                Valor = float(Valor)\r\n",
+							"                ArrayCostoTransacciones.append((iteradorDescripcionTranscciones, Valor))\r\n",
+							"                iteradorCostoTranscciones = iteradorCostoTranscciones + 1\r\n",
+							"\r\n",
+							"    if (row[\"contenido\"] == \"Autorización\"):\r\n",
+							"        obtenerIDDataTranscciones = True\r\n",
+							"\r\n",
+							"    if (row[\"contenido\"] == \"Transacción\"):\r\n",
+							"        obtenerFechaTranscciones = True\r\n",
+							"\r\n",
+							"    if (row[\"contenido\"] == \"Valor Original\"):\r\n",
+							"        obtenerDescripcionTranscciones = True\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 204
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Crear dataframes\r\n",
+							"\r\n",
+							"df_idTransacciones = spark.createDataFrame(ArrayIdTransacciones, schema1)\r\n",
+							"df_FechaTransacciones = spark.createDataFrame(ArrayFechaTransacciones, schema2)\r\n",
+							"df_DescripcionTransacciones = spark.createDataFrame(ArrayDescripcionTransacciones, schema3)\r\n",
+							"df_CostoTransacciones = spark.createDataFrame(ArrayCostoTransacciones, schema4)"
+						],
+						"outputs": [],
+						"execution_count": 205
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_idTransacciones.show()\r\n",
+							"df_FechaTransacciones.show()\r\n",
+							"df_DescripcionTransacciones.show()\r\n",
+							"df_CostoTransacciones.show()"
+						],
+						"outputs": [],
+						"execution_count": 206
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Iterate over the elements in the array\r\n",
+							"for row in df_fromated.collect():\r\n",
+							"    #if (row[\"contenido\"] == \"Autorización\"):\r\n",
+							"        print(row[\"contenido\"])\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 155
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
 						],
 						"outputs": [],
 						"execution_count": null
@@ -762,18 +1200,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "eastus2"
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/spproymaestria')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -794,7 +1220,7 @@
 				"libraryRequirements": {
 					"content": "name: proyectomaestiraenv\r\nchannels:\r\n- defaults\r\ndependencies:\r\n- pip:\r\n  - Tika\r\n  - PyPDF2\r\n  - pdfminer",
 					"filename": "enviroment.yml",
-					"time": "2023-05-31T05:18:23.8262921Z"
+					"time": "2023-06-06T05:12:59.1874798Z"
 				},
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": true,
@@ -804,26 +1230,16 @@
 			"location": "eastus2"
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/DataLakeMaster')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
+			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "synapseproyectomaestria-WorkspaceDefaultStorage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileSystem": "stagedata"
-					}
-				}
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
 			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/synapseproyectomaestria-WorkspaceDefaultStorage')]"
-			]
+			"dependsOn": [],
+			"location": "eastus2"
 		}
 	]
 }
