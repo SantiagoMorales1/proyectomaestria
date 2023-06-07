@@ -1,5 +1,5 @@
 {
-	"name": "Notebook 1",
+	"name": "Processar Data Cruda PDF",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8affa071-ebd8-4cdc-8699-2300694fb55d"
+				"spark.autotune.trackingId": "a60cd238-285b-451a-9e4d-fe725ea2e4ad"
 			}
 		},
 		"metadata": {
@@ -60,10 +60,10 @@
 					"from pyspark.sql.functions import col\r\n",
 					"from pyspark.sql.functions import size\r\n",
 					"from pyspark.sql.functions import explode\r\n",
-					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType\r\n",
+					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType\r\n",
 					""
 				],
-				"execution_count": 151
+				"execution_count": 156
 			},
 			{
 				"cell_type": "markdown",
@@ -195,18 +195,39 @@
 					}
 				},
 				"source": [
-					"\r\n",
-					"schema = StructType([\r\n",
-					"    StructField(\"id\", StringType(), nullable=True),\r\n",
-					"    StructField(\"IdTransaccion\", IntegerType(), nullable=True)\r\n",
+					"#Definir estructura para informaicon de ID Transaccion\r\n",
+					"schema1 = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"IdTransaccion\", StringType(), nullable=True)\r\n",
 					"])\r\n",
 					"\r\n",
-					"df_idtransacciones = spark.createDataFrame([], schema)\r\n",
-					"arraytransacciones = []\r\n",
+					"df_idTransacciones = spark.createDataFrame([], schema1)\r\n",
+					"ArrayIdTransacciones = []\r\n",
+					"\r\n",
+					"\r\n",
+					"#Definir estructura para fecha Transaccion\r\n",
+					"schema2 = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"FechaTransaccion\", StringType(), nullable=True)\r\n",
+					"])\r\n",
+					"\r\n",
+					"df_FechaTransacciones = spark.createDataFrame([], schema2)\r\n",
+					"ArrayFechaTransacciones = []\r\n",
+					"\r\n",
+					"\r\n",
+					"#Definir estructura para fecha Descripciones\r\n",
+					"schema3 = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"DescripcionTransaccion\", StringType(), nullable=True)\r\n",
+					"])\r\n",
+					"\r\n",
+					"df_DescripcionTransacciones = spark.createDataFrame([], schema3)\r\n",
+					"ArrayDescripcionTransacciones = []\r\n",
+					"\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": 152
+				"execution_count": 186
 			},
 			{
 				"cell_type": "code",
@@ -222,21 +243,92 @@
 					}
 				},
 				"source": [
-					"obtenerData = False\r\n",
-					"iterador = 1\r\n",
+					"obtenerIDDataTranscciones = False\r\n",
+					"obtenerFechaTranscciones = False\r\n",
+					"obtenerDescripcionTranscciones = False\r\n",
+					"\r\n",
+					"iteradorIDDataTranscciones = 1\r\n",
+					"iteradorFechaDataTranscciones = 1\r\n",
+					"iteradorDescripcionTranscciones = 1\r\n",
 					"\r\n",
 					"for row in df_fromated.collect():\r\n",
 					"    \r\n",
-					"    if (obtenerData == True):\r\n",
-					"        arraytransacciones.append(iterador, row[\"contenido\"])\r\n",
+					"    if (obtenerIDDataTranscciones == True):\r\n",
+					"        if (row[\"contenido\"] == \"\"):\r\n",
+					"             obtenerIDDataTranscciones = False\r\n",
+					"        else:\r\n",
+					"            ArrayIdTransacciones.append((iteradorIDDataTranscciones, row[\"contenido\"]))\r\n",
+					"            iteradorIDDataTranscciones = iteradorIDDataTranscciones + 1\r\n",
+					"\r\n",
+					"    if (obtenerFechaTranscciones == True):\r\n",
+					"        if (row[\"contenido\"] == \"\"):\r\n",
+					"            obtenerFechaTranscciones = False\r\n",
+					"        else:\r\n",
+					"            ArrayFechaTransacciones.append((iteradorFechaDataTranscciones, row[\"contenido\"]))\r\n",
+					"            iteradorFechaDataTranscciones = iteradorFechaDataTranscciones + 1\r\n",
+					"\r\n",
+					"    if (obtenerDescripcionTranscciones == True):\r\n",
+					"        if (row[\"contenido\"] == \"\" and iteradorDescripcionTranscciones != 1):\r\n",
+					"            obtenerDescripcionTranscciones = False\r\n",
+					"        else:\r\n",
+					"            if row[\"contenido\"] != \"\":\r\n",
+					"                ArrayDescripcionTransacciones.append((iteradorDescripcionTranscciones, row[\"contenido\"]))\r\n",
+					"                iteradorDescripcionTranscciones = iteradorDescripcionTranscciones + 1\r\n",
 					"\r\n",
 					"    if (row[\"contenido\"] == \"Autorización\"):\r\n",
-					"        obtenerData = True\r\n",
+					"        obtenerIDDataTranscciones = True\r\n",
 					"\r\n",
-					"    if (row[\"contenido\"] == \"Autorización\"):       \r\n",
+					"    if (row[\"contenido\"] == \"Transacción\"):\r\n",
+					"        obtenerFechaTranscciones = True\r\n",
+					"\r\n",
+					"    if (row[\"contenido\"] == \"Valor Original\"):\r\n",
+					"        obtenerDescripcionTranscciones = True\r\n",
+					"\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 187
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Crear dataframes\r\n",
+					"\r\n",
+					"df_idTransacciones = spark.createDataFrame(ArrayIdTransacciones, schema1)\r\n",
+					"df_FechaTransacciones = spark.createDataFrame(ArrayFechaTransacciones, schema2)\r\n",
+					"df_DescripcionTransacciones = spark.createDataFrame(ArrayDescripcionTransacciones, schema3)"
+				],
+				"execution_count": 188
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_idTransacciones.show()\r\n",
+					"df_FechaTransacciones.show()\r\n",
+					"df_DescripcionTransacciones.show()"
+				],
+				"execution_count": 189
 			},
 			{
 				"cell_type": "code",
