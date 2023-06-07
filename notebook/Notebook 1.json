@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5da7c913-cce8-429d-b767-888616dcdd82"
+				"spark.autotune.trackingId": "8affa071-ebd8-4cdc-8699-2300694fb55d"
 			}
 		},
 		"metadata": {
@@ -60,9 +60,10 @@
 					"from pyspark.sql.functions import col\r\n",
 					"from pyspark.sql.functions import size\r\n",
 					"from pyspark.sql.functions import explode\r\n",
+					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType\r\n",
 					""
 				],
-				"execution_count": 85
+				"execution_count": 151
 			},
 			{
 				"cell_type": "markdown",
@@ -195,14 +196,47 @@
 				},
 				"source": [
 					"\r\n",
-					"FirsPosition = df.select(\"contenido\").filter(col(\"contenido\") = \"\")\r\n",
+					"schema = StructType([\r\n",
+					"    StructField(\"id\", StringType(), nullable=True),\r\n",
+					"    StructField(\"IdTransaccion\", IntegerType(), nullable=True)\r\n",
+					"])\r\n",
 					"\r\n",
-					"\r\n",
-					"\r\n",
+					"df_idtransacciones = spark.createDataFrame([], schema)\r\n",
+					"arraytransacciones = []\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": 141
+				"execution_count": 152
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"obtenerData = False\r\n",
+					"iterador = 1\r\n",
+					"\r\n",
+					"for row in df_fromated.collect():\r\n",
+					"    \r\n",
+					"    if (obtenerData == True):\r\n",
+					"        arraytransacciones.append(iterador, row[\"contenido\"])\r\n",
+					"\r\n",
+					"    if (row[\"contenido\"] == \"Autorización\"):\r\n",
+					"        obtenerData = True\r\n",
+					"\r\n",
+					"    if (row[\"contenido\"] == \"Autorización\"):       \r\n",
+					""
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -220,8 +254,26 @@
 				"source": [
 					"# Iterate over the elements in the array\r\n",
 					"for row in df_fromated.collect():\r\n",
-					"    if (row[\"contenido\"] == \"Autorización\"):\r\n",
+					"    #if (row[\"contenido\"] == \"Autorización\"):\r\n",
 					"        print(row[\"contenido\"])\r\n",
+					""
+				],
+				"execution_count": 155
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
 					""
 				],
 				"execution_count": null
