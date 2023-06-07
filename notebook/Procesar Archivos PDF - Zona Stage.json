@@ -1,5 +1,5 @@
 {
-	"name": "Process PDF Files - Stage Zone",
+	"name": "Procesar Archivos PDF - Zona Stage",
 	"properties": {
 		"folder": {
 			"name": "LecturaScripts"
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0c2c99a2-8ecd-4c3b-b0ae-50aba41c68b1"
+				"spark.autotune.trackingId": "e88da22a-ccb7-4d9b-aca8-108a98b42f4e"
 			}
 		},
 		"metadata": {
