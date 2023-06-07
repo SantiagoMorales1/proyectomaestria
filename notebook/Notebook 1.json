@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d83e9d93-4f23-49ec-a1fb-64c0bddf978b"
+				"spark.autotune.trackingId": "5da7c913-cce8-429d-b767-888616dcdd82"
 			}
 		},
 		"metadata": {
@@ -54,37 +54,50 @@
 					"collapsed": false
 				},
 				"source": [
+					"#Importar Librerias Necesarias\r\n",
 					"\r\n",
-					"df = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/*.parquet', format='parquet')\r\n",
-					"display(df.limit(10))\r\n",
-					""
-				],
-				"execution_count": 12
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
 					"from pyspark.sql.functions import split\r\n",
-					"\r\n",
-					"# Assuming you have a DataFrame named 'df' with a column named 'file_name' containing values separated by line breaks\r\n",
-					"\r\n",
-					"# Split the values in the 'file_name' column by line breaks\r\n",
-					"df_with_split = df.withColumn(\"file_name_list\", split(df[\"contenido\"], \"\\n\"))\r\n",
-					"\r\n",
+					"from pyspark.sql.functions import col\r\n",
+					"from pyspark.sql.functions import size\r\n",
+					"from pyspark.sql.functions import explode\r\n",
 					""
 				],
-				"execution_count": 24
+				"execution_count": 85
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"#Obtener Datos para Tarjeta Credito\r\n",
+					"\r\n",
+					"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/*.parquet', format='parquet')\r\n",
+					""
+				],
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -100,9 +113,118 @@
 					}
 				},
 				"source": [
-					"df_with_split.show(truncate=False)"
+					"# Dividir los vlaores por salto de linea\r\n",
+					"\r\n",
+					"df_split = df.withColumn(\"contenido\", split(df[\"contenido\"], \"\\n\"))\r\n",
+					"\r\n",
+					"# Transformar la columna array para crear una nueva fila por cada elemento\r\n",
+					"df_fromated = df_split.select(explode(\"contenido\").alias(\"contenido\"))\r\n",
+					""
 				],
-				"execution_count": 26
+				"execution_count": 129
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#ObtenerInfomraicon de Cliente\r\n",
+					"\r\n",
+					"Nombre = df_fromated.collect()[1].asDict()[\"contenido\"]\r\n",
+					"Direccion = df_fromated.collect()[3].asDict()[\"contenido\"]\r\n",
+					"Ciudad_1 = df_fromated.collect()[4].asDict()[\"contenido\"]\r\n",
+					"Ciudad_2 = df_fromated.collect()[5].asDict()[\"contenido\"]\r\n",
+					""
+				],
+				"execution_count": 130
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Obtener Informacion de Prodcuto\r\n",
+					"\r\n",
+					"TipoProducto = 'Tarjeta Credito'\r\n",
+					"CupoTotal =  df_fromated.collect()[54].asDict()[\"contenido\"]\r\n",
+					"NumeroTarjeta = df_fromated.collect()[23].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVCompra1Mes = df_fromated.collect()[93].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVCompra2MesOMas = df_fromated.collect()[94].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVImpuestos = df_fromated.collect()[95].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVAvances = df_fromated.collect()[96].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVMora = df_fromated.collect()[97].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEACompra1Mes = df_fromated.collect()[99].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEACompra2MesOMas =df_fromated.collect()[100].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEAImpuestos = df_fromated.collect()[101].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEAAvances = df_fromated.collect()[102].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEAMora = df_fromated.collect()[103].asDict()[\"contenido\"]\r\n",
+					""
+				],
+				"execution_count": 134
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"\r\n",
+					"FirsPosition = df.select(\"contenido\").filter(col(\"contenido\") = \"\")\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					""
+				],
+				"execution_count": 141
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Iterate over the elements in the array\r\n",
+					"for row in df_fromated.collect():\r\n",
+					"    if (row[\"contenido\"] == \"Autorización\"):\r\n",
+					"        print(row[\"contenido\"])\r\n",
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}
