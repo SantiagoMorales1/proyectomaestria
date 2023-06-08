@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "544aab63-ebab-476b-a9fa-ff068eb35154"
+				"spark.autotune.trackingId": "236fcc6b-73be-4c46-b0a1-a7469b12f26f"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					""
 				],
-				"execution_count": 2
+				"execution_count": 174
 			},
 			{
 				"cell_type": "code",
@@ -85,7 +85,7 @@
 					"#Configurar parametros aqui\r\n",
 					""
 				],
-				"execution_count": 3
+				"execution_count": 175
 			},
 			{
 				"cell_type": "code",
@@ -106,7 +106,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/Raw/*.parquet', format='parquet')"
 				],
-				"execution_count": 4
+				"execution_count": 176
 			},
 			{
 				"cell_type": "code",
@@ -130,7 +130,7 @@
 					"df_fromated = df_split.select(explode(\"contenido\").alias(\"contenido\"))\r\n",
 					""
 				],
-				"execution_count": 5
+				"execution_count": 177
 			},
 			{
 				"cell_type": "code",
@@ -146,7 +146,7 @@
 					}
 				},
 				"source": [
-					"# Obtener Infomraicon de Cliente\r\n",
+					"# Obtener Informacion de Cliente\r\n",
 					"\r\n",
 					"Nombre = df_fromated.collect()[1].asDict()[\"contenido\"]\r\n",
 					"Direccion = df_fromated.collect()[3].asDict()[\"contenido\"]\r\n",
@@ -154,7 +154,7 @@
 					"Ciudad_2 = df_fromated.collect()[5].asDict()[\"contenido\"]\r\n",
 					""
 				],
-				"execution_count": 6
+				"execution_count": 178
 			},
 			{
 				"cell_type": "code",
@@ -187,7 +187,7 @@
 					"TasaInteresEAMora = df_fromated.collect()[103].asDict()[\"contenido\"]\r\n",
 					""
 				],
-				"execution_count": 7
+				"execution_count": 179
 			},
 			{
 				"cell_type": "code",
@@ -304,7 +304,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 152
+				"execution_count": 180
 			},
 			{
 				"cell_type": "code",
@@ -476,7 +476,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 153
+				"execution_count": 181
 			},
 			{
 				"cell_type": "code",
@@ -506,7 +506,7 @@
 					"    iteradorTasaFacturada = iteradorTasaFacturada + 1  \r\n",
 					""
 				],
-				"execution_count": 154
+				"execution_count": 182
 			},
 			{
 				"cell_type": "code",
@@ -534,7 +534,7 @@
 					"df_SaldoADiferir = spark.createDataFrame(ArraySaldoADiferir, schema8)\r\n",
 					"df_Cuotas = spark.createDataFrame(ArrayCuotas, schema9)"
 				],
-				"execution_count": 155
+				"execution_count": 183
 			},
 			{
 				"cell_type": "code",
@@ -560,7 +560,7 @@
 					"#df_SaldoADiferir.show()\r\n",
 					"#df_Cuotas.show()"
 				],
-				"execution_count": 173
+				"execution_count": 184
 			},
 			{
 				"cell_type": "code",
@@ -599,7 +599,7 @@
 					"                        )\r\n",
 					""
 				],
-				"execution_count": 171
+				"execution_count": 185
 			},
 			{
 				"cell_type": "code",
@@ -617,7 +617,7 @@
 				"source": [
 					"df_Transacciones.show()"
 				],
-				"execution_count": 172
+				"execution_count": 186
 			},
 			{
 				"cell_type": "code",
