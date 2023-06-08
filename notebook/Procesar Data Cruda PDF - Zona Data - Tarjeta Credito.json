@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "815f8d3b-617c-4363-a155-1e73f27f8907"
+				"spark.autotune.trackingId": "b993610d-20b6-4296-9e64-87a74df983b5"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					""
 				],
-				"execution_count": 24
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -85,7 +85,7 @@
 					"#Configurar parametros aqui\r\n",
 					""
 				],
-				"execution_count": 25
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -106,7 +106,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/Raw/*.parquet', format='parquet')"
 				],
-				"execution_count": 26
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -130,7 +130,7 @@
 					"df_fromated = df_split.select(explode(\"contenido\").alias(\"contenido\"))\r\n",
 					""
 				],
-				"execution_count": 27
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -154,7 +154,7 @@
 					"Ciudad_2 = df_fromated.collect()[5].asDict()[\"contenido\"]\r\n",
 					""
 				],
-				"execution_count": 28
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -187,7 +187,7 @@
 					"TasaInteresEAMora = df_fromated.collect()[103].asDict()[\"contenido\"]\r\n",
 					""
 				],
-				"execution_count": 33
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -254,13 +254,75 @@
 					"    StructField(\"TasaPactada\", DoubleType(), nullable=True)\r\n",
 					"])\r\n",
 					"\r\n",
-					"df_TasaPactada = spark.createDataFrame([], schema4)\r\n",
+					"df_TasaPactada = spark.createDataFrame([], schema5)\r\n",
 					"ArrayTasaPactada = []\r\n",
+					"\r\n",
+					"\r\n",
+					"# Definir estructura para Tasa Facturada\r\n",
+					"\r\n",
+					"schema6 = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"TasaFacturada\", DoubleType(), nullable=True)\r\n",
+					"])\r\n",
+					"\r\n",
+					"df_TasaFacturada = spark.createDataFrame([], schema6)\r\n",
+					"ArrayTasaFacturada = []\r\n",
+					"\r\n",
+					"\r\n",
+					"# Definir estructura para Cargos y Abonos\r\n",
+					"\r\n",
+					"schema7 = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"CargosYAbonos\", DoubleType(), nullable=True)\r\n",
+					"])\r\n",
+					"\r\n",
+					"df_CargosYAbonos = spark.createDataFrame([], schema7)\r\n",
+					"ArrayCargosYAbonos = []\r\n",
+					"\r\n",
+					"\r\n",
+					"# Definir estructura Saldo A Diferir\r\n",
+					"\r\n",
+					"schema8 = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"SaldoADiferir\", DoubleType(), nullable=True)\r\n",
+					"])\r\n",
+					"\r\n",
+					"df_SaldoADiferir = spark.createDataFrame([], schema8)\r\n",
+					"ArraySaldoADiferir = []\r\n",
+					"\r\n",
+					"\r\n",
+					"# Definir estructura Cuotas\r\n",
+					"\r\n",
+					"schema9 = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"Cuotas\", StringType(), nullable=True)\r\n",
+					"])\r\n",
+					"\r\n",
+					"df_Cuotas = spark.createDataFrame([], schema9)\r\n",
+					"ArrayCuotas = []\r\n",
 					"\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": 34
+				"execution_count": 144
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -283,12 +345,20 @@
 					"obtenerDescripcionTranscciones = False\r\n",
 					"obtenerCostoTranscciones = False\r\n",
 					"obtenerTasaPactada = False\r\n",
+					"obtenerTasaFacturada = False\r\n",
+					"obtenerCargosYAbonos = False\r\n",
+					"obtenerSaldoADiferir = False\r\n",
+					"obtenerCuotas = False\r\n",
 					"\r\n",
 					"iteradorIDDataTranscciones = 1\r\n",
 					"iteradorFechaDataTranscciones = 1\r\n",
 					"iteradorDescripcionTranscciones = 1\r\n",
 					"iteradorCostoTranscciones = 1\r\n",
 					"iteradorTasaPactada = 1\r\n",
+					"iteradorTasaFacturada = 1\r\n",
+					"iteradorTasaCargosYAbonos = 1\r\n",
+					"iteradorSaldoAdiferir = 1\r\n",
+					"iteradorCuotas = 1\r\n",
 					"\r\n",
 					"for row in df_fromated.collect():\r\n",
 					"    \r\n",
@@ -326,15 +396,81 @@
 					"                    Valor = Valor.replace(\"-\", \"\")                    \r\n",
 					"                    Valor = \"-\"+Valor\r\n",
 					"                Valor = float(Valor)\r\n",
-					"                ArrayCostoTransacciones.append((iteradorDescripcionTranscciones, Valor))\r\n",
+					"                ArrayCostoTransacciones.append((iteradorCostoTranscciones, Valor))\r\n",
 					"                iteradorCostoTranscciones = iteradorCostoTranscciones + 1\r\n",
 					"\r\n",
 					"    if (obtenerTasaPactada == True):\r\n",
 					"        if (row[\"contenido\"] == \"\"):\r\n",
 					"            obtenerTasaPactada = False\r\n",
 					"        else:\r\n",
-					"            ArrayTasaPactada.append((iteradorTasaPactada, row[\"contenido\"]))            \r\n",
+					"            Valor = row[\"contenido\"]\r\n",
+					"            Valor = Valor.replace(\",\", \"\")\r\n",
+					"            Valor = float(Valor)\r\n",
+					"            ArrayTasaPactada.append((iteradorTasaPactada, Valor))            \r\n",
 					"            iteradorTasaPactada = iteradorTasaPactada + 1\r\n",
+					"\r\n",
+					"    if (obtenerTasaFacturada == True):\r\n",
+					"        if (row[\"contenido\"] == \"\"):\r\n",
+					"            obtenerTasaFacturada = False\r\n",
+					"        else:\r\n",
+					"            Valor = row[\"contenido\"]\r\n",
+					"            Valor = Valor.replace(\",\", \"\")\r\n",
+					"            Valor = float(Valor)\r\n",
+					"            ArrayTasaFacturada.append((iteradorTasaFacturada, Valor))            \r\n",
+					"            iteradorTasaFacturada = iteradorTasaFacturada + 1\r\n",
+					"\r\n",
+					"    if (obtenerCargosYAbonos == True):        \r\n",
+					"        if (row[\"contenido\"] == \"\" and iteradorTasaCargosYAbonos != 1):\r\n",
+					"            obtenerCargosYAbonos = False\r\n",
+					"        else:\r\n",
+					"            if row[\"contenido\"] != \"\":\r\n",
+					"                Valor = row[\"contenido\"]\r\n",
+					"                Valor = Valor.replace(\",\", \"\")\r\n",
+					"                if \"-\" in Valor:\r\n",
+					"                    Valor = Valor.replace(\"-\", \"\")                    \r\n",
+					"                    Valor = \"-\"+Valor\r\n",
+					"                Valor = float(Valor)\r\n",
+					"                ArrayCargosYAbonos.append((iteradorTasaCargosYAbonos, Valor))\r\n",
+					"                iteradorTasaCargosYAbonos = iteradorTasaCargosYAbonos + 1\r\n",
+					"\r\n",
+					"    if (obtenerSaldoADiferir == True):        \r\n",
+					"        #Omitir primer espacio\r\n",
+					"        if (row[\"contenido\"] == \"\" and iteradorSaldoAdiferir != 1):           \r\n",
+					"            obtenerSaldoADiferir = False\r\n",
+					"        else:\r\n",
+					"             #Cuando ya se ha recorrido cargos y abonos\r\n",
+					"            if obtenerCargosYAbonos == False:\r\n",
+					"                if row[\"contenido\"] != \"\":\r\n",
+					"                    Valor = row[\"contenido\"]\r\n",
+					"                    Valor = Valor.replace(\",\", \"\")\r\n",
+					"                    if \"-\" in Valor:\r\n",
+					"                        Valor = Valor.replace(\"-\", \"\")                    \r\n",
+					"                        Valor = \"-\"+Valor\r\n",
+					"                    Valor = float(Valor)                                            \r\n",
+					"                    ArraySaldoADiferir.append((iteradorSaldoAdiferir, Valor))\r\n",
+					"                    iteradorSaldoAdiferir = iteradorSaldoAdiferir + 1\r\n",
+					"\r\n",
+					"\r\n",
+					"    if (obtenerCuotas == True):          \r\n",
+					"        if (\"Defensor\" in row[\"contenido\"]):           \r\n",
+					"                obtenerCuotas = False\r\n",
+					"                #eliminar el ultimo elemento que e su espaico antes de parar\r\n",
+					"                ArrayCuotas.pop(-1)\r\n",
+					"        else:            \r\n",
+					"            #Cuando ya se ha recorrido saldo a diferir\r\n",
+					"            if obtenerSaldoADiferir == False:\r\n",
+					"                #evalua el primer espacio para omitirlo los demas los debe insertar\r\n",
+					"                if (row[\"contenido\"] == \"\" and iteradorCuotas == 1):                                                                                                                        \r\n",
+					"                    iteradorCuotas = iteradorCuotas + 1\r\n",
+					"                    \r\n",
+					"                else:\r\n",
+					"                    #Reiniciariterador para evitar que se corra el codigo y evlauar que la lista este vacia par aa;adir el pirmer elemento\r\n",
+					"                    if (iteradorCuotas == 2 and ArrayCuotas == False):\r\n",
+					"                        print(\"entor\")\r\n",
+					"                        iteradorCuotas = 1\r\n",
+					"\r\n",
+					"                    ArrayCuotas.append((iteradorCuotas, row[\"contenido\"]))\r\n",
+					"                    iteradorCuotas = iteradorCuotas + 1\r\n",
 					"\r\n",
 					"    if (row[\"contenido\"] == \"Autorización\"):\r\n",
 					"        obtenerIDDataTranscciones = True\r\n",
@@ -347,10 +483,19 @@
 					"\r\n",
 					"    if (row[\"contenido\"] == \"Pactada\"):\r\n",
 					"        obtenerTasaPactada = True\r\n",
+					"    \r\n",
+					"    if (row[\"contenido\"] == \"Facturada\"):\r\n",
+					"        obtenerTasaFacturada = True\r\n",
+					"\r\n",
+					"    if (row[\"contenido\"] == \"Cuotas\"):\r\n",
+					"        obtenerCargosYAbonos = True\r\n",
+					"        obtenerSaldoADiferir = True\r\n",
+					"        obtenerCuotas = True\r\n",
+					"\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": 35
+				"execution_count": 145
 			},
 			{
 				"cell_type": "code",
@@ -367,12 +512,18 @@
 				},
 				"source": [
 					"#Completar Data TasaPactada\r\n",
-					"while (iteradorTasaPactada <= iteradorIDDataTranscciones):\r\n",
+					"while (iteradorTasaPactada < iteradorIDDataTranscciones):\r\n",
 					"    ArrayTasaPactada.append((iteradorTasaPactada, 0.0))\r\n",
 					"    iteradorTasaPactada = iteradorTasaPactada + 1  \r\n",
+					"\r\n",
+					"\r\n",
+					"#Completar Data TasaFacturada\r\n",
+					"while (iteradorTasaFacturada < iteradorIDDataTranscciones):\r\n",
+					"    ArrayTasaFacturada.append((iteradorTasaFacturada, 0.0))\r\n",
+					"    iteradorTasaFacturada = iteradorTasaFacturada + 1  \r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 141
 			},
 			{
 				"cell_type": "code",
@@ -394,9 +545,13 @@
 					"df_FechaTransacciones = spark.createDataFrame(ArrayFechaTransacciones, schema2)\r\n",
 					"df_DescripcionTransacciones = spark.createDataFrame(ArrayDescripcionTransacciones, schema3)\r\n",
 					"df_CostoTransacciones = spark.createDataFrame(ArrayCostoTransacciones, schema4)\r\n",
-					"df_TasaPactada = spark.createDataFrame(ArrayTasaPactada, schema5)"
+					"df_TasaPactada = spark.createDataFrame(ArrayTasaPactada, schema5)\r\n",
+					"df_TasaFacturada = spark.createDataFrame(ArrayTasaFacturada, schema6)\r\n",
+					"df_CargosYAbonos = spark.createDataFrame(ArrayCargosYAbonos, schema7)\r\n",
+					"df_SaldoADiferir = spark.createDataFrame(ArraySaldoADiferir, schema8)\r\n",
+					"df_Cuotas = spark.createDataFrame(ArrayCuotas, schema9)"
 				],
-				"execution_count": null
+				"execution_count": 142
 			},
 			{
 				"cell_type": "code",
@@ -416,9 +571,13 @@
 					"df_FechaTransacciones.show()\r\n",
 					"df_DescripcionTransacciones.show()\r\n",
 					"df_CostoTransacciones.show()\r\n",
-					"df_TasaPactada.show()"
+					"df_TasaPactada.show()\r\n",
+					"df_TasaFacturada.show()\r\n",
+					"df_CargosYAbonos.show()\r\n",
+					"df_SaldoADiferir.show()\r\n",
+					"df_Cuotas.show()"
 				],
-				"execution_count": null
+				"execution_count": 143
 			},
 			{
 				"cell_type": "code",
@@ -440,7 +599,7 @@
 					"        print(row[\"contenido\"])\r\n",
 					""
 				],
-				"execution_count": 19
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
