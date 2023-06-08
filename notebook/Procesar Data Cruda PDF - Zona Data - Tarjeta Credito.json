@@ -1,5 +1,5 @@
 {
-	"name": "Procesar Data Cruda PDF - Zona Data",
+	"name": "Procesar Data Cruda PDF - Zona Data - Tarjeta Credito",
 	"properties": {
 		"folder": {
 			"name": "LecturaScripts"
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6ff768b8-a838-4821-b82f-5d9b8f81ba6d"
+				"spark.autotune.trackingId": "abdcd182-c2e0-4a6f-85be-890e0ef4bba3"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					""
 				],
-				"execution_count": 4
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
