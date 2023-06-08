@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f6d011bb-e04b-42a9-b5f8-4a54b0984ce0"
+				"spark.autotune.trackingId": "6ff768b8-a838-4821-b82f-5d9b8f81ba6d"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					""
 				],
-				"execution_count": 1
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -85,9 +85,9 @@
 				"source": [
 					"#Obtener Datos para Tarjeta Credito\r\n",
 					"\r\n",
-					"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/*.parquet', format='parquet')"
+					"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/Raw/*.parquet', format='parquet')"
 				],
-				"execution_count": 66
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
