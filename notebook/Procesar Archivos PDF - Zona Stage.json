@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5fc056a0-0d92-4c0c-bed8-8b7a2434d327"
+				"spark.autotune.trackingId": "2b6d7389-6618-4de2-a87e-7992bb75070f"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					"import io\r\n",
 					""
 				],
-				"execution_count": 26
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -136,7 +136,7 @@
 					"\r\n",
 					"#Ruta Destino\r\n",
 					"file_name = file_name.replace(\".pdf\", \"\")\r\n",
-					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name"
+					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
 				],
 				"execution_count": null
 			},
