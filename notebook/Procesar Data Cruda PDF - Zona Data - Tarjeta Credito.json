@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "abdcd182-c2e0-4a6f-85be-890e0ef4bba3"
+				"spark.autotune.trackingId": "815f8d3b-617c-4363-a155-1e73f27f8907"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,26 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					""
 				],
-				"execution_count": 5
+				"execution_count": 24
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Configurar parametros aqui\r\n",
+					""
+				],
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -87,7 +106,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/Raw/*.parquet', format='parquet')"
 				],
-				"execution_count": 2
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -105,13 +124,13 @@
 				"source": [
 					"# Dividir los valores por salto de linea\r\n",
 					"\r\n",
-					"df_split = df.withColumn(\"contenido\", split(df[\"contenido\"], \"\\n\"))\r\n",
+					"df_split = DataCruda.withColumn(\"contenido\", split(DataCruda[\"contenido\"], \"\\n\"))\r\n",
 					"\r\n",
 					"# Transformar la columna array para crear una nueva fila por cada elemento\r\n",
 					"df_fromated = df_split.select(explode(\"contenido\").alias(\"contenido\"))\r\n",
 					""
 				],
-				"execution_count": 129
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -127,7 +146,7 @@
 					}
 				},
 				"source": [
-					"#ObtenerInfomraicon de Cliente\r\n",
+					"# Obtener Infomraicon de Cliente\r\n",
 					"\r\n",
 					"Nombre = df_fromated.collect()[1].asDict()[\"contenido\"]\r\n",
 					"Direccion = df_fromated.collect()[3].asDict()[\"contenido\"]\r\n",
@@ -135,7 +154,7 @@
 					"Ciudad_2 = df_fromated.collect()[5].asDict()[\"contenido\"]\r\n",
 					""
 				],
-				"execution_count": 130
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -168,7 +187,7 @@
 					"TasaInteresEAMora = df_fromated.collect()[103].asDict()[\"contenido\"]\r\n",
 					""
 				],
-				"execution_count": 134
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -195,7 +214,7 @@
 					"ArrayIdTransacciones = []\r\n",
 					"\r\n",
 					"\r\n",
-					"#Definir estructura para fecha Transaccion\r\n",
+					"# Definir estructura para fecha Transaccion\r\n",
 					"\r\n",
 					"schema2 = StructType([\r\n",
 					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
@@ -206,7 +225,7 @@
 					"ArrayFechaTransacciones = []\r\n",
 					"\r\n",
 					"\r\n",
-					"#Definir estructura para fecha Descripciones\r\n",
+					"# Definir estructura para fecha Descripciones\r\n",
 					"\r\n",
 					"schema3 = StructType([\r\n",
 					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
@@ -217,7 +236,7 @@
 					"ArrayDescripcionTransacciones = []\r\n",
 					"\r\n",
 					"\r\n",
-					"#Definir estructura para Costo transaccion\r\n",
+					"# Definir estructura para Costo transaccion\r\n",
 					"\r\n",
 					"schema4 = StructType([\r\n",
 					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
@@ -228,9 +247,20 @@
 					"ArrayCostoTransacciones = []\r\n",
 					"\r\n",
 					"\r\n",
+					"# Definir estructura para Tasa Pactada\r\n",
+					"\r\n",
+					"schema5 = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"TasaPactada\", DoubleType(), nullable=True)\r\n",
+					"])\r\n",
+					"\r\n",
+					"df_TasaPactada = spark.createDataFrame([], schema4)\r\n",
+					"ArrayTasaPactada = []\r\n",
+					"\r\n",
+					"\r\n",
 					""
 				],
-				"execution_count": 203
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -252,11 +282,13 @@
 					"obtenerFechaTranscciones = False\r\n",
 					"obtenerDescripcionTranscciones = False\r\n",
 					"obtenerCostoTranscciones = False\r\n",
+					"obtenerTasaPactada = False\r\n",
 					"\r\n",
 					"iteradorIDDataTranscciones = 1\r\n",
 					"iteradorFechaDataTranscciones = 1\r\n",
 					"iteradorDescripcionTranscciones = 1\r\n",
 					"iteradorCostoTranscciones = 1\r\n",
+					"iteradorTasaPactada = 1\r\n",
 					"\r\n",
 					"for row in df_fromated.collect():\r\n",
 					"    \r\n",
@@ -297,6 +329,13 @@
 					"                ArrayCostoTransacciones.append((iteradorDescripcionTranscciones, Valor))\r\n",
 					"                iteradorCostoTranscciones = iteradorCostoTranscciones + 1\r\n",
 					"\r\n",
+					"    if (obtenerTasaPactada == True):\r\n",
+					"        if (row[\"contenido\"] == \"\"):\r\n",
+					"            obtenerTasaPactada = False\r\n",
+					"        else:\r\n",
+					"            ArrayTasaPactada.append((iteradorTasaPactada, row[\"contenido\"]))            \r\n",
+					"            iteradorTasaPactada = iteradorTasaPactada + 1\r\n",
+					"\r\n",
 					"    if (row[\"contenido\"] == \"Autorización\"):\r\n",
 					"        obtenerIDDataTranscciones = True\r\n",
 					"\r\n",
@@ -306,9 +345,34 @@
 					"    if (row[\"contenido\"] == \"Valor Original\"):\r\n",
 					"        obtenerDescripcionTranscciones = True\r\n",
 					"\r\n",
+					"    if (row[\"contenido\"] == \"Pactada\"):\r\n",
+					"        obtenerTasaPactada = True\r\n",
+					"\r\n",
 					""
 				],
-				"execution_count": 204
+				"execution_count": 35
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Completar Data TasaPactada\r\n",
+					"while (iteradorTasaPactada <= iteradorIDDataTranscciones):\r\n",
+					"    ArrayTasaPactada.append((iteradorTasaPactada, 0.0))\r\n",
+					"    iteradorTasaPactada = iteradorTasaPactada + 1  \r\n",
+					""
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -329,9 +393,10 @@
 					"df_idTransacciones = spark.createDataFrame(ArrayIdTransacciones, schema1)\r\n",
 					"df_FechaTransacciones = spark.createDataFrame(ArrayFechaTransacciones, schema2)\r\n",
 					"df_DescripcionTransacciones = spark.createDataFrame(ArrayDescripcionTransacciones, schema3)\r\n",
-					"df_CostoTransacciones = spark.createDataFrame(ArrayCostoTransacciones, schema4)"
+					"df_CostoTransacciones = spark.createDataFrame(ArrayCostoTransacciones, schema4)\r\n",
+					"df_TasaPactada = spark.createDataFrame(ArrayTasaPactada, schema5)"
 				],
-				"execution_count": 205
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -350,9 +415,10 @@
 					"df_idTransacciones.show()\r\n",
 					"df_FechaTransacciones.show()\r\n",
 					"df_DescripcionTransacciones.show()\r\n",
-					"df_CostoTransacciones.show()"
+					"df_CostoTransacciones.show()\r\n",
+					"df_TasaPactada.show()"
 				],
-				"execution_count": 206
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -374,7 +440,7 @@
 					"        print(row[\"contenido\"])\r\n",
 					""
 				],
-				"execution_count": 155
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
