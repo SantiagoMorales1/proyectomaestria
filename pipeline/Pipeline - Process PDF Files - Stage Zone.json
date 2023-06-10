@@ -81,24 +81,20 @@
 						"type": "NotebookReference"
 					},
 					"parameters": {
-						"pdf_user": {
+						"user": {
 							"value": "bsmoralesg@outlook.com",
 							"type": "string"
 						},
-						"pdf_type": {
+						"type": {
 							"value": "Tarjeta Credito",
 							"type": "string"
 						},
-						"pdf_fecha": {
+						"fecha": {
 							"value": "10012023",
 							"type": "string"
 						},
-						"file_name": {
+						"name": {
 							"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
-							"type": "string"
-						},
-						"pdf_password": {
-							"value": "1233491047",
 							"type": "string"
 						}
 					},
