@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0d457fe1-4e40-4b0d-8115-14c6809b84f5"
+				"spark.autotune.trackingId": "1f191d34-c4cf-439a-86e9-64e1910f8de0"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					""
 				],
-				"execution_count": 30
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -154,7 +154,7 @@
 					"df_split = DataCruda.withColumn(\"contenido\", split(DataCruda[\"contenido\"], \"\\n\"))\r\n",
 					"\r\n",
 					"# Transformar la columna array para crear una nueva fila por cada elemento\r\n",
-					"df_fromated = df_split.select(explode(\"contenido\").alias(\"contenido\"))\r\n",
+					"df_formated = df_split.select(explode(\"contenido\").alias(\"contenido\"))\r\n",
 					""
 				],
 				"execution_count": 34
@@ -175,11 +175,11 @@
 				"source": [
 					"# Obtener Informacion de Cliente\r\n",
 					"\r\n",
-					"Nombre = df_fromated.collect()[1].asDict()[\"contenido\"]\r\n",
+					"Nombre = df_formated.collect()[1].asDict()[\"contenido\"]\r\n",
 					"Email = user\r\n",
-					"Direccion = df_fromated.collect()[3].asDict()[\"contenido\"]\r\n",
-					"Ciudad_1 = df_fromated.collect()[4].asDict()[\"contenido\"]\r\n",
-					"Ciudad_2 = df_fromated.collect()[5].asDict()[\"contenido\"]\r\n",
+					"Direccion = df_formated.collect()[3].asDict()[\"contenido\"]\r\n",
+					"Ciudad_1 = df_formated.collect()[4].asDict()[\"contenido\"]\r\n",
+					"Ciudad_2 = df_formated.collect()[5].asDict()[\"contenido\"]\r\n",
 					"\r\n",
 					"# Crear dataframe para informacion de cliente\r\n",
 					"\r\n",
@@ -214,18 +214,18 @@
 					"#Obtener Informacion de Prodcuto\r\n",
 					"\r\n",
 					"TipoProducto = 'Tarjeta Credito'\r\n",
-					"CupoTotal =  df_fromated.collect()[54].asDict()[\"contenido\"]\r\n",
-					"NumeroTarjeta = df_fromated.collect()[23].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVCompra1Mes = df_fromated.collect()[93].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVCompra2MesOMas = df_fromated.collect()[94].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVImpuestos = df_fromated.collect()[95].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVAvances = df_fromated.collect()[96].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVMora = df_fromated.collect()[97].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEACompra1Mes = df_fromated.collect()[99].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEACompra2MesOMas =df_fromated.collect()[100].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEAImpuestos = df_fromated.collect()[101].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEAAvances = df_fromated.collect()[102].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEAMora = df_fromated.collect()[103].asDict()[\"contenido\"]\r\n",
+					"CupoTotal =  df_formated.collect()[54].asDict()[\"contenido\"]\r\n",
+					"NumeroTarjeta = df_formated.collect()[23].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVCompra1Mes = df_formated.collect()[93].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVCompra2MesOMas = df_formated.collect()[94].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVImpuestos = df_formated.collect()[95].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVAvances = df_formated.collect()[96].asDict()[\"contenido\"]\r\n",
+					"TasaInteresMVMora = df_formated.collect()[97].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEACompra1Mes = df_formated.collect()[99].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEACompra2MesOMas =df_formated.collect()[100].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEAImpuestos = df_formated.collect()[101].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEAAvances = df_formated.collect()[102].asDict()[\"contenido\"]\r\n",
+					"TasaInteresEAMora = df_formated.collect()[103].asDict()[\"contenido\"]\r\n",
 					"\r\n",
 					"# Crear dataframe para informacion de producto\r\n",
 					"\r\n",
@@ -407,7 +407,7 @@
 					"iteradorSaldoAdiferir = 1\r\n",
 					"iteradorCuotas = 1\r\n",
 					"\r\n",
-					"for row in df_fromated.collect():\r\n",
+					"for row in df_formated.collect():\r\n",
 					"    \r\n",
 					"    if (obtenerIDDataTranscciones == True):\r\n",
 					"        if (row[\"contenido\"] == \"\"):\r\n",
@@ -692,6 +692,25 @@
 					""
 				],
 				"execution_count": 43
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"\r\n",
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}
