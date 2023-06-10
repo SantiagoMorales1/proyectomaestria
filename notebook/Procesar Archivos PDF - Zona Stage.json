@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "06e68b46-a508-4329-9a85-65db1383bdee"
+				"spark.autotune.trackingId": "7d41ac23-2d2f-4f07-a22f-389bb4bc730a"
 			}
 		},
 		"metadata": {
@@ -61,11 +61,14 @@
 					"from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter\r\n",
 					"from pdfminer.pdfpage import PDFPage\r\n",
 					"from pdfminer.converter import TextConverter\r\n",
-					"from pdfminer.layout import LAParams\r\n",
+					"from pdfminer.layout import LAParams, LTTextBoxHorizontal, LTFigure\r\n",
+					"from pdfminer.converter import PDFPageAggregator\r\n",
+					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					"import io\r\n",
+					"\r\n",
 					""
 				],
-				"execution_count": 34
+				"execution_count": 197
 			},
 			{
 				"cell_type": "code",
@@ -87,7 +90,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 35
+				"execution_count": 198
 			},
 			{
 				"cell_type": "code",
@@ -110,11 +113,11 @@
 					"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
 					"pdf_type = \"Tarjeta Credito\"\r\n",
 					"pdf_fecha = \"10012023\"\r\n",
-					"#file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
-					"file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
+					"#file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 					"pdf_password = \"1233491047\""
 				],
-				"execution_count": 36
+				"execution_count": 199
 			},
 			{
 				"cell_type": "code",
@@ -139,7 +142,40 @@
 					"file_name = file_name.replace(\".pdf\", \"\")\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
 				],
-				"execution_count": 37
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Definir estructura para datos crudos\r\n",
+					"\r\n",
+					"schemarawdata = StructType([\r\n",
+					"    StructField(\"index\", StringType(), nullable=True),\r\n",
+					"    StructField(\"pagenumber\", StringType(), nullable=True),\r\n",
+					"    StructField(\"x0\", StringType(), nullable=True),\r\n",
+					"    StructField(\"x1\", StringType(), nullable=True),\r\n",
+					"    StructField(\"y0\", StringType(), nullable=True),\r\n",
+					"    StructField(\"y1\", StringType(), nullable=True),\r\n",
+					"    StructField(\"contenido\", StringType(), nullable=True)\r\n",
+					"])\r\n",
+					"\r\n",
+					"df_RawDat = spark.createDataFrame([], schemarawdata)\r\n",
+					"ArrayRawData = []\r\n",
+					"\r\n",
+					" "
+				],
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -195,7 +231,7 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": 38
+				"execution_count": 194
 			},
 			{
 				"cell_type": "code",
@@ -239,25 +275,38 @@
 					"password = pdf_password.encode()\r\n",
 					"pages = PDFPage.get_pages(pdf_stream, password=password, check_extractable=True)    \r\n",
 					"\r\n",
-					"  \r\n",
+					"\r\n",
+					"#Recorrer las Paginas del PDF \r\n",
+					"pagenumber = 1\r\n",
 					"for page in pages:\r\n",
+					"        \r\n",
 					"        # Process the page\r\n",
+					"        pageraux = page\r\n",
 					"        interpreter.process_page(page)\r\n",
 					"        layout = device.get_result()\r\n",
 					"\r\n",
-					"        # Iterate over each element in the layout\r\n",
+					"        # Cambiar la pagina\r\n",
+					"        if (page != pageraux):\r\n",
+					"            pagenumber = pagenumber + 1\r\n",
+					"        \r\n",
+					"        # Iterar por cada elemnto del layout        \r\n",
 					"        for element in layout:\r\n",
-					"            print(\"tipo elemtno \" + element.get_text().strip())\r\n",
-					"            if isinstance(element, (LTTextBoxHorizontal, LTTextLineHorizontal)):\r\n",
-					"                # Print the text content and the coordinates of the element\r\n",
-					"                print(\"Text:\", element.get_text().strip())\r\n",
-					"                print(\"Coordinates:\", element.bbox)\r\n",
-					"                print(\"\")    \r\n",
-					"    \r\n",
+					"            if (not isinstance(element, LTFigure)):\r\n",
+					"                \r\n",
+					"                index = str(element.index)                \r\n",
+					"                x0 = str(element.x0)\r\n",
+					"                x1 = str(element.x1)\r\n",
+					"                y0 = str(element.y0)\r\n",
+					"                y1 = str(element.y1)\r\n",
+					"                contenido = str(element.get_text())\r\n",
+					"                ArrayRawData.append((index, pagenumber, x0, x1, y0, y1, contenido)) \r\n",
 					"\r\n",
-					"    "
+					"#Crear dataframe con toda la data cruda\r\n",
+					"\r\n",
+					"df_RawDat = spark.createDataFrame(ArrayRawData, schemarawdata)\r\n",
+					"                "
 				],
-				"execution_count": 50
+				"execution_count": 195
 			},
 			{
 				"cell_type": "code",
@@ -273,57 +322,8 @@
 					}
 				},
 				"source": [
-					"for page in pages:\r\n",
-					"        # Process the page\r\n",
-					"        interpreter.process_page(page)\r\n",
-					"        layout = device.get_result()\r\n",
-					"\r\n",
-					"        for element in layout:\r\n",
-					"            if isinstance(element, (LTTextBoxHorizontal, LTTextLineHorizontal)):\r\n",
-					"                print(element.get_text().strip())\r\n",
-					"                # Identify table structures based on specific patterns or attributes\r\n",
-					"                if element.get_text().strip() == \"Table\":\r\n",
-					"                    table_content = extract_table_content(element)"
-				],
-				"execution_count": 47
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					""
-				],
-				"execution_count": 46
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"# Crear dataframe\r\n",
-					"pdf_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
-					"\r\n",
 					"# crear parquet file\r\n",
-					"pdf_df.write.mode(\"overwrite\").parquet(path_sink)"
+					"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
 				],
 				"execution_count": null
 			},
