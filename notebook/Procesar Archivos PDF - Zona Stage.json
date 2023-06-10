@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "553320b4-57c9-46ca-86a8-917e6c3feedd"
+				"spark.autotune.trackingId": "7df2020b-54d5-41b5-bd50-5bdd582a75ef"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					"import io"
 				],
-				"execution_count": 1
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
@@ -88,7 +88,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 2
+				"execution_count": 27
 			},
 			{
 				"cell_type": "code",
@@ -115,7 +115,7 @@
 					"#file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 					"pdf_password = \"1233491047\""
 				],
-				"execution_count": 3
+				"execution_count": 28
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"file_name = file_name.replace(\".pdf\", \"\")\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
 				],
-				"execution_count": 4
+				"execution_count": 29
 			},
 			{
 				"cell_type": "code",
@@ -173,7 +173,7 @@
 					"\r\n",
 					" "
 				],
-				"execution_count": 6
+				"execution_count": 30
 			},
 			{
 				"cell_type": "code",
@@ -229,7 +229,7 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": 7
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -275,11 +275,13 @@
 					"\r\n",
 					"\r\n",
 					"#Recorrer las Paginas del PDF \r\n",
-					"pagenumber = 1\r\n",
+					"pageraux = None\r\n",
+					"pagenumber = 0\r\n",
+					"\r\n",
 					"for page in pages:\r\n",
 					"        \r\n",
 					"        # Process the page\r\n",
-					"        pageraux = page\r\n",
+					"\r\n",
 					"        interpreter.process_page(page)\r\n",
 					"        layout = device.get_result()\r\n",
 					"\r\n",
@@ -298,13 +300,11 @@
 					"                y1 = float(element.y1)\r\n",
 					"                contenido = str(element.get_text())\r\n",
 					"                ArrayRawData.append((index, pagenumber, x0, x1, y0, y1, contenido)) \r\n",
-					"\r\n",
-					"#Crear dataframe con toda la data cruda\r\n",
-					"\r\n",
-					"df_RawDat = spark.createDataFrame(ArrayRawData, schemarawdata)\r\n",
-					"                "
+					"    \r\n",
+					"        pageraux = page\r\n",
+					""
 				],
-				"execution_count": 8
+				"execution_count": 32
 			},
 			{
 				"cell_type": "code",
@@ -320,10 +320,14 @@
 					}
 				},
 				"source": [
+					"#Crear dataframe con toda la data cruda\r\n",
+					"\r\n",
+					"df_RawDat = spark.createDataFrame(ArrayRawData, schemarawdata)\r\n",
+					"\r\n",
 					"# crear parquet file\r\n",
 					"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
 				],
-				"execution_count": 9
+				"execution_count": 33
 			},
 			{
 				"cell_type": "code",
@@ -340,9 +344,27 @@
 					"collapsed": false
 				},
 				"source": [
-					"#display(df_RawDat)"
+					"display(df_RawDat)"
 				],
-				"execution_count": 11
+				"execution_count": 34
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
 			}
 		]
 	}
