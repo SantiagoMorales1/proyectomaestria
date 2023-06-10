@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "52b5bca3-54c2-4f3f-a5de-9e116a3f209e"
+				"spark.autotune.trackingId": "41a17e83-ea2a-49fa-9ea0-bd58148328db"
 			}
 		},
 		"metadata": {
@@ -67,7 +67,7 @@
 					"from pyspark.sql.functions import row_number\r\n",
 					"from pyspark.sql.window import Window"
 				],
-				"execution_count": 38
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -91,7 +91,7 @@
 					"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
 					"name = \"Extracto_7358651_202108_TARJETA_VISA_2166\""
 				],
-				"execution_count": 40
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -113,7 +113,7 @@
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name\r\n",
 					""
 				],
-				"execution_count": 41
+				"execution_count": 68
 			},
 			{
 				"cell_type": "code",
@@ -134,7 +134,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 42
+				"execution_count": 69
 			},
 			{
 				"cell_type": "code",
@@ -162,7 +162,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 24
+				"execution_count": 70
 			},
 			{
 				"cell_type": "code",
@@ -181,26 +181,7 @@
 				"source": [
 					"display(df_formated)"
 				],
-				"execution_count": 25
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"Nombre = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 2).first()[0]\r\n",
-					""
-				],
-				"execution_count": 33
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -238,25 +219,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 36
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"df_Cliente.show()"
-				],
-				"execution_count": 37
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -275,18 +238,18 @@
 					"#Obtener Informacion de Prodcuto\r\n",
 					"\r\n",
 					"TipoProducto = 'Tarjeta Credito'\r\n",
-					"CupoTotal =  df_formated.collect()[54].asDict()[\"contenido\"]\r\n",
-					"NumeroTarjeta = df_formated.collect()[23].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVCompra1Mes = df_formated.collect()[93].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVCompra2MesOMas = df_formated.collect()[94].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVImpuestos = df_formated.collect()[95].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVAvances = df_formated.collect()[96].asDict()[\"contenido\"]\r\n",
-					"TasaInteresMVMora = df_formated.collect()[97].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEACompra1Mes = df_formated.collect()[99].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEACompra2MesOMas =df_formated.collect()[100].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEAImpuestos = df_formated.collect()[101].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEAAvances = df_formated.collect()[102].asDict()[\"contenido\"]\r\n",
-					"TasaInteresEAMora = df_formated.collect()[103].asDict()[\"contenido\"]\r\n",
+					"CupoTotal =  df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 55).first()[0]\r\n",
+					"NumeroTarjeta = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 24).first()[0]\r\n",
+					"TasaInteresMVCompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 94).first()[0]\r\n",
+					"TasaInteresMVCompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 95).first()[0]\r\n",
+					"TasaInteresMVImpuestos = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 96).first()[0]\r\n",
+					"TasaInteresMVAvances = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 97).first()[0]\r\n",
+					"TasaInteresMVMora = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 98).first()[0]\r\n",
+					"TasaInteresEACompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 100).first()[0]\r\n",
+					"TasaInteresEACompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 101).first()[0]\r\n",
+					"TasaInteresEAImpuestos = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 102).first()[0]\r\n",
+					"TasaInteresEAAvances = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 103).first()[0]\r\n",
+					"TasaInteresEAMora = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 104).first()[0]\r\n",
 					"\r\n",
 					"# Crear dataframe para informacion de producto\r\n",
 					"\r\n",
@@ -313,7 +276,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 36
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
