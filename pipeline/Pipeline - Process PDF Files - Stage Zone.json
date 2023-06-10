@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Reafing PDF Files - Stage Zone",
+				"name": "Reading PDF Files - Stagefiles Zone",
 				"type": "SynapseNotebook",
 				"dependsOn": [],
 				"policy": {
@@ -57,11 +57,11 @@
 				}
 			},
 			{
-				"name": "Delete Success File",
-				"type": "Delete",
+				"name": "Reading Raw Data - StageData Zone",
+				"type": "SynapseNotebook",
 				"dependsOn": [
 					{
-						"activity": "Reafing PDF Files - Stage Zone",
+						"activity": "Reading PDF Files - Stagefiles Zone",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -76,17 +76,45 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataset": {
-						"referenceName": "DataLakeMaster",
-						"type": "DatasetReference"
+					"notebook": {
+						"referenceName": "Procesar Data Cruda PDF - Zona Data - Tarjeta Credito",
+						"type": "NotebookReference"
 					},
-					"enableLogging": false,
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"wildcardFileName": "*_SUCCESS",
-						"enablePartitionDiscovery": false
-					}
+					"parameters": {
+						"pdf_user": {
+							"value": "bsmoralesg@outlook.com",
+							"type": "string"
+						},
+						"pdf_type": {
+							"value": "Tarjeta Credito",
+							"type": "string"
+						},
+						"pdf_fecha": {
+							"value": "10012023",
+							"type": "string"
+						},
+						"file_name": {
+							"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
+							"type": "string"
+						},
+						"pdf_password": {
+							"value": "1233491047",
+							"type": "string"
+						}
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "spproymaestria",
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"conf": {
+						"spark.dynamicAllocation.enabled": false,
+						"spark.dynamicAllocation.minExecutors": 1,
+						"spark.dynamicAllocation.maxExecutors": 1
+					},
+					"driverSize": "Small",
+					"numExecutors": 1
 				}
 			}
 		],
