@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "4d4995a9-1e50-4507-b03f-d8601ce003c8"
+				"spark.autotune.trackingId": "06e68b46-a508-4329-9a85-65db1383bdee"
 			}
 		},
 		"metadata": {
@@ -65,7 +65,7 @@
 					"import io\r\n",
 					""
 				],
-				"execution_count": 1
+				"execution_count": 34
 			},
 			{
 				"cell_type": "code",
@@ -87,7 +87,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": null
+				"execution_count": 35
 			},
 			{
 				"cell_type": "code",
@@ -110,10 +110,11 @@
 					"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
 					"pdf_type = \"Tarjeta Credito\"\r\n",
 					"pdf_fecha = \"10012023\"\r\n",
-					"file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
+					"#file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
+					"file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 					"pdf_password = \"1233491047\""
 				],
-				"execution_count": null
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -138,7 +139,7 @@
 					"file_name = file_name.replace(\".pdf\", \"\")\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
 				],
-				"execution_count": null
+				"execution_count": 37
 			},
 			{
 				"cell_type": "code",
@@ -183,6 +184,7 @@
 					"# Porcesar cada pagina del archivo PDF\r\n",
 					"password = pdf_password.encode()\r\n",
 					"pages = PDFPage.get_pages(pdf_stream, password=password, check_extractable=True)\r\n",
+					"\r\n",
 					"for page in pages:\r\n",
 					"    interpreter.process_page(page)\r\n",
 					"\r\n",
@@ -193,7 +195,115 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": null
+				"execution_count": 38
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Leer the PDF file como bytes\r\n",
+					"pdf_bytes = spark.read \\\r\n",
+					"    .format(\"binaryFile\") \\\r\n",
+					"    .option(\"path\", pdf_path_origin) \\\r\n",
+					"    .load() \\\r\n",
+					"    .select(\"content\") \\\r\n",
+					"    .collect()[0][0]\r\n",
+					"\r\n",
+					"# crear un BytesIO stream de the PDF bytes\r\n",
+					"pdf_stream = BytesIO(pdf_bytes)\r\n",
+					"pdf_stream.seek(0)\r\n",
+					"\r\n",
+					"# Crear objeto PDFResourceManager y configurar parametros\r\n",
+					"rsrcmgr = PDFResourceManager()\r\n",
+					"retstr = io.StringIO()\r\n",
+					"\r\n",
+					"# Crear Objeto  TextConverter para las paginas dle PDF\r\n",
+					"laparams = LAParams()\r\n",
+					"#device = TextConverter(rsrcmgr, retstr, laparams=laparams)\r\n",
+					"device = PDFPageAggregator(rsrcmgr, laparams=laparams)\r\n",
+					"\r\n",
+					"# Crear objeto PDFPageInterpreter\r\n",
+					"interpreter = PDFPageInterpreter(rsrcmgr, device)\r\n",
+					"\r\n",
+					"# Porcesar cada pagina del archivo PDF\r\n",
+					"password = pdf_password.encode()\r\n",
+					"pages = PDFPage.get_pages(pdf_stream, password=password, check_extractable=True)    \r\n",
+					"\r\n",
+					"  \r\n",
+					"for page in pages:\r\n",
+					"        # Process the page\r\n",
+					"        interpreter.process_page(page)\r\n",
+					"        layout = device.get_result()\r\n",
+					"\r\n",
+					"        # Iterate over each element in the layout\r\n",
+					"        for element in layout:\r\n",
+					"            print(\"tipo elemtno \" + element.get_text().strip())\r\n",
+					"            if isinstance(element, (LTTextBoxHorizontal, LTTextLineHorizontal)):\r\n",
+					"                # Print the text content and the coordinates of the element\r\n",
+					"                print(\"Text:\", element.get_text().strip())\r\n",
+					"                print(\"Coordinates:\", element.bbox)\r\n",
+					"                print(\"\")    \r\n",
+					"    \r\n",
+					"\r\n",
+					"    "
+				],
+				"execution_count": 50
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"for page in pages:\r\n",
+					"        # Process the page\r\n",
+					"        interpreter.process_page(page)\r\n",
+					"        layout = device.get_result()\r\n",
+					"\r\n",
+					"        for element in layout:\r\n",
+					"            if isinstance(element, (LTTextBoxHorizontal, LTTextLineHorizontal)):\r\n",
+					"                print(element.get_text().strip())\r\n",
+					"                # Identify table structures based on specific patterns or attributes\r\n",
+					"                if element.get_text().strip() == \"Table\":\r\n",
+					"                    table_content = extract_table_content(element)"
+				],
+				"execution_count": 47
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -214,6 +324,24 @@
 					"\r\n",
 					"# crear parquet file\r\n",
 					"pdf_df.write.mode(\"overwrite\").parquet(path_sink)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
 				],
 				"execution_count": null
 			}
