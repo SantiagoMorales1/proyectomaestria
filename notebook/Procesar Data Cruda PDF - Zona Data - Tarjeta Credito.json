@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "32bda82a-fc20-4471-aeb5-990cb7c8b6b4"
+				"spark.autotune.trackingId": "18518eed-72d2-4be7-977a-6ffa76534f8d"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					""
 				],
-				"execution_count": 29
+				"execution_count": 43
 			},
 			{
 				"cell_type": "code",
@@ -90,7 +90,7 @@
 					"name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
 					""
 				],
-				"execution_count": 30
+				"execution_count": 44
 			},
 			{
 				"cell_type": "code",
@@ -106,13 +106,13 @@
 					}
 				},
 				"source": [
-					"# Configurar rutas d eorigne y destino de archivos\r\n",
+					"# Configurar rutas de origen y destino de archivos\r\n",
 					"\r\n",
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name\r\n",
 					""
 				],
-				"execution_count": 31
+				"execution_count": 46
 			},
 			{
 				"cell_type": "code",
@@ -133,7 +133,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 32
+				"execution_count": 47
 			},
 			{
 				"cell_type": "code",
@@ -157,7 +157,7 @@
 					"df_formated = df_split.select(df_split.index, df_split.pagenumber, df_split.x0, df_split.x1, df_split.y0, df_split.y1, explode(\"contenido\").alias(\"contenido\"))\r\n",
 					""
 				],
-				"execution_count": 34
+				"execution_count": 48
 			},
 			{
 				"cell_type": "code",
@@ -176,7 +176,7 @@
 				"source": [
 					"display(df_formated)"
 				],
-				"execution_count": 35
+				"execution_count": 49
 			},
 			{
 				"cell_type": "code",
@@ -214,7 +214,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 35
+				"execution_count": 42
 			},
 			{
 				"cell_type": "code",
