@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cf910b74-ce93-4fc7-8060-f2ec2e5c65bf"
+				"spark.autotune.trackingId": "c121a6c0-314c-4775-8f54-954b48321f38"
 			}
 		},
 		"metadata": {
@@ -336,12 +336,13 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
-					""
+					"display(df_RawDat)"
 				],
-				"execution_count": null
+				"execution_count": 11
 			}
 		]
 	}
