@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7df2020b-54d5-41b5-bd50-5bdd582a75ef"
+				"spark.autotune.trackingId": "fbc4f61e-4d4b-4c2e-82c8-859699c163a1"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					"import io"
 				],
-				"execution_count": 26
+				"execution_count": 36
 			},
 			{
 				"cell_type": "code",
@@ -88,7 +88,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 27
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -111,11 +111,11 @@
 					"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
 					"pdf_type = \"Tarjeta Credito\"\r\n",
 					"pdf_fecha = \"10012023\"\r\n",
-					"file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
-					"#file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"#file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
+					"file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 					"pdf_password = \"1233491047\""
 				],
-				"execution_count": 28
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"file_name = file_name.replace(\".pdf\", \"\")\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
 				],
-				"execution_count": 29
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -173,7 +173,7 @@
 					"\r\n",
 					" "
 				],
-				"execution_count": 30
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -229,7 +229,7 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": 31
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -304,7 +304,7 @@
 					"        pageraux = page\r\n",
 					""
 				],
-				"execution_count": 32
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -327,7 +327,7 @@
 					"# crear parquet file\r\n",
 					"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
 				],
-				"execution_count": 33
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -347,24 +347,6 @@
 					"display(df_RawDat)"
 				],
 				"execution_count": 34
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					""
-				],
-				"execution_count": null
 			}
 		]
 	}
