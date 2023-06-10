@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7d41ac23-2d2f-4f07-a22f-389bb4bc730a"
+				"spark.autotune.trackingId": "cf910b74-ce93-4fc7-8060-f2ec2e5c65bf"
 			}
 		},
 		"metadata": {
@@ -64,11 +64,9 @@
 					"from pdfminer.layout import LAParams, LTTextBoxHorizontal, LTFigure\r\n",
 					"from pdfminer.converter import PDFPageAggregator\r\n",
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
-					"import io\r\n",
-					"\r\n",
-					""
+					"import io"
 				],
-				"execution_count": 197
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -90,7 +88,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 198
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -117,7 +115,7 @@
 					"#file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 					"pdf_password = \"1233491047\""
 				],
-				"execution_count": 199
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -142,7 +140,7 @@
 					"file_name = file_name.replace(\".pdf\", \"\")\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -161,12 +159,12 @@
 					"# Definir estructura para datos crudos\r\n",
 					"\r\n",
 					"schemarawdata = StructType([\r\n",
-					"    StructField(\"index\", StringType(), nullable=True),\r\n",
-					"    StructField(\"pagenumber\", StringType(), nullable=True),\r\n",
-					"    StructField(\"x0\", StringType(), nullable=True),\r\n",
-					"    StructField(\"x1\", StringType(), nullable=True),\r\n",
-					"    StructField(\"y0\", StringType(), nullable=True),\r\n",
-					"    StructField(\"y1\", StringType(), nullable=True),\r\n",
+					"    StructField(\"index\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"pagenumber\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"x0\", DoubleType(), nullable=True),\r\n",
+					"    StructField(\"x1\", DoubleType(), nullable=True),\r\n",
+					"    StructField(\"y0\", DoubleType(), nullable=True),\r\n",
+					"    StructField(\"y1\", DoubleType(), nullable=True),\r\n",
 					"    StructField(\"contenido\", StringType(), nullable=True)\r\n",
 					"])\r\n",
 					"\r\n",
@@ -175,7 +173,7 @@
 					"\r\n",
 					" "
 				],
-				"execution_count": null
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -231,7 +229,7 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": 194
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -293,11 +291,11 @@
 					"        for element in layout:\r\n",
 					"            if (not isinstance(element, LTFigure)):\r\n",
 					"                \r\n",
-					"                index = str(element.index)                \r\n",
-					"                x0 = str(element.x0)\r\n",
-					"                x1 = str(element.x1)\r\n",
-					"                y0 = str(element.y0)\r\n",
-					"                y1 = str(element.y1)\r\n",
+					"                index = int(element.index)                \r\n",
+					"                x0 = float(element.x0)\r\n",
+					"                x1 = float(element.x1)\r\n",
+					"                y0 = float(element.y0)\r\n",
+					"                y1 = float(element.y1)\r\n",
 					"                contenido = str(element.get_text())\r\n",
 					"                ArrayRawData.append((index, pagenumber, x0, x1, y0, y1, contenido)) \r\n",
 					"\r\n",
@@ -306,7 +304,7 @@
 					"df_RawDat = spark.createDataFrame(ArrayRawData, schemarawdata)\r\n",
 					"                "
 				],
-				"execution_count": 195
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -325,7 +323,7 @@
 					"# crear parquet file\r\n",
 					"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
