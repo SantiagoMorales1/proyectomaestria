@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7af14e01-b718-4105-958c-89ee32df36ad"
+				"spark.autotune.trackingId": "3e3e305a-57e4-45f8-9735-2f16f1a37bf1"
 			}
 		},
 		"metadata": {
@@ -385,7 +385,7 @@
 					}
 				},
 				"source": [
-					"#Obtener informaicon de transacciones\r\n",
+					"#Obtener informacion de transacciones\r\n",
 					"\r\n",
 					"obtenerIDDataTranscciones = False\r\n",
 					"obtenerFechaTranscciones = False\r\n",
