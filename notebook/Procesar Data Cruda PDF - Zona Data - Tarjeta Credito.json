@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "89945305-1796-484a-97dc-2cd384546310"
+				"spark.autotune.trackingId": "a2bb7215-f8bd-4932-ba00-18a8feb1dc10"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 140
+				"execution_count": 320
 			},
 			{
 				"cell_type": "code",
@@ -94,7 +94,7 @@
 					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 				],
-				"execution_count": 141
+				"execution_count": 321
 			},
 			{
 				"cell_type": "code",
@@ -115,7 +115,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": 142
+				"execution_count": 322
 			},
 			{
 				"cell_type": "code",
@@ -136,7 +136,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 143
+				"execution_count": 323
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 144
+				"execution_count": 324
 			},
 			{
 				"cell_type": "code",
@@ -183,7 +183,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 145
+				"execution_count": 325
 			},
 			{
 				"cell_type": "code",
@@ -201,7 +201,7 @@
 				"source": [
 					"# Obtener Informacion de Cliente\r\n",
 					"\r\n",
-					"Nombre = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 2).first()[0]\r\n",
+					"Nombre = df_formated.select(df_formated.contenido).where((df_formated.UniqueId == 2)).first()[0]\r\n",
 					"Email = user\r\n",
 					"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
 					"Ciudad_1 = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 5).first()[0]\r\n",
@@ -221,7 +221,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 146
+				"execution_count": 326
 			},
 			{
 				"cell_type": "code",
@@ -239,19 +239,20 @@
 				"source": [
 					"#Obtener Informacion de Prodcuto\r\n",
 					"\r\n",
+					"\r\n",
 					"TipoProducto = 'Tarjeta Credito'\r\n",
-					"CupoTotal =  df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 55).first()[0]\r\n",
-					"NumeroTarjeta = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 24).first()[0]\r\n",
-					"TasaInteresMVCompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 94).first()[0]\r\n",
-					"TasaInteresMVCompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 95).first()[0]\r\n",
-					"TasaInteresMVImpuestos = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 96).first()[0]\r\n",
-					"TasaInteresMVAvances = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 97).first()[0]\r\n",
-					"TasaInteresMVMora = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 98).first()[0]\r\n",
-					"TasaInteresEACompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 100).first()[0]\r\n",
-					"TasaInteresEACompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 101).first()[0]\r\n",
-					"TasaInteresEAImpuestos = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 102).first()[0]\r\n",
-					"TasaInteresEAAvances = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 103).first()[0]\r\n",
-					"TasaInteresEAMora = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 104).first()[0]\r\n",
+					"CupoTotal =  df_formated.select(df_formated.contenido).where(df_formated.x0 == 65.0).first()[0]\r\n",
+					"NumeroTarjeta = df_formated.select(df_formated.contenido).where(df_formated.x0 == 465.0).first()[0]\r\n",
+					"TasaInteresMVCompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[0].__getitem__('contenido')\r\n",
+					"TasaInteresMVCompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[1].__getitem__('contenido')\r\n",
+					"TasaInteresMVImpuestos = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[2].__getitem__('contenido')\r\n",
+					"TasaInteresMVAvances = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[3].__getitem__('contenido')\r\n",
+					"TasaInteresMVMora = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[4].__getitem__('contenido')\r\n",
+					"TasaInteresEACompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[0].__getitem__('contenido')\r\n",
+					"TasaInteresEACompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[1].__getitem__('contenido')\r\n",
+					"TasaInteresEAImpuestos = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[2].__getitem__('contenido')\r\n",
+					"TasaInteresEAAvances = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[3].__getitem__('contenido')\r\n",
+					"TasaInteresEAMora = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[4].__getitem__('contenido')\r\n",
 					"\r\n",
 					"# Crear dataframe para informacion de producto\r\n",
 					"\r\n",
@@ -278,7 +279,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 147
+				"execution_count": 327
 			},
 			{
 				"cell_type": "code",
@@ -469,7 +470,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 148
+				"execution_count": 328
 			},
 			{
 				"cell_type": "code",
@@ -485,17 +486,17 @@
 					}
 				},
 				"source": [
-					"df_idTransacciones.show(50)\r\n",
-					"df_FechaTransacciones.show(50)\r\n",
-					"df_DescripcionTransacciones.show(50)\r\n",
-					"df_CostoTransacciones.show(50)\r\n",
-					"df_TasaPactada.show(50)\r\n",
-					"df_TasaFacturada.show(50)\r\n",
-					"df_CargosYAbonos.show(50)\r\n",
-					"df_SaldoADiferir.show(50)\r\n",
-					"df_Cuotas.show(50)"
+					"#df_idTransacciones.show(50)\r\n",
+					"#df_FechaTransacciones.show(50)\r\n",
+					"#df_DescripcionTransacciones.show(50)\r\n",
+					"#df_CostoTransacciones.show(50)\r\n",
+					"#df_TasaPactada.show(50)\r\n",
+					"#df_TasaFacturada.show(50)\r\n",
+					"#df_CargosYAbonos.show(50)\r\n",
+					"#df_SaldoADiferir.show(50)\r\n",
+					"#df_Cuotas.show(50)"
 				],
-				"execution_count": null
+				"execution_count": 329
 			},
 			{
 				"cell_type": "code",
@@ -533,7 +534,7 @@
 					"                        df_Cuotas.Cuotas                       \r\n",
 					"                        )"
 				],
-				"execution_count": null
+				"execution_count": 330
 			},
 			{
 				"cell_type": "code",
@@ -554,7 +555,7 @@
 					"display(df_Producto)\r\n",
 					"display(df_Transacciones)"
 				],
-				"execution_count": null
+				"execution_count": 216
 			},
 			{
 				"cell_type": "code",
@@ -580,6 +581,24 @@
 					"\r\n",
 					"# crear parquet file para transacciones\r\n",
 					"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
+					""
+				],
+				"execution_count": 331
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
 					""
 				],
 				"execution_count": null
