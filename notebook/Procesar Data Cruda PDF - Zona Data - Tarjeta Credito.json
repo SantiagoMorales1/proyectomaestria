@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0fa22d23-273f-4196-a4e5-50e585ccda69"
+				"spark.autotune.trackingId": "e4f21099-1c7a-4a04-9522-d7dde5dcbc0b"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 126
+				"execution_count": 257
 			},
 			{
 				"cell_type": "code",
@@ -86,10 +86,10 @@
 					"user = \"bsmoralesg@outlook.com\"\r\n",
 					"type = \"Tarjeta Credito\"\r\n",
 					"fecha = \"10012023\"\r\n",
-					"name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
-					"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\""
+					"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
+					"name = \"Extracto_7358651_202108_TARJETA_VISA_2166\""
 				],
-				"execution_count": 128
+				"execution_count": 258
 			},
 			{
 				"cell_type": "code",
@@ -110,7 +110,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": 131
+				"execution_count": 259
 			},
 			{
 				"cell_type": "code",
@@ -131,7 +131,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 132
+				"execution_count": 260
 			},
 			{
 				"cell_type": "code",
@@ -159,7 +159,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 133
+				"execution_count": 261
 			},
 			{
 				"cell_type": "code",
@@ -176,9 +176,104 @@
 					"collapsed": false
 				},
 				"source": [
-					"display(df_formated)"
+					"display (df_formated)"
 				],
-				"execution_count": 134
+				"execution_count": 262
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Obtener Informacion de Cliente\r\n",
+					"\r\n",
+					"Nombre = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 2).first()[0]\r\n",
+					"Email = user\r\n",
+					"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
+					"Ciudad_1 = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 5).first()[0]\r\n",
+					"Ciudad_2 = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 6).first()[0]\r\n",
+					"\r\n",
+					"# Crear dataframe para informacion de cliente\r\n",
+					"\r\n",
+					"schemaCliente = StructType([ \\\r\n",
+					"    StructField(\"Nombre\",StringType(),True), \\\r\n",
+					"    StructField(\"Email\",StringType(),True), \\\r\n",
+					"    StructField(\"Direccion\",StringType(),True), \\\r\n",
+					"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
+					"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
+					"  ])\r\n",
+					"\r\n",
+					"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
+					"\r\n",
+					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
+				],
+				"execution_count": 245
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Obtener Informacion de Prodcuto\r\n",
+					"\r\n",
+					"TipoProducto = 'Tarjeta Credito'\r\n",
+					"CupoTotal =  df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 55).first()[0]\r\n",
+					"NumeroTarjeta = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 24).first()[0]\r\n",
+					"TasaInteresMVCompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 94).first()[0]\r\n",
+					"TasaInteresMVCompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 95).first()[0]\r\n",
+					"TasaInteresMVImpuestos = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 96).first()[0]\r\n",
+					"TasaInteresMVAvances = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 97).first()[0]\r\n",
+					"TasaInteresMVMora = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 98).first()[0]\r\n",
+					"TasaInteresEACompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 100).first()[0]\r\n",
+					"TasaInteresEACompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 101).first()[0]\r\n",
+					"TasaInteresEAImpuestos = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 102).first()[0]\r\n",
+					"TasaInteresEAAvances = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 103).first()[0]\r\n",
+					"TasaInteresEAMora = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 104).first()[0]\r\n",
+					"\r\n",
+					"# Crear dataframe para informacion de producto\r\n",
+					"\r\n",
+					"schemaProducto = StructType([ \\\r\n",
+					"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
+					"    StructField(\"CupoTotal\",StringType(),True), \\\r\n",
+					"    StructField(\"NumeroTarjeta\",StringType(),True), \\\r\n",
+					"    StructField(\"TasaInteresMVCompra1Mes\", StringType(), True), \\\r\n",
+					"    StructField(\"TasaInteresMVCompra2MesOMas\", StringType(), True), \\\r\n",
+					"    StructField(\"TasaInteresMVImpuestos\", StringType(), True), \\\r\n",
+					"    StructField(\"TasaInteresMVAvances\", StringType(), True), \\\r\n",
+					"    StructField(\"TasaInteresMVMora\", StringType(), True), \\\r\n",
+					"    StructField(\"TasaInteresEACompra1Mes\", StringType(), True), \\\r\n",
+					"    StructField(\"TasaInteresEACompra2MesOMas\", StringType(), True), \\\r\n",
+					"    StructField(\"TasaInteresEAImpuestos\", StringType(), True), \\\r\n",
+					"    StructField(\"TasaInteresEAAvances\", StringType(), True), \\\r\n",
+					"    StructField(\"TasaInteresEAMora\", StringType(), True) \\\r\n",
+					"  ])\r\n",
+					"\r\n",
+					"data_Producto = [(TipoProducto, CupoTotal, NumeroTarjeta, TasaInteresMVCompra1Mes, TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, \\\r\n",
+					"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra1Mes, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora\r\n",
+					")]\r\n",
+					"\r\n",
+					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
+					""
+				],
+				"execution_count": 246
 			},
 			{
 				"cell_type": "code",
@@ -341,6 +436,8 @@
 					"    )\r\n",
 					"df_Cuotas = df_Cuotas.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
+					"display  (df_Cuotas)\r\n",
+					"\r\n",
 					"#Trear las descripciones para comparar con ellas eliminando los blancos que se generan en las cuotas\r\n",
 					"\r\n",
 					"df_DescripcionsFiltradas = df_DescripcionTransacciones.select(df_DescripcionTransacciones.DescripcionTransaccion, \\\r\n",
@@ -364,11 +461,9 @@
 					"    .select(df_Cuotas.Cuotas, df_Cuotas.UniqueId, df_DescripcionTransacciones.id) \\\r\n",
 					"    .fillna(0).fillna(\"\") \r\n",
 					"\r\n",
-					"display(df_Cuotas)\r\n",
-					"\r\n",
 					""
 				],
-				"execution_count": 225
+				"execution_count": 247
 			},
 			{
 				"cell_type": "code",
@@ -384,229 +479,17 @@
 					}
 				},
 				"source": [
-					"# Obtener Informacion de Cliente\r\n",
-					"\r\n",
-					"Nombre = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 2).first()[0]\r\n",
-					"Email = user\r\n",
-					"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
-					"Ciudad_1 = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 5).first()[0]\r\n",
-					"Ciudad_2 = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 6).first()[0]\r\n",
-					"\r\n",
-					"# Crear dataframe para informacion de cliente\r\n",
-					"\r\n",
-					"schemaCliente = StructType([ \\\r\n",
-					"    StructField(\"Nombre\",StringType(),True), \\\r\n",
-					"    StructField(\"Email\",StringType(),True), \\\r\n",
-					"    StructField(\"Direccion\",StringType(),True), \\\r\n",
-					"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
-					"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
-					"  ])\r\n",
-					"\r\n",
-					"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
-					"\r\n",
-					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
+					"#df_idTransacciones.show(50)\r\n",
+					"#df_FechaTransacciones.show(50)\r\n",
+					"#df_DescripcionTransacciones.show(50)\r\n",
+					"#df_CostoTransacciones.show(50)\r\n",
+					"#df_TasaPactada.show(50)\r\n",
+					"#df_TasaFacturada.show(50)\r\n",
+					"#df_CargosYAbonos.show(50)\r\n",
+					"#df_SaldoADiferir.show(50)\r\n",
+					"#df_Cuotas.show(50)"
 				],
-				"execution_count": 10
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"#Obtener Informacion de Prodcuto\r\n",
-					"\r\n",
-					"TipoProducto = 'Tarjeta Credito'\r\n",
-					"CupoTotal =  df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 55).first()[0]\r\n",
-					"NumeroTarjeta = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 24).first()[0]\r\n",
-					"TasaInteresMVCompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 94).first()[0]\r\n",
-					"TasaInteresMVCompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 95).first()[0]\r\n",
-					"TasaInteresMVImpuestos = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 96).first()[0]\r\n",
-					"TasaInteresMVAvances = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 97).first()[0]\r\n",
-					"TasaInteresMVMora = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 98).first()[0]\r\n",
-					"TasaInteresEACompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 100).first()[0]\r\n",
-					"TasaInteresEACompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 101).first()[0]\r\n",
-					"TasaInteresEAImpuestos = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 102).first()[0]\r\n",
-					"TasaInteresEAAvances = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 103).first()[0]\r\n",
-					"TasaInteresEAMora = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 104).first()[0]\r\n",
-					"\r\n",
-					"# Crear dataframe para informacion de producto\r\n",
-					"\r\n",
-					"schemaProducto = StructType([ \\\r\n",
-					"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
-					"    StructField(\"CupoTotal\",StringType(),True), \\\r\n",
-					"    StructField(\"NumeroTarjeta\",StringType(),True), \\\r\n",
-					"    StructField(\"TasaInteresMVCompra1Mes\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresMVCompra2MesOMas\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresMVImpuestos\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresMVAvances\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresMVMora\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresEACompra1Mes\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresEACompra2MesOMas\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresEAImpuestos\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresEAAvances\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresEAMora\", StringType(), True) \\\r\n",
-					"  ])\r\n",
-					"\r\n",
-					"data_Producto = [(TipoProducto, CupoTotal, NumeroTarjeta, TasaInteresMVCompra1Mes, TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, \\\r\n",
-					"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra1Mes, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora\r\n",
-					")]\r\n",
-					"\r\n",
-					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
-					""
-				],
-				"execution_count": 12
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"#Definir estructura para Informacion de ID Transaccion\r\n",
-					"\r\n",
-					"schema1 = StructType([\r\n",
-					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-					"    StructField(\"IdTransaccion\", StringType(), nullable=True)\r\n",
-					"])\r\n",
-					"\r\n",
-					"df_idTransacciones = spark.createDataFrame([], schema1)\r\n",
-					"ArrayIdTransacciones = []\r\n",
-					"\r\n",
-					"\r\n",
-					"# Definir estructura para fecha Transaccion\r\n",
-					"\r\n",
-					"schema2 = StructType([\r\n",
-					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-					"    StructField(\"FechaTransaccion\", StringType(), nullable=True)\r\n",
-					"])\r\n",
-					"\r\n",
-					"df_FechaTransacciones = spark.createDataFrame([], schema2)\r\n",
-					"ArrayFechaTransacciones = []\r\n",
-					"\r\n",
-					"\r\n",
-					"# Definir estructura para fecha Descripciones\r\n",
-					"\r\n",
-					"schema3 = StructType([\r\n",
-					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-					"    StructField(\"DescripcionTransaccion\", StringType(), nullable=True)\r\n",
-					"])\r\n",
-					"\r\n",
-					"df_DescripcionTransacciones = spark.createDataFrame([], schema3)\r\n",
-					"ArrayDescripcionTransacciones = []\r\n",
-					"\r\n",
-					"\r\n",
-					"# Definir estructura para Costo transaccion\r\n",
-					"\r\n",
-					"schema4 = StructType([\r\n",
-					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-					"    StructField(\"CostoTransaccion\", DoubleType(), nullable=True)\r\n",
-					"])\r\n",
-					"\r\n",
-					"df_CostoTransacciones = spark.createDataFrame([], schema4)\r\n",
-					"ArrayCostoTransacciones = []\r\n",
-					"\r\n",
-					"\r\n",
-					"# Definir estructura para Tasa Pactada\r\n",
-					"\r\n",
-					"schema5 = StructType([\r\n",
-					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-					"    StructField(\"TasaPactada\", DoubleType(), nullable=True)\r\n",
-					"])\r\n",
-					"\r\n",
-					"df_TasaPactada = spark.createDataFrame([], schema5)\r\n",
-					"ArrayTasaPactada = []\r\n",
-					"\r\n",
-					"\r\n",
-					"# Definir estructura para Tasa Facturada\r\n",
-					"\r\n",
-					"schema6 = StructType([\r\n",
-					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-					"    StructField(\"TasaFacturada\", DoubleType(), nullable=True)\r\n",
-					"])\r\n",
-					"\r\n",
-					"df_TasaFacturada = spark.createDataFrame([], schema6)\r\n",
-					"ArrayTasaFacturada = []\r\n",
-					"\r\n",
-					"\r\n",
-					"# Definir estructura para Cargos y Abonos\r\n",
-					"\r\n",
-					"schema7 = StructType([\r\n",
-					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-					"    StructField(\"CargosYAbonos\", DoubleType(), nullable=True)\r\n",
-					"])\r\n",
-					"\r\n",
-					"df_CargosYAbonos = spark.createDataFrame([], schema7)\r\n",
-					"ArrayCargosYAbonos = []\r\n",
-					"\r\n",
-					"\r\n",
-					"# Definir estructura Saldo A Diferir\r\n",
-					"\r\n",
-					"schema8 = StructType([\r\n",
-					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-					"    StructField(\"SaldoADiferir\", DoubleType(), nullable=True)\r\n",
-					"])\r\n",
-					"\r\n",
-					"df_SaldoADiferir = spark.createDataFrame([], schema8)\r\n",
-					"ArraySaldoADiferir = []\r\n",
-					"\r\n",
-					"\r\n",
-					"# Definir estructura Cuotas\r\n",
-					"\r\n",
-					"schema9 = StructType([\r\n",
-					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-					"    StructField(\"Cuotas\", StringType(), nullable=True)\r\n",
-					"])\r\n",
-					"\r\n",
-					"df_Cuotas = spark.createDataFrame([], schema9)\r\n",
-					"ArrayCuotas = []\r\n",
-					"\r\n",
-					"\r\n",
-					""
-				],
-				"execution_count": 37
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"#df_idTransacciones.show()\r\n",
-					"#df_FechaTransacciones.show()\r\n",
-					"#df_DescripcionTransacciones.show()\r\n",
-					"#df_CostoTransacciones.show()\r\n",
-					"#df_TasaPactada.show()\r\n",
-					"#df_TasaFacturada.show()\r\n",
-					"#df_CargosYAbonos.show()\r\n",
-					"#df_SaldoADiferir.show()\r\n",
-					"#df_Cuotas.show()"
-				],
-				"execution_count": 41
+				"execution_count": 248
 			},
 			{
 				"cell_type": "code",
@@ -644,7 +527,25 @@
 					"                        df_Cuotas.Cuotas                       \r\n",
 					"                        )"
 				],
-				"execution_count": 42
+				"execution_count": 249
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_Transacciones.show(40)"
+				],
+				"execution_count": 250
 			},
 			{
 				"cell_type": "code",
@@ -672,7 +573,7 @@
 					"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
 					""
 				],
-				"execution_count": 43
+				"execution_count": 240
 			},
 			{
 				"cell_type": "code",
