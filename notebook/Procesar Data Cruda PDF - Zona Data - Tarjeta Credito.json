@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "00c62d39-21e2-4ff2-af14-3ed602de357d"
+				"spark.autotune.trackingId": "ec1a67e2-d888-4065-aad1-6b2823a07577"
 			}
 		},
 		"metadata": {
@@ -58,16 +58,11 @@
 				},
 				"source": [
 					"#Importar Librerias Necesarias\r\n",
-					"\r\n",
-					"from pyspark.sql.functions import split\r\n",
-					"from pyspark.sql.functions import col\r\n",
-					"from pyspark.sql.functions import size\r\n",
-					"from pyspark.sql.functions import explode\r\n",
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
-					"from pyspark.sql.functions import row_number\r\n",
-					"from pyspark.sql.window import Window"
+					"from pyspark.sql.window import Window\r\n",
+					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 1
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -80,7 +75,10 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"tags": [
+						"parameters"
+					]
 				},
 				"source": [
 					"#Configurar parametros aqui\r\n",
@@ -88,10 +86,10 @@
 					"user = \"bsmoralesg@outlook.com\"\r\n",
 					"type = \"Tarjeta Credito\"\r\n",
 					"fecha = \"10012023\"\r\n",
-					"name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
-					"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\""
+					"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
+					"name = \"Extracto_7358651_202108_TARJETA_VISA_2166\""
 				],
-				"execution_count": 14
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -110,10 +108,9 @@
 					"# Configurar rutas de origen y destino de archivos\r\n",
 					"\r\n",
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
-					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name\r\n",
-					""
+					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": 15
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -134,7 +131,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 16
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -157,12 +154,12 @@
 					"# Transformar la columna array para crear una nueva fila por cada elemento\r\n",
 					"df_formated = df_split.select(df_split.index, df_split.pagenumber, df_split.x0, df_split.x1, df_split.y0, df_split.y1, explode(\"contenido\").alias(\"contenido\"))\r\n",
 					"\r\n",
-					"#Crear idnetificar unico  basado enel orden de lectura\r\n",
+					"#Crear identificador unico  basado enel orden de lectura\r\n",
 					"\r\n",
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 17
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -181,7 +178,7 @@
 				"source": [
 					"display(df_formated)"
 				],
-				"execution_count": 9
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -198,12 +195,78 @@
 					"collapsed": false
 				},
 				"source": [
-					"#display(df_formated)\r\n",
+					"# Definir incrementales basado en el unique idabs\r\n",
 					"\r\n",
-					"df_idTransacciones = df_formated.select(df_formated.contenido).where(df_formated.x0 == 33.0)\r\n",
-					"df_FechaTransacciones = df_formated.select(df_formated.contenido).where(df_formated.x0 == 90.0)\r\n",
-					"90.0\r\n",
-					"display(df_FechaTransacciones)\r\n",
+					"Incremental = Window.orderBy(\"UniqueId\")\r\n",
+					"\r\n",
+					"#Extraer id de transacciones\r\n",
+					"\r\n",
+					"df_idTransacciones = df_formated.select(df_formated.contenido.alias(\"IdTransaccion\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"        (df_formated.x0 == 33.0) & \\\r\n",
+					"        (df_formated.contenido != \"Número de\")  & \\\r\n",
+					"        (df_formated.contenido != \"Autorización\")  & \\\r\n",
+					"        (df_formated.contenido != \"\") \r\n",
+					"    )\r\n",
+					"df_idTransacciones = df_idTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"\r\n",
+					"# Obtener cantidad de transacciones\r\n",
+					"CantidadTransacciones = df_idTransacciones.count()\r\n",
+					"\r\n",
+					"#Extraer fecha de transacciones\r\n",
+					"\r\n",
+					"df_FechaTransacciones = df_formated.select(df_formated.contenido.alias(\"FechaTransaccion\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"        (df_formated.x0 == 90.0) & \\\r\n",
+					"        (df_formated.contenido != \"Transacción\")  & \\\r\n",
+					"        (df_formated.contenido != \"Fecha de\")  & \\\r\n",
+					"        (df_formated.contenido != \"ESTADO DE CUENTA EN:\")  & \\\r\n",
+					"        (df_formated.contenido != \"\") \r\n",
+					"    )\r\n",
+					"df_FechaTransacciones = df_FechaTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"\r\n",
+					"\r\n",
+					"#Extraer descripcion de transacciones\r\n",
+					"\r\n",
+					"df_DescripcionTransacciones = df_formated.select(df_formated.contenido.alias(\"DescripcionTransaccion\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"        (df_formated.x0 == 135.0) & \\\r\n",
+					"        (df_formated.contenido != \"ESTADO DE CUENTA EN:\") & \\\r\n",
+					"        (df_formated.contenido != \"\")\r\n",
+					"    )\r\n",
+					"df_DescripcionTransacciones = df_DescripcionTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"\r\n",
+					"\r\n",
+					"#Extraer Costo de transacciones\r\n",
+					"\r\n",
+					"df_CostoTransacciones = df_formated.select(df_formated.contenido.alias(\"CostoTransaccion\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"        (df_formated.x0 == 312.99) & \\\r\n",
+					"        (df_formated.contenido != \"\")\r\n",
+					"    )\r\n",
+					"df_CostoTransacciones = df_CostoTransacciones.withColumn('CostoTransaccion', \\\r\n",
+					"        when(df_CostoTransacciones.CostoTransaccion.contains('-'), concat(lit(\"-\"), regexp_replace(df_CostoTransacciones.CostoTransaccion, '-', ''))) \\\r\n",
+					"        .otherwise(df_CostoTransacciones.CostoTransaccion)\r\n",
+					"    )\r\n",
+					"df_CostoTransacciones = df_CostoTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"\r\n",
+					"\r\n",
+					"#Extraer Costo de transacciones\r\n",
+					"\r\n",
+					"df_TasaPactada = df_formated.select(df_formated.contenido.alias(\"TasaPactada\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"            (df_formated.x0 == 354.00) & \\\r\n",
+					"            (df_formated.contenido != \"\")\r\n",
+					"    )\r\n",
+					"\r\n",
+					"print (CantidadTransacciones)\r\n",
+					"display(df_TasaPactada)\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"#Comepletar datos Faltantes\r\n",
+					"\r\n",
+					"if (df_TasaPactada.count() !=  )\r\n",
 					"\r\n",
 					"#df_idTransacciones = spark.createDataFrame(ArrayIdTransacciones, schema1)\r\n",
 					"#df_FechaTransacciones = spark.createDataFrame(ArrayFechaTransacciones, schema2)\r\n",
@@ -215,7 +278,7 @@
 					"#df_SaldoADiferir = spark.createDataFrame(ArraySaldoADiferir, schema8)\r\n",
 					"#df_Cuotas = spark.createDataFrame(ArrayCuotas, schema9)"
 				],
-				"execution_count": 23
+				"execution_count": 92
 			},
 			{
 				"cell_type": "code",
@@ -349,24 +412,6 @@
 					"display(df_Producto)"
 				],
 				"execution_count": 13
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 2)"
-				],
-				"execution_count": null
 			},
 			{
 				"cell_type": "code",
