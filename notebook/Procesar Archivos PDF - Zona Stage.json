@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "676dd9f3-7244-4172-993f-0af8aa607608"
+				"spark.autotune.trackingId": "ac8dc34b-b245-4c17-806c-f8479da74f04"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					"import io"
 				],
-				"execution_count": 36
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -112,7 +112,13 @@
 					"pdf_type = \"Tarjeta Credito\"\r\n",
 					"pdf_fecha = \"10012023\"\r\n",
 					"#file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
-					"file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"#file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+					"\r\n",
+					"name = \"Extracto_392576648_202304_TARJETA_VISA_2166.pdf\"\r\n",
+					"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166.pdf\"\r\n",
+					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166.pdf\"\r\n",
+					"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166.pdf\"\r\n",
+					"\r\n",
 					"pdf_password = \"1233491047\""
 				],
 				"execution_count": 38
