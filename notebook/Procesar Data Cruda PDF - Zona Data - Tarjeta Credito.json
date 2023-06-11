@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7a5f33c0-80ee-4eb2-a219-d6973d0eb1f5"
+				"spark.autotune.trackingId": "c91a63d5-63ae-4c40-b1ee-872c42635e49"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 263
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -86,8 +86,13 @@
 					"user = \"bsmoralesg@outlook.com\"\r\n",
 					"type = \"Tarjeta Credito\"\r\n",
 					"fecha = \"10012023\"\r\n",
-					"name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
-					"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\""
+					"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
+					"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
+					"\r\n",
+					"name = \"Extracto_392576648_202304_TARJETA_VISA_2166\"\r\n",
+					"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166\"\r\n",
+					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
+					"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 				],
 				"execution_count": 277
 			},
