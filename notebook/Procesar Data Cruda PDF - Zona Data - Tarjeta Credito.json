@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0d042bf1-3806-4f11-b16d-7b2eea80efbd"
+				"spark.autotune.trackingId": "1288388c-125a-4787-ad81-9f0a619e5315"
 			}
 		},
 		"metadata": {
@@ -551,9 +551,9 @@
 					"collapsed": false
 				},
 				"source": [
-					"display(df_Cliente)\r\n",
-					"display(df_Producto)\r\n",
-					"display(df_Transacciones)"
+					"#display(df_Cliente)\r\n",
+					"#display(df_Producto)\r\n",
+					"#display(df_Transacciones)"
 				],
 				"execution_count": 540
 			},
