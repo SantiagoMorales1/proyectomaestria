@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "e32ec239-523e-4acd-a165-ddd2925d2d2e"
+				"spark.autotune.trackingId": "70d11dcc-430b-4d54-bcdd-e3ce705168e5"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -94,7 +94,7 @@
 					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 				],
-				"execution_count": 277
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -115,7 +115,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": 278
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -136,7 +136,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 279
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 280
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -183,7 +183,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 281
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -221,7 +221,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 282
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -278,7 +278,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 283
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -468,7 +468,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 284
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -494,7 +494,7 @@
 					"#df_SaldoADiferir.show(50)\r\n",
 					"#df_Cuotas.show(50)"
 				],
-				"execution_count": 285
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -532,7 +532,7 @@
 					"                        df_Cuotas.Cuotas                       \r\n",
 					"                        )"
 				],
-				"execution_count": 286
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -548,9 +548,11 @@
 					}
 				},
 				"source": [
+					"df_Cliente.show(40)\r\n",
+					"df_Producto.show(40)\r\n",
 					"df_Transacciones.show(40)"
 				],
-				"execution_count": 287
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -578,7 +580,7 @@
 					"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
 					""
 				],
-				"execution_count": 288
+				"execution_count": null
 			}
 		]
 	}
