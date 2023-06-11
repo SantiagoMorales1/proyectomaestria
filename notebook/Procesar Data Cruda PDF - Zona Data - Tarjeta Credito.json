@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1288388c-125a-4787-ad81-9f0a619e5315"
+				"spark.autotune.trackingId": "a87310d7-affd-45f9-8d9b-c1668a697b7f"
 			}
 		},
 		"metadata": {
@@ -306,7 +306,7 @@
 					"\r\n",
 					"df_idTransacciones = df_formated.select(df_formated.contenido.alias(\"IdTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"        ((df_formated.x0 == 33.0) | (df_formated.x0 == 35.0)) & \\\r\n",
+					"        ((df_formated.x0 => 33.0) & (df_formated.x0 <= 35.0)) & \\\r\n",
 					"        (df_formated.contenido != \"Número de\")  & \\\r\n",
 					"        (df_formated.contenido != \"Autorización\")  & \\\r\n",
 					"        (df_formated.contenido != \"\") \r\n",
@@ -320,7 +320,7 @@
 					"\r\n",
 					"df_FechaTransacciones = df_formated.select(df_formated.contenido.alias(\"FechaTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"        ((df_formated.x0 == 90.0) | (df_formated.x0 == 92.0)) & \\\r\n",
+					"        ((df_formated.x0 >= 90.0) & (df_formated.x0 <= 92.0)) & \\\r\n",
 					"        (df_formated.contenido != \"Transacción\")  & \\\r\n",
 					"        (df_formated.contenido != \"Fecha de\")  & \\\r\n",
 					"        (df_formated.contenido != \"ESTADO DE CUENTA EN:\")  & \\\r\n",
@@ -551,9 +551,9 @@
 					"collapsed": false
 				},
 				"source": [
-					"#display(df_Cliente)\r\n",
-					"#display(df_Producto)\r\n",
-					"#display(df_Transacciones)"
+					"display(df_Cliente)\r\n",
+					"display(df_Producto)\r\n",
+					"display(df_Transacciones)"
 				],
 				"execution_count": 540
 			},
