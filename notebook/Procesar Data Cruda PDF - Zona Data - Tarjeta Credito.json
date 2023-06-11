@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ec1a67e2-d888-4065-aad1-6b2823a07577"
+				"spark.autotune.trackingId": "77130932-0d9c-411c-b1b8-96a5dcf658b3"
 			}
 		},
 		"metadata": {
@@ -232,7 +232,7 @@
 					"    ( \\\r\n",
 					"        (df_formated.x0 == 135.0) & \\\r\n",
 					"        (df_formated.contenido != \"ESTADO DE CUENTA EN:\") & \\\r\n",
-					"        (df_formated.contenido != \"\")\r\n",
+					"        (df_formated.contenido != \"Pactada\")\r\n",
 					"    )\r\n",
 					"df_DescripcionTransacciones = df_DescripcionTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
@@ -256,17 +256,28 @@
 					"df_TasaPactada = df_formated.select(df_formated.contenido.alias(\"TasaPactada\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
 					"            (df_formated.x0 == 354.00) & \\\r\n",
+					"            (df_formated.contenido != \"Pactada\") & \\\r\n",
 					"            (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
 					"\r\n",
-					"print (CantidadTransacciones)\r\n",
-					"display(df_TasaPactada)\r\n",
+					"\r\n",
+					"\r\n",
 					"\r\n",
 					"\r\n",
 					"\r\n",
 					"#Comepletar datos Faltantes\r\n",
 					"\r\n",
-					"if (df_TasaPactada.count() !=  )\r\n",
+					"\r\n",
+					"if (df_TasaPactada.count() !=  CantidadTransacciones):\r\n",
+					"    MaximaCantidadRegistros = df_TasaPactada.count()\r\n",
+					"    RegistrosPedintes = CantidadTransacciones - MaximaCantidadRegistros\r\n",
+					"    MaxUniqueID = df_TasaPactada.select(max(df_TasaPactada.UniqueId)).first()[0]\r\n",
+					"\r\n",
+					"    for i in range (RegistrosPedintes):                \r\n",
+					"        newRow = spark.createDataFrame([(\"\",str(MaxUniqueID+(i+1)))])\r\n",
+					"        df_TasaPactada = df_TasaPactada.union(newRow)\r\n",
+					"\r\n",
+					"display(df_CostoTransacciones)\r\n",
 					"\r\n",
 					"#df_idTransacciones = spark.createDataFrame(ArrayIdTransacciones, schema1)\r\n",
 					"#df_FechaTransacciones = spark.createDataFrame(ArrayFechaTransacciones, schema2)\r\n",
@@ -278,7 +289,7 @@
 					"#df_SaldoADiferir = spark.createDataFrame(ArraySaldoADiferir, schema8)\r\n",
 					"#df_Cuotas = spark.createDataFrame(ArrayCuotas, schema9)"
 				],
-				"execution_count": 92
+				"execution_count": 116
 			},
 			{
 				"cell_type": "code",
