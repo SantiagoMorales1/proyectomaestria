@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "af0ff635-3201-4568-b2a4-c29bf0cfe221"
+				"spark.autotune.trackingId": "86019ea9-7570-4f6e-a92a-3cc97035cb4f"
 			}
 		},
 		"metadata": {
@@ -345,7 +345,7 @@
 					"\r\n",
 					"df_CostoTransacciones = df_formated.select(df_formated.contenido.alias(\"CostoTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"        ((df_formated.x0 == 307.92) | (df_formated.x0 == 312.99)) & \\     \r\n",
+					"        ((df_formated.x0 == 307.92) | (df_formated.x0 == 312.99)) & \\\r\n",
 					"        (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
 					"df_CostoTransacciones = df_CostoTransacciones.withColumn('CostoTransaccion', \\\r\n",
