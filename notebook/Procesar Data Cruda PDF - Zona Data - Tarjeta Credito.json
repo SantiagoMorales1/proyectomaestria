@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ef5de63e-46ef-4132-b192-ca3538009c30"
+				"spark.autotune.trackingId": "e6f87375-acce-4d70-8b88-b046b60407d2"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 85
+				"execution_count": 126
 			},
 			{
 				"cell_type": "code",
@@ -86,10 +86,10 @@
 					"user = \"bsmoralesg@outlook.com\"\r\n",
 					"type = \"Tarjeta Credito\"\r\n",
 					"fecha = \"10012023\"\r\n",
-					"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
-					"name = \"Extracto_7358651_202108_TARJETA_VISA_2166\""
+					"name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
+					"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\""
 				],
-				"execution_count": 86
+				"execution_count": 128
 			},
 			{
 				"cell_type": "code",
@@ -110,7 +110,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": 87
+				"execution_count": 131
 			},
 			{
 				"cell_type": "code",
@@ -131,7 +131,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 88
+				"execution_count": 132
 			},
 			{
 				"cell_type": "code",
@@ -159,7 +159,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 89
+				"execution_count": 133
 			},
 			{
 				"cell_type": "code",
@@ -178,7 +178,7 @@
 				"source": [
 					"display(df_formated)"
 				],
-				"execution_count": 90
+				"execution_count": 134
 			},
 			{
 				"cell_type": "code",
@@ -195,7 +195,7 @@
 					"collapsed": false
 				},
 				"source": [
-					"#Extraer informaicon de transacciones\r\n",
+					"# Extraer informaicon de transacciones\r\n",
 					"\r\n",
 					"# Definir incrementales basado en el uniqueid\r\n",
 					"\r\n",
@@ -215,7 +215,7 @@
 					"# Obtener cantidad de transacciones\r\n",
 					"CantidadTransacciones = df_idTransacciones.count()\r\n",
 					"\r\n",
-					"#Extraer fecha de transacciones\r\n",
+					"# Extraer fecha de transacciones\r\n",
 					"\r\n",
 					"df_FechaTransacciones = df_formated.select(df_formated.contenido.alias(\"FechaTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
@@ -228,7 +228,7 @@
 					"df_FechaTransacciones = df_FechaTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
 					"\r\n",
-					"#Extraer descripcion de transacciones\r\n",
+					"# Extraer descripcion de transacciones\r\n",
 					"\r\n",
 					"df_DescripcionTransacciones = df_formated.select(df_formated.contenido.alias(\"DescripcionTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
@@ -239,7 +239,7 @@
 					"df_DescripcionTransacciones = df_DescripcionTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
 					"\r\n",
-					"#Extraer Costo de transacciones\r\n",
+					"# Extraer Costo de transacciones\r\n",
 					"\r\n",
 					"df_CostoTransacciones = df_formated.select(df_formated.contenido.alias(\"CostoTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
@@ -253,7 +253,7 @@
 					"df_CostoTransacciones = df_CostoTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
 					"\r\n",
-					"#Extraer Tasa Pactada\r\n",
+					"# Extraer Tasa Pactada\r\n",
 					"\r\n",
 					"df_TasaPactada = df_formated.select(df_formated.contenido.alias(\"TasaPactada\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
@@ -262,12 +262,15 @@
 					"            (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
 					"\r\n",
-					"#Completar datos Faltantes\r\n",
+					"# Completar datos Faltantes\r\n",
 					"\r\n",
 					"if (df_TasaPactada.count() !=  CantidadTransacciones):\r\n",
 					"    MaximaCantidadRegistros = df_TasaPactada.count()\r\n",
 					"    RegistrosPendintes = CantidadTransacciones - MaximaCantidadRegistros\r\n",
 					"    MaxUniqueID = df_TasaPactada.select(max(df_TasaPactada.UniqueId)).first()[0]\r\n",
+					"    \r\n",
+					"    if MaxUniqueID is None:\r\n",
+					"        MaxUniqueID = 1\r\n",
 					"\r\n",
 					"    for i in range (RegistrosPendintes):                \r\n",
 					"        newRow = spark.createDataFrame([(\"\",str(MaxUniqueID+(i+1)))])\r\n",
@@ -276,7 +279,7 @@
 					"df_TasaPactada = df_TasaPactada.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
 					"\r\n",
-					"#Extraer Tasa Facturada\r\n",
+					"# Extraer Tasa Facturada\r\n",
 					"\r\n",
 					"df_TasaFacturada = df_formated.select(df_formated.contenido.alias(\"TasaFacturada\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
@@ -286,13 +289,16 @@
 					"            (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
 					"\r\n",
-					"#Completar datos Faltantes\r\n",
+					"# Completar datos Faltantes\r\n",
 					"\r\n",
 					"if (df_TasaFacturada.count() !=  CantidadTransacciones):\r\n",
 					"    MaximaCantidadRegistros = df_TasaFacturada.count()\r\n",
 					"    RegistrosPendintes = CantidadTransacciones - MaximaCantidadRegistros\r\n",
 					"    MaxUniqueID = df_TasaFacturada.select(max(df_TasaFacturada.UniqueId)).first()[0]\r\n",
-					"\r\n",
+					"    \r\n",
+					"    if MaxUniqueID is None:\r\n",
+					"        MaxUniqueID = 1\r\n",
+					"    \r\n",
 					"    for i in range (RegistrosPendintes):                \r\n",
 					"        newRow = spark.createDataFrame([(\"\",str(MaxUniqueID+(i+1)))])\r\n",
 					"        df_TasaFacturada = df_TasaFacturada.union(newRow)\r\n",
@@ -300,9 +306,30 @@
 					"df_TasaFacturada = df_TasaFacturada.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
 					"\r\n",
+					"# Extraer Cargos Y Abonos\r\n",
+					"\r\n",
+					"df_CargosYAbonos = df_formated.select(df_formated.contenido.alias(\"CargosYAbonos\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"            (df_formated.x0 == 453.99) & \\\r\n",
+					"            (df_formated.contenido != \"Pactada\") & \\\r\n",
+					"            (df_formated.contenido != \"\")\r\n",
+					"    )\r\n",
+					"df_CargosYAbonos = df_CargosYAbonos.withColumn('CargosYAbonos', \\\r\n",
+					"        when(df_CargosYAbonos.CargosYAbonos.contains('-'), concat(lit(\"-\"), regexp_replace(df_CargosYAbonos.CargosYAbonos, '-', ''))) \\\r\n",
+					"        .otherwise(df_CargosYAbonos.CargosYAbonos)\r\n",
+					"    )\r\n",
+					"df_CargosYAbonos = df_CargosYAbonos.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
 					"\r\n",
-					"display(df_TasaFacturada)\r\n",
+					"# Extraer Saldo A diferir\r\n",
+					"\r\n",
+					"df_SaldoADiferir = df_formated.select(df_formated.contenido.alias(\"SaldoADiferir\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"            (df_formated.x0 == 540.33) &             \r\n",
+					"            (df_formated.contenido != \"\")\r\n",
+					"    )\r\n",
+					"\r\n",
+					"display(df_SaldoADiferir)\r\n",
 					"\r\n",
 					"\r\n",
 					"\r\n",
@@ -317,7 +344,7 @@
 					"#df_SaldoADiferir = spark.createDataFrame(ArraySaldoADiferir, schema8)\r\n",
 					"#df_Cuotas = spark.createDataFrame(ArrayCuotas, schema9)"
 				],
-				"execution_count": 122
+				"execution_count": 145
 			},
 			{
 				"cell_type": "code",
