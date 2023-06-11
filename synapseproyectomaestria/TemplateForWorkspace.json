@@ -4,12 +4,12 @@
 	"parameters": {
 		"workspaceName": {
 			"type": "string",
-			"metadata": "Workspace name",
+			"metadata": "Nombre del área de trabajo",
 			"defaultValue": "synapseproyectomaestria"
 		},
 		"synapseproyectomaestria-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'synapseproyectomaestria-WorkspaceDefaultSqlServer'",
+			"metadata": "Cadena protegida para \"connectionString\"de \"synapseproyectomaestria-WorkspaceDefaultSqlServer\"",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapseproyectomaestria.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
 		"synapseproyectomaestria-WorkspaceDefaultStorage_properties_typeProperties_url": {
@@ -28,7 +28,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Reafing PDF Files - Stage Zone",
+						"name": "Reading PDF Files - Stagefiles Zone",
 						"type": "SynapseNotebook",
 						"dependsOn": [],
 						"policy": {
@@ -82,11 +82,11 @@
 						}
 					},
 					{
-						"name": "Delete Success File",
-						"type": "Delete",
+						"name": "Reading Raw Data - StageData Zone",
+						"type": "SynapseNotebook",
 						"dependsOn": [
 							{
-								"activity": "Reafing PDF Files - Stage Zone",
+								"activity": "Reading PDF Files - Stagefiles Zone",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -101,18 +101,41 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"dataset": {
-								"referenceName": "DataLakeMaster",
-								"type": "DatasetReference",
-								"parameters": {}
+							"notebook": {
+								"referenceName": "Procesar Data Cruda PDF - Zona Data - Tarjeta Credito",
+								"type": "NotebookReference"
 							},
-							"enableLogging": false,
-							"storeSettings": {
-								"type": "AzureBlobFSReadSettings",
-								"recursive": true,
-								"wildcardFileName": "*_SUCCESS",
-								"enablePartitionDiscovery": false
-							}
+							"parameters": {
+								"user": {
+									"value": "bsmoralesg@outlook.com",
+									"type": "string"
+								},
+								"type": {
+									"value": "Tarjeta Credito",
+									"type": "string"
+								},
+								"fecha": {
+									"value": "10012023",
+									"type": "string"
+								},
+								"name": {
+									"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
+									"type": "string"
+								}
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "spproymaestria",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": false,
+								"spark.dynamicAllocation.minExecutors": 1,
+								"spark.dynamicAllocation.maxExecutors": 1
+							},
+							"driverSize": "Small",
+							"numExecutors": 1
 						}
 					}
 				],
@@ -125,7 +148,7 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/notebooks/Procesar Archivos PDF - Zona Stage')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/spproymaestria')]",
-				"[concat(variables('workspaceId'), '/datasets/DataLakeMaster')]"
+				"[concat(variables('workspaceId'), '/notebooks/Procesar Data Cruda PDF - Zona Data - Tarjeta Credito')]"
 			]
 		},
 		{
@@ -266,7 +289,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "957bca07-6006-4cea-a099-db69112ce30e"
+						"spark.autotune.trackingId": "ac8dc34b-b245-4c17-806c-f8479da74f04"
 					}
 				},
 				"metadata": {
@@ -308,12 +331,13 @@
 							"from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter\r\n",
 							"from pdfminer.pdfpage import PDFPage\r\n",
 							"from pdfminer.converter import TextConverter\r\n",
-							"from pdfminer.layout import LAParams\r\n",
-							"import io\r\n",
-							""
+							"from pdfminer.layout import LAParams, LTTextBoxHorizontal, LTFigure\r\n",
+							"from pdfminer.converter import PDFPageAggregator\r\n",
+							"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
+							"import io"
 						],
 						"outputs": [],
-						"execution_count": 26
+						"execution_count": 1
 					},
 					{
 						"cell_type": "code",
@@ -336,7 +360,7 @@
 							"    .getOrCreate()"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 37
 					},
 					{
 						"cell_type": "code",
@@ -356,14 +380,21 @@
 						},
 						"source": [
 							"#Capturar Parametros\r\n",
-							"pdf_user = \"\"\r\n",
-							"pdf_type = \"\"\r\n",
-							"pdf_fecha = \"\"\r\n",
-							"file_name = \"\"\r\n",
-							"pdf_password = \"\""
+							"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
+							"pdf_type = \"Tarjeta Credito\"\r\n",
+							"pdf_fecha = \"10012023\"\r\n",
+							"#file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
+							"#file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+							"\r\n",
+							"name = \"Extracto_392576648_202304_TARJETA_VISA_2166.pdf\"\r\n",
+							"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166.pdf\"\r\n",
+							"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166.pdf\"\r\n",
+							"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166.pdf\"\r\n",
+							"\r\n",
+							"pdf_password = \"1233491047\""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 38
 					},
 					{
 						"cell_type": "code",
@@ -386,10 +417,44 @@
 							"\r\n",
 							"#Ruta Destino\r\n",
 							"file_name = file_name.replace(\".pdf\", \"\")\r\n",
-							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name"
+							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 39
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Definir estructura para datos crudos\r\n",
+							"\r\n",
+							"schemarawdata = StructType([\r\n",
+							"    StructField(\"index\", IntegerType(), nullable=True),\r\n",
+							"    StructField(\"pagenumber\", IntegerType(), nullable=True),\r\n",
+							"    StructField(\"x0\", DoubleType(), nullable=True),\r\n",
+							"    StructField(\"x1\", DoubleType(), nullable=True),\r\n",
+							"    StructField(\"y0\", DoubleType(), nullable=True),\r\n",
+							"    StructField(\"y1\", DoubleType(), nullable=True),\r\n",
+							"    StructField(\"contenido\", StringType(), nullable=True)\r\n",
+							"])\r\n",
+							"\r\n",
+							"df_RawDat = spark.createDataFrame([], schemarawdata)\r\n",
+							"ArrayRawData = []\r\n",
+							"\r\n",
+							" "
+						],
+						"outputs": [],
+						"execution_count": 40
 					},
 					{
 						"cell_type": "code",
@@ -434,6 +499,7 @@
 							"# Porcesar cada pagina del archivo PDF\r\n",
 							"password = pdf_password.encode()\r\n",
 							"pages = PDFPage.get_pages(pdf_stream, password=password, check_extractable=True)\r\n",
+							"\r\n",
 							"for page in pages:\r\n",
 							"    interpreter.process_page(page)\r\n",
 							"\r\n",
@@ -445,7 +511,7 @@
 							"retstr.close()"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 41
 					},
 					{
 						"cell_type": "code",
@@ -461,11 +527,127 @@
 							}
 						},
 						"source": [
-							"# Crear dataframe\r\n",
-							"pdf_df = spark.createDataFrame([(pdf_content,)], [\"contenido\"])\r\n",
+							"# Leer the PDF file como bytes\r\n",
+							"pdf_bytes = spark.read \\\r\n",
+							"    .format(\"binaryFile\") \\\r\n",
+							"    .option(\"path\", pdf_path_origin) \\\r\n",
+							"    .load() \\\r\n",
+							"    .select(\"content\") \\\r\n",
+							"    .collect()[0][0]\r\n",
+							"\r\n",
+							"# crear un BytesIO stream de the PDF bytes\r\n",
+							"pdf_stream = BytesIO(pdf_bytes)\r\n",
+							"pdf_stream.seek(0)\r\n",
+							"\r\n",
+							"# Crear objeto PDFResourceManager y configurar parametros\r\n",
+							"rsrcmgr = PDFResourceManager()\r\n",
+							"retstr = io.StringIO()\r\n",
+							"\r\n",
+							"# Crear Objeto  TextConverter para las paginas dle PDF\r\n",
+							"laparams = LAParams()\r\n",
+							"#device = TextConverter(rsrcmgr, retstr, laparams=laparams)\r\n",
+							"device = PDFPageAggregator(rsrcmgr, laparams=laparams)\r\n",
+							"\r\n",
+							"# Crear objeto PDFPageInterpreter\r\n",
+							"interpreter = PDFPageInterpreter(rsrcmgr, device)\r\n",
+							"\r\n",
+							"# Porcesar cada pagina del archivo PDF\r\n",
+							"password = pdf_password.encode()\r\n",
+							"pages = PDFPage.get_pages(pdf_stream, password=password, check_extractable=True)    \r\n",
+							"\r\n",
+							"\r\n",
+							"#Recorrer las Paginas del PDF \r\n",
+							"pageraux = None\r\n",
+							"pagenumber = 0\r\n",
+							"\r\n",
+							"for page in pages:\r\n",
+							"        \r\n",
+							"        # Process the page\r\n",
+							"\r\n",
+							"        interpreter.process_page(page)\r\n",
+							"        layout = device.get_result()\r\n",
+							"\r\n",
+							"        # Cambiar la pagina\r\n",
+							"        if (page != pageraux):\r\n",
+							"            pagenumber = pagenumber + 1\r\n",
+							"        \r\n",
+							"        # Iterar por cada elemnto del layout        \r\n",
+							"        for element in layout:\r\n",
+							"            if (not isinstance(element, LTFigure)):\r\n",
+							"                \r\n",
+							"                index = int(element.index)                \r\n",
+							"                x0 = float(element.x0)\r\n",
+							"                x1 = float(element.x1)\r\n",
+							"                y0 = float(element.y0)\r\n",
+							"                y1 = float(element.y1)\r\n",
+							"                contenido = str(element.get_text())\r\n",
+							"                ArrayRawData.append((index, pagenumber, x0, x1, y0, y1, contenido)) \r\n",
+							"    \r\n",
+							"        pageraux = page\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 42
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Crear dataframe con toda la data cruda\r\n",
+							"\r\n",
+							"df_RawDat = spark.createDataFrame(ArrayRawData, schemarawdata)\r\n",
 							"\r\n",
 							"# crear parquet file\r\n",
-							"pdf_df.write.mode(\"overwrite\").parquet(path_sink)"
+							"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
+						],
+						"outputs": [],
+						"execution_count": 43
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display(df_RawDat)"
+						],
+						"outputs": [],
+						"execution_count": 44
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
 						],
 						"outputs": [],
 						"execution_count": null
@@ -475,7 +657,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Procesar Data Cruda PDF - Zona Data')]",
+			"name": "[concat(parameters('workspaceName'), '/Procesar Data Cruda PDF - Zona Data - Tarjeta Credito')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -498,7 +680,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1341e1bc-89ff-4d2d-98cd-fa86eff958af"
+						"spark.autotune.trackingId": "897c9f9c-a2f0-41f6-8d95-c24e705ef177"
 					}
 				},
 				"metadata": {
@@ -536,16 +718,67 @@
 						},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
-							"\r\n",
-							"from pyspark.sql.functions import split\r\n",
-							"from pyspark.sql.functions import col\r\n",
-							"from pyspark.sql.functions import size\r\n",
-							"from pyspark.sql.functions import explode\r\n",
 							"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
-							""
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 192
+						"execution_count": 529
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"tags": [
+								"parameters"
+							]
+						},
+						"source": [
+							"#Configurar parametros aqui\r\n",
+							"\r\n",
+							"user = \"bsmoralesg@outlook.com\"\r\n",
+							"type = \"Tarjeta Credito\"\r\n",
+							"fecha = \"10012023\"\r\n",
+							"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
+							"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
+							"\r\n",
+							"#name = \"Extracto_392576648_202304_TARJETA_VISA_2166\"\r\n",
+							"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166\"\r\n",
+							"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
+							"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
+						],
+						"outputs": [],
+						"execution_count": 530
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Configurar rutas de origen y destino de archivos\r\n",
+							"\r\n",
+							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
+							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
+						],
+						"outputs": [],
+						"execution_count": 531
 					},
 					{
 						"cell_type": "code",
@@ -564,10 +797,10 @@
 						"source": [
 							"#Obtener Datos para Tarjeta Credito\r\n",
 							"\r\n",
-							"DataCruda = spark.read.load('abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/bsmoralesg@outlook.com/Tarjeta Credito/10012023/Extracto_7358651_202108_TARJETA_VISA_2166/*.parquet', format='parquet')"
+							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 66
+						"execution_count": 532
 					},
 					{
 						"cell_type": "code",
@@ -585,14 +818,38 @@
 						"source": [
 							"# Dividir los valores por salto de linea\r\n",
 							"\r\n",
-							"df_split = df.withColumn(\"contenido\", split(df[\"contenido\"], \"\\n\"))\r\n",
+							"df_split = DataCruda.withColumn(\"contenido\", split(DataCruda[\"contenido\"], \"\\n\"))\r\n",
 							"\r\n",
 							"# Transformar la columna array para crear una nueva fila por cada elemento\r\n",
-							"df_fromated = df_split.select(explode(\"contenido\").alias(\"contenido\"))\r\n",
-							""
+							"df_formated = df_split.select(df_split.index, df_split.pagenumber, df_split.x0, df_split.x1, df_split.y0, df_split.y1, explode(\"contenido\").alias(\"contenido\"))\r\n",
+							"\r\n",
+							"#Crear identificador unico  basado enel orden de lectura\r\n",
+							"\r\n",
+							"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
+							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 129
+						"execution_count": 533
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display (df_formated)"
+						],
+						"outputs": [],
+						"execution_count": 534
 					},
 					{
 						"cell_type": "code",
@@ -608,16 +865,30 @@
 							}
 						},
 						"source": [
-							"#ObtenerInfomraicon de Cliente\r\n",
+							"# Obtener Informacion de Cliente\r\n",
 							"\r\n",
-							"Nombre = df_fromated.collect()[1].asDict()[\"contenido\"]\r\n",
-							"Direccion = df_fromated.collect()[3].asDict()[\"contenido\"]\r\n",
-							"Ciudad_1 = df_fromated.collect()[4].asDict()[\"contenido\"]\r\n",
-							"Ciudad_2 = df_fromated.collect()[5].asDict()[\"contenido\"]\r\n",
-							""
+							"Nombre = df_formated.select(df_formated.contenido).where((df_formated.UniqueId == 2)).first()[0]\r\n",
+							"Email = user\r\n",
+							"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
+							"Ciudad_1 = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 5).first()[0]\r\n",
+							"Ciudad_2 = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 6).first()[0]\r\n",
+							"\r\n",
+							"# Crear dataframe para informacion de cliente\r\n",
+							"\r\n",
+							"schemaCliente = StructType([ \\\r\n",
+							"    StructField(\"Nombre\",StringType(),True), \\\r\n",
+							"    StructField(\"Email\",StringType(),True), \\\r\n",
+							"    StructField(\"Direccion\",StringType(),True), \\\r\n",
+							"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
+							"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
+							"  ])\r\n",
+							"\r\n",
+							"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
+							"\r\n",
+							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 130
+						"execution_count": 535
 					},
 					{
 						"cell_type": "code",
@@ -635,23 +906,48 @@
 						"source": [
 							"#Obtener Informacion de Prodcuto\r\n",
 							"\r\n",
+							"\r\n",
 							"TipoProducto = 'Tarjeta Credito'\r\n",
-							"CupoTotal =  df_fromated.collect()[54].asDict()[\"contenido\"]\r\n",
-							"NumeroTarjeta = df_fromated.collect()[23].asDict()[\"contenido\"]\r\n",
-							"TasaInteresMVCompra1Mes = df_fromated.collect()[93].asDict()[\"contenido\"]\r\n",
-							"TasaInteresMVCompra2MesOMas = df_fromated.collect()[94].asDict()[\"contenido\"]\r\n",
-							"TasaInteresMVImpuestos = df_fromated.collect()[95].asDict()[\"contenido\"]\r\n",
-							"TasaInteresMVAvances = df_fromated.collect()[96].asDict()[\"contenido\"]\r\n",
-							"TasaInteresMVMora = df_fromated.collect()[97].asDict()[\"contenido\"]\r\n",
-							"TasaInteresEACompra1Mes = df_fromated.collect()[99].asDict()[\"contenido\"]\r\n",
-							"TasaInteresEACompra2MesOMas =df_fromated.collect()[100].asDict()[\"contenido\"]\r\n",
-							"TasaInteresEAImpuestos = df_fromated.collect()[101].asDict()[\"contenido\"]\r\n",
-							"TasaInteresEAAvances = df_fromated.collect()[102].asDict()[\"contenido\"]\r\n",
-							"TasaInteresEAMora = df_fromated.collect()[103].asDict()[\"contenido\"]\r\n",
+							"CupoTotal =  df_formated.select(df_formated.contenido).where(df_formated.x0 == 65.0).first()[0]\r\n",
+							"NumeroTarjeta = df_formated.select(df_formated.contenido).where(df_formated.x0 == 465.0).first()[0]\r\n",
+							"TasaInteresMVCompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[0].__getitem__('contenido')\r\n",
+							"TasaInteresMVCompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[1].__getitem__('contenido')\r\n",
+							"TasaInteresMVImpuestos = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[2].__getitem__('contenido')\r\n",
+							"TasaInteresMVAvances = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[3].__getitem__('contenido')\r\n",
+							"TasaInteresMVMora = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[4].__getitem__('contenido')\r\n",
+							"TasaInteresEACompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[0].__getitem__('contenido')\r\n",
+							"TasaInteresEACompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[1].__getitem__('contenido')\r\n",
+							"TasaInteresEAImpuestos = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[2].__getitem__('contenido')\r\n",
+							"TasaInteresEAAvances = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[3].__getitem__('contenido')\r\n",
+							"TasaInteresEAMora = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[4].__getitem__('contenido')\r\n",
+							"\r\n",
+							"# Crear dataframe para informacion de producto\r\n",
+							"\r\n",
+							"schemaProducto = StructType([ \\\r\n",
+							"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
+							"    StructField(\"CupoTotal\",StringType(),True), \\\r\n",
+							"    StructField(\"NumeroTarjeta\",StringType(),True), \\\r\n",
+							"    StructField(\"TasaInteresMVCompra1Mes\", StringType(), True), \\\r\n",
+							"    StructField(\"TasaInteresMVCompra2MesOMas\", StringType(), True), \\\r\n",
+							"    StructField(\"TasaInteresMVImpuestos\", StringType(), True), \\\r\n",
+							"    StructField(\"TasaInteresMVAvances\", StringType(), True), \\\r\n",
+							"    StructField(\"TasaInteresMVMora\", StringType(), True), \\\r\n",
+							"    StructField(\"TasaInteresEACompra1Mes\", StringType(), True), \\\r\n",
+							"    StructField(\"TasaInteresEACompra2MesOMas\", StringType(), True), \\\r\n",
+							"    StructField(\"TasaInteresEAImpuestos\", StringType(), True), \\\r\n",
+							"    StructField(\"TasaInteresEAAvances\", StringType(), True), \\\r\n",
+							"    StructField(\"TasaInteresEAMora\", StringType(), True) \\\r\n",
+							"  ])\r\n",
+							"\r\n",
+							"data_Producto = [(TipoProducto, CupoTotal, NumeroTarjeta, TasaInteresMVCompra1Mes, TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, \\\r\n",
+							"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra1Mes, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora\r\n",
+							")]\r\n",
+							"\r\n",
+							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 134
+						"execution_count": 536
 					},
 					{
 						"cell_type": "code",
@@ -664,136 +960,186 @@
 								"transient": {
 									"deleting": false
 								}
-							}
-						},
-						"source": [
-							"#Definir estructura para Informacion de ID Transaccion\r\n",
-							"\r\n",
-							"schema1 = StructType([\r\n",
-							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-							"    StructField(\"IdTransaccion\", StringType(), nullable=True)\r\n",
-							"])\r\n",
-							"\r\n",
-							"df_idTransacciones = spark.createDataFrame([], schema1)\r\n",
-							"ArrayIdTransacciones = []\r\n",
-							"\r\n",
-							"\r\n",
-							"#Definir estructura para fecha Transaccion\r\n",
-							"\r\n",
-							"schema2 = StructType([\r\n",
-							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-							"    StructField(\"FechaTransaccion\", StringType(), nullable=True)\r\n",
-							"])\r\n",
-							"\r\n",
-							"df_FechaTransacciones = spark.createDataFrame([], schema2)\r\n",
-							"ArrayFechaTransacciones = []\r\n",
-							"\r\n",
-							"\r\n",
-							"#Definir estructura para fecha Descripciones\r\n",
-							"\r\n",
-							"schema3 = StructType([\r\n",
-							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-							"    StructField(\"DescripcionTransaccion\", StringType(), nullable=True)\r\n",
-							"])\r\n",
-							"\r\n",
-							"df_DescripcionTransacciones = spark.createDataFrame([], schema3)\r\n",
-							"ArrayDescripcionTransacciones = []\r\n",
-							"\r\n",
-							"\r\n",
-							"#Definir estructura para Costo transaccion\r\n",
-							"\r\n",
-							"schema4 = StructType([\r\n",
-							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
-							"    StructField(\"CostoTransaccion\", DoubleType(), nullable=True)\r\n",
-							"])\r\n",
-							"\r\n",
-							"df_CostoTransacciones = spark.createDataFrame([], schema4)\r\n",
-							"ArrayCostoTransacciones = []\r\n",
-							"\r\n",
-							"\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 203
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
 							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
+							"collapsed": false
 						},
 						"source": [
-							"#Obtener informaicon de transacciones\r\n",
+							"# Extraer informaicon de transacciones\r\n",
 							"\r\n",
-							"obtenerIDDataTranscciones = False\r\n",
-							"obtenerFechaTranscciones = False\r\n",
-							"obtenerDescripcionTranscciones = False\r\n",
-							"obtenerCostoTranscciones = False\r\n",
+							"# Definir incrementales basado en el uniqueid\r\n",
 							"\r\n",
-							"iteradorIDDataTranscciones = 1\r\n",
-							"iteradorFechaDataTranscciones = 1\r\n",
-							"iteradorDescripcionTranscciones = 1\r\n",
-							"iteradorCostoTranscciones = 1\r\n",
+							"Incremental = Window.orderBy(\"UniqueId\")\r\n",
 							"\r\n",
-							"for row in df_fromated.collect():\r\n",
+							"#Extraer id de transacciones\r\n",
+							"\r\n",
+							"df_idTransacciones = df_formated.select(df_formated.contenido.alias(\"IdTransaccion\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"        ((df_formated.x0 == 33.0) | (df_formated.x0 == 35.0)) & \\\r\n",
+							"        (df_formated.contenido != \"Número de\")  & \\\r\n",
+							"        (df_formated.contenido != \"Autorización\")  & \\\r\n",
+							"        (df_formated.contenido != \"\") \r\n",
+							"    )\r\n",
+							"df_idTransacciones = df_idTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"# Obtener cantidad de transacciones\r\n",
+							"CantidadTransacciones = df_idTransacciones.count()\r\n",
+							"\r\n",
+							"# Extraer fecha de transacciones\r\n",
+							"\r\n",
+							"df_FechaTransacciones = df_formated.select(df_formated.contenido.alias(\"FechaTransaccion\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"        ((df_formated.x0 == 90.0) | (df_formated.x0 == 92.0)) & \\\r\n",
+							"        (df_formated.contenido != \"Transacción\")  & \\\r\n",
+							"        (df_formated.contenido != \"Fecha de\")  & \\\r\n",
+							"        (df_formated.contenido != \"ESTADO DE CUENTA EN:\")  & \\\r\n",
+							"        (df_formated.contenido != \"\") \r\n",
+							"    )\r\n",
+							"df_FechaTransacciones = df_FechaTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"# Extraer descripcion de transacciones\r\n",
+							"\r\n",
+							"df_DescripcionTransacciones = df_formated.select(df_formated.contenido.alias(\"DescripcionTransaccion\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"        (df_formated.x0 == 135.0) & \\\r\n",
+							"        (df_formated.contenido != \"ESTADO DE CUENTA EN:\") & \\\r\n",
+							"        (df_formated.contenido != \"Pactada\") & \\\r\n",
+							"        (~ df_formated.contenido.contains('VR MONEDA ORIG')) & \\\r\n",
+							"        (df_formated.contenido != \"\") \r\n",
+							"    )\r\n",
+							"df_DescripcionTransacciones = df_DescripcionTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"# Extraer Costo de transacciones\r\n",
+							"\r\n",
+							"df_CostoTransacciones = df_formated.select(df_formated.contenido.alias(\"CostoTransaccion\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"        ((df_formated.x0 >= 307.0) & (df_formated.x0 <= 317)) & \\\r\n",
+							"        (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
+							"df_CostoTransacciones = df_CostoTransacciones.withColumn('CostoTransaccion', \\\r\n",
+							"        when(df_CostoTransacciones.CostoTransaccion.contains('-'), concat(lit(\"-\"), regexp_replace(df_CostoTransacciones.CostoTransaccion, '-', ''))) \\\r\n",
+							"        .otherwise(df_CostoTransacciones.CostoTransaccion)\r\n",
+							"    )\r\n",
+							"df_CostoTransacciones = df_CostoTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"# Extraer Tasa Pactada\r\n",
+							"\r\n",
+							"df_TasaPactada = df_formated.select(df_formated.contenido.alias(\"TasaPactada\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"            (df_formated.x0 == 354.00) & \\\r\n",
+							"            (df_formated.contenido != \"Pactada\") & \\\r\n",
+							"            (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
+							"\r\n",
+							"# Completar datos Faltantes\r\n",
+							"\r\n",
+							"if (df_TasaPactada.count() !=  CantidadTransacciones):\r\n",
+							"    MaximaCantidadRegistros = df_TasaPactada.count()\r\n",
+							"    RegistrosPendintes = CantidadTransacciones - MaximaCantidadRegistros\r\n",
+							"    MaxUniqueID = df_TasaPactada.select(max(df_TasaPactada.UniqueId)).first()[0]\r\n",
 							"    \r\n",
-							"    if (obtenerIDDataTranscciones == True):\r\n",
-							"        if (row[\"contenido\"] == \"\"):\r\n",
-							"             obtenerIDDataTranscciones = False\r\n",
-							"        else:\r\n",
-							"            ArrayIdTransacciones.append((iteradorIDDataTranscciones, row[\"contenido\"]))\r\n",
-							"            iteradorIDDataTranscciones = iteradorIDDataTranscciones + 1\r\n",
+							"    if MaxUniqueID is None:\r\n",
+							"        MaxUniqueID = 1\r\n",
 							"\r\n",
-							"    if (obtenerFechaTranscciones == True):\r\n",
-							"        if (row[\"contenido\"] == \"\"):\r\n",
-							"            obtenerFechaTranscciones = False\r\n",
-							"        else:\r\n",
-							"            ArrayFechaTransacciones.append((iteradorFechaDataTranscciones, row[\"contenido\"]))\r\n",
-							"            iteradorFechaDataTranscciones = iteradorFechaDataTranscciones + 1\r\n",
+							"    for i in range (RegistrosPendintes):                \r\n",
+							"        newRow = spark.createDataFrame([(\"\",str(MaxUniqueID+(i+1)))])\r\n",
+							"        df_TasaPactada = df_TasaPactada.union(newRow)\r\n",
 							"\r\n",
-							"    if (obtenerDescripcionTranscciones == True):\r\n",
-							"        if (row[\"contenido\"] == \"\" and iteradorDescripcionTranscciones != 1):\r\n",
-							"            obtenerDescripcionTranscciones = False\r\n",
-							"            obtenerCostoTranscciones = True\r\n",
-							"        else:\r\n",
-							"            if row[\"contenido\"] != \"\":\r\n",
-							"                ArrayDescripcionTransacciones.append((iteradorDescripcionTranscciones, row[\"contenido\"]))\r\n",
-							"                iteradorDescripcionTranscciones = iteradorDescripcionTranscciones + 1\r\n",
+							"df_TasaPactada = df_TasaPactada.withColumn(\"id\", row_number().over(Incremental))\r\n",
 							"\r\n",
-							"    if (obtenerCostoTranscciones == True):\r\n",
-							"        if (row[\"contenido\"] == \"\" and iteradorCostoTranscciones != 1):\r\n",
-							"            obtenerCostoTranscciones = False\r\n",
-							"        else:\r\n",
-							"            if row[\"contenido\"] != \"\":\r\n",
-							"                Valor = row[\"contenido\"]\r\n",
-							"                Valor = Valor.replace(\",\", \"\")\r\n",
-							"                if \"-\" in Valor:\r\n",
-							"                    Valor = Valor.replace(\"-\", \"\")                    \r\n",
-							"                    Valor = \"-\"+Valor\r\n",
-							"                Valor = float(Valor)\r\n",
-							"                ArrayCostoTransacciones.append((iteradorDescripcionTranscciones, Valor))\r\n",
-							"                iteradorCostoTranscciones = iteradorCostoTranscciones + 1\r\n",
 							"\r\n",
-							"    if (row[\"contenido\"] == \"Autorización\"):\r\n",
-							"        obtenerIDDataTranscciones = True\r\n",
+							"# Extraer Tasa Facturada\r\n",
 							"\r\n",
-							"    if (row[\"contenido\"] == \"Transacción\"):\r\n",
-							"        obtenerFechaTranscciones = True\r\n",
+							"df_TasaFacturada = df_formated.select(df_formated.contenido.alias(\"TasaFacturada\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"            (df_formated.x0 == 389.00) & \\\r\n",
+							"            (df_formated.contenido != \"Tasa EA\") & \\\r\n",
+							"            (df_formated.contenido != \"Facturada\") & \\\r\n",
+							"            (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
 							"\r\n",
-							"    if (row[\"contenido\"] == \"Valor Original\"):\r\n",
-							"        obtenerDescripcionTranscciones = True\r\n",
+							"# Completar datos Faltantes\r\n",
+							"\r\n",
+							"if (df_TasaFacturada.count() !=  CantidadTransacciones):\r\n",
+							"    MaximaCantidadRegistros = df_TasaFacturada.count()\r\n",
+							"    RegistrosPendintes = CantidadTransacciones - MaximaCantidadRegistros\r\n",
+							"    MaxUniqueID = df_TasaFacturada.select(max(df_TasaFacturada.UniqueId)).first()[0]\r\n",
+							"    \r\n",
+							"    if MaxUniqueID is None:\r\n",
+							"        MaxUniqueID = 1\r\n",
+							"    \r\n",
+							"    for i in range (RegistrosPendintes):                \r\n",
+							"        newRow = spark.createDataFrame([(\"\",str(MaxUniqueID+(i+1)))])\r\n",
+							"        df_TasaFacturada = df_TasaFacturada.union(newRow)\r\n",
+							"\r\n",
+							"df_TasaFacturada = df_TasaFacturada.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"# Extraer Cargos Y Abonos\r\n",
+							"\r\n",
+							"df_CargosYAbonos = df_formated.select(df_formated.contenido.alias(\"CargosYAbonos\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"\r\n",
+							"            ((df_formated.x0 >= 448.90) & (df_formated.x0 <= 460.0)) & \\\r\n",
+							"            (df_formated.contenido.rlike(\"[0-9]\")) & \\\r\n",
+							"            (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
+							"df_CargosYAbonos = df_CargosYAbonos.withColumn('CargosYAbonos', \\\r\n",
+							"        when(df_CargosYAbonos.CargosYAbonos.contains('-'), concat(lit(\"-\"), regexp_replace(df_CargosYAbonos.CargosYAbonos, '-', ''))) \\\r\n",
+							"        .otherwise(df_CargosYAbonos.CargosYAbonos)\r\n",
+							"    )\r\n",
+							"df_CargosYAbonos = df_CargosYAbonos.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"# Extraer Saldo A diferir\r\n",
+							"\r\n",
+							"df_SaldoADiferir = df_formated.select(df_formated.contenido.alias(\"SaldoADiferir\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"            (df_formated.x0 == 540.33) &             \r\n",
+							"            (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
+							"df_SaldoADiferir = df_SaldoADiferir.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"# Extraer Cuotas\r\n",
+							"\r\n",
+							"df_Cuotas = df_formated.select(df_formated.contenido.alias(\"Cuotas\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"            (df_formated.x0 >= 567.0) & (df_formated.x0 <= 571.0) &\r\n",
+							"            (df_formated.contenido != \"\")                    \r\n",
+							"    )\r\n",
+							"df_Cuotas = df_Cuotas.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"#Trear las descripciones para comparar con ellas eliminando los blancos que se generan en las cuotas\r\n",
+							"\r\n",
+							"df_DescripcionsFiltradas = df_DescripcionTransacciones.select(df_DescripcionTransacciones.DescripcionTransaccion, \\\r\n",
+							"    df_DescripcionTransacciones.UniqueId, df_DescripcionTransacciones.id.alias(\"OriginalID\") ).where \\\r\n",
+							"    ( \\\r\n",
+							"            (~ df_DescripcionTransacciones.DescripcionTransaccion.contains('ABONO')) &\r\n",
+							"            (~ df_DescripcionTransacciones.DescripcionTransaccion.contains('CUOTA DE MANEJO'))                    \r\n",
+							"    )\r\n",
+							"df_DescripcionsFiltradas = df_DescripcionsFiltradas.withColumn(\"id\", row_number().over(Incremental))  \r\n",
+							"df_DescripcionsFiltradas = df_DescripcionsFiltradas.drop(\"UniqueId\")\r\n",
+							"\r\n",
+							"# Validar contra descripciones filtradas y actualizar - obtener real id de cuota\r\n",
+							"\r\n",
+							"df_Cuotas = df_DescripcionsFiltradas.join(df_Cuotas, df_DescripcionsFiltradas.id == df_Cuotas.id, \"inner\") \\\r\n",
+							"    .select(df_Cuotas.Cuotas, df_Cuotas.UniqueId, df_DescripcionsFiltradas.OriginalID.alias(\"id\"))\r\n",
+							"\r\n",
+							"# Usar Left Join para consolidar Cuotas (con blancos y sin blancos)\r\n",
+							"\r\n",
+							"df_DescripcionTransacciones_aux = df_DescripcionTransacciones.select(df_DescripcionTransacciones.id) \r\n",
+							"df_Cuotas = df_DescripcionTransacciones_aux.join(df_Cuotas, df_DescripcionTransacciones.id == df_Cuotas.id, \"left\") \\\r\n",
+							"    .select(df_Cuotas.Cuotas, df_Cuotas.UniqueId, df_DescripcionTransacciones.id) \\\r\n",
+							"    .fillna(0).fillna(\"\") \r\n",
 							"\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 204
+						"execution_count": 537
 					},
 					{
 						"cell_type": "code",
@@ -809,15 +1155,79 @@
 							}
 						},
 						"source": [
-							"#Crear dataframes\r\n",
+							"#df_idTransacciones.show(50)\r\n",
+							"#df_FechaTransacciones.show(50)\r\n",
+							"#df_DescripcionTransacciones.show(50)\r\n",
+							"#df_CostoTransacciones.show(50)\r\n",
+							"#df_TasaPactada.show(50)\r\n",
+							"#df_TasaFacturada.show(50)\r\n",
+							"#df_CargosYAbonos.show(50)\r\n",
+							"#df_SaldoADiferir.show(50)\r\n",
+							"#df_Cuotas.show(50)"
+						],
+						"outputs": [],
+						"execution_count": 538
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Consolidar Transacciones\r\n",
 							"\r\n",
-							"df_idTransacciones = spark.createDataFrame(ArrayIdTransacciones, schema1)\r\n",
-							"df_FechaTransacciones = spark.createDataFrame(ArrayFechaTransacciones, schema2)\r\n",
-							"df_DescripcionTransacciones = spark.createDataFrame(ArrayDescripcionTransacciones, schema3)\r\n",
-							"df_CostoTransacciones = spark.createDataFrame(ArrayCostoTransacciones, schema4)"
+							"df_Transacciones = df_idTransacciones.join(df_FechaTransacciones, df_idTransacciones.id == df_FechaTransacciones.id, \"inner\") \\\r\n",
+							"                  .join(df_DescripcionTransacciones, df_idTransacciones.id == df_DescripcionTransacciones.id, \"inner\") \\\r\n",
+							"                  .join(df_CostoTransacciones, df_idTransacciones.id == df_CostoTransacciones.id, \"inner\") \\\r\n",
+							"                  .join(df_TasaPactada, df_idTransacciones.id == df_TasaPactada.id, \"inner\") \\\r\n",
+							"                  .join(df_TasaFacturada, df_idTransacciones.id == df_TasaFacturada.id, \"inner\") \\\r\n",
+							"                  .join(df_CargosYAbonos, df_idTransacciones.id == df_CargosYAbonos.id, \"inner\") \\\r\n",
+							"                  .join(df_SaldoADiferir, df_idTransacciones.id == df_SaldoADiferir.id, \"inner\") \\\r\n",
+							"                  .join(df_Cuotas, df_idTransacciones.id == df_Cuotas.id, \"inner\") \\\r\n",
+							"                  .select( \\\r\n",
+							"                        df_idTransacciones.IdTransaccion, \\\r\n",
+							"                        df_FechaTransacciones.FechaTransaccion, \\\r\n",
+							"                        df_DescripcionTransacciones.DescripcionTransaccion, \\\r\n",
+							"                        df_CostoTransacciones.CostoTransaccion, \\\r\n",
+							"                        df_TasaPactada.TasaPactada, \\\r\n",
+							"                        df_TasaFacturada.TasaFacturada, \\\r\n",
+							"                        df_CargosYAbonos.CargosYAbonos, \\\r\n",
+							"                        df_SaldoADiferir.SaldoADiferir, \\\r\n",
+							"                        df_Cuotas.Cuotas                       \r\n",
+							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 205
+						"execution_count": 539
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display(df_Cliente)\r\n",
+							"display(df_Producto)\r\n",
+							"display(df_Transacciones)"
+						],
+						"outputs": [],
+						"execution_count": 540
 					},
 					{
 						"cell_type": "code",
@@ -833,55 +1243,20 @@
 							}
 						},
 						"source": [
-							"df_idTransacciones.show()\r\n",
-							"df_FechaTransacciones.show()\r\n",
-							"df_DescripcionTransacciones.show()\r\n",
-							"df_CostoTransacciones.show()"
-						],
-						"outputs": [],
-						"execution_count": 206
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"# Iterate over the elements in the array\r\n",
-							"for row in df_fromated.collect():\r\n",
-							"    #if (row[\"contenido\"] == \"Autorización\"):\r\n",
-							"        print(row[\"contenido\"])\r\n",
+							"#Generar archivos con informacion\r\n",
+							"\r\n",
+							"# crear parquet file para cliente\r\n",
+							"df_Cliente.write.mode(\"overwrite\").parquet(path_sink+\"/Cliente\")\r\n",
+							"\r\n",
+							"# crear parquet file para porducto\r\n",
+							"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
+							"\r\n",
+							"# crear parquet file para transacciones\r\n",
+							"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 155
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							""
-						],
-						"outputs": [],
-						"execution_count": null
+						"execution_count": 541
 					}
 				]
 			},
@@ -1200,6 +1575,18 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "eastus2"
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/spproymaestria')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -1224,18 +1611,6 @@
 				},
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": true,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "eastus2"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
