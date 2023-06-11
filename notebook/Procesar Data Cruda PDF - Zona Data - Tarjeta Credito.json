@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5f275a43-6b0b-4b6a-9d5a-3c4586c60e3d"
+				"spark.autotune.trackingId": "7a5f33c0-80ee-4eb2-a219-d6973d0eb1f5"
 			}
 		},
 		"metadata": {
@@ -454,7 +454,7 @@
 					"df_Cuotas = df_DescripcionsFiltradas.join(df_Cuotas, df_DescripcionsFiltradas.id == df_Cuotas.id, \"inner\") \\\r\n",
 					"    .select(df_Cuotas.Cuotas, df_Cuotas.UniqueId, df_DescripcionsFiltradas.OriginalID.alias(\"id\"))\r\n",
 					"\r\n",
-					"# Usar Left Join para consolidar Cuotas (con blancos y sin blancas)\r\n",
+					"# Usar Left Join para consolidar Cuotas (con blancos y sin blancos)\r\n",
 					"\r\n",
 					"df_DescripcionTransacciones_aux = df_DescripcionTransacciones.select(df_DescripcionTransacciones.id) \r\n",
 					"df_Cuotas = df_DescripcionTransacciones_aux.join(df_Cuotas, df_DescripcionTransacciones.id == df_Cuotas.id, \"left\") \\\r\n",
