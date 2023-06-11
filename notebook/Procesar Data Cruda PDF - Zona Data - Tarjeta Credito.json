@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "86019ea9-7570-4f6e-a92a-3cc97035cb4f"
+				"spark.autotune.trackingId": "89945305-1796-484a-97dc-2cd384546310"
 			}
 		},
 		"metadata": {
@@ -62,7 +62,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 104
+				"execution_count": 140
 			},
 			{
 				"cell_type": "code",
@@ -94,7 +94,7 @@
 					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 				],
-				"execution_count": 105
+				"execution_count": 141
 			},
 			{
 				"cell_type": "code",
@@ -115,7 +115,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": 106
+				"execution_count": 142
 			},
 			{
 				"cell_type": "code",
@@ -136,7 +136,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 107
+				"execution_count": 143
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +164,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 108
+				"execution_count": 144
 			},
 			{
 				"cell_type": "code",
@@ -183,7 +183,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 109
+				"execution_count": 145
 			},
 			{
 				"cell_type": "code",
@@ -221,7 +221,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 110
+				"execution_count": 146
 			},
 			{
 				"cell_type": "code",
@@ -278,7 +278,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 111
+				"execution_count": 147
 			},
 			{
 				"cell_type": "code",
@@ -345,7 +345,7 @@
 					"\r\n",
 					"df_CostoTransacciones = df_formated.select(df_formated.contenido.alias(\"CostoTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"        ((df_formated.x0 == 307.92) | (df_formated.x0 == 312.99)) & \\\r\n",
+					"        ((df_formated.x0 == 307.992) | (df_formated.x0 == 312.99)) & \\\r\n",
 					"        (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
 					"df_CostoTransacciones = df_CostoTransacciones.withColumn('CostoTransaccion', \\\r\n",
@@ -412,7 +412,8 @@
 					"\r\n",
 					"df_CargosYAbonos = df_formated.select(df_formated.contenido.alias(\"CargosYAbonos\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"            (df_formated.x0 == 453.99) & \\\r\n",
+					"\r\n",
+					"            ((df_formated.x0 == 448.992) | (df_formated.x0 ==  453.99)) & \\\r\n",
 					"            (df_formated.contenido != \"Pactada\") & \\\r\n",
 					"            (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
@@ -468,7 +469,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 112
+				"execution_count": 148
 			},
 			{
 				"cell_type": "code",
