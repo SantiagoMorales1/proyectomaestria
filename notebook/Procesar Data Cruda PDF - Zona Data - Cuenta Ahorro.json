@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f9f22bb2-f6d6-408d-8f85-e579d5401067"
+				"spark.autotune.trackingId": "524acea5-d7b7-4256-a5d3-d5ddfbe28db5"
 			}
 		},
 		"metadata": {
@@ -241,7 +241,6 @@
 				"source": [
 					"#Obtener Informacion de Prodcuto\r\n",
 					"\r\n",
-					"\r\n",
 					"TipoProducto = 'Cuenta Ahorros'\r\n",
 					"NumeroProducto = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 16).first()[0]\r\n",
 					"Sucursal = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 14).first()[0]\r\n",
@@ -259,6 +258,81 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 				],
 				"execution_count": 88
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Extraer informaicon de transacciones\r\n",
+					"\r\n",
+					"# Definir incrementales basado en el uniqueid\r\n",
+					"\r\n",
+					"Incremental = Window.orderBy(\"UniqueId\")\r\n",
+					"\r\n",
+					"#Extraer id de transacciones\r\n",
+					"\r\n",
+					"df_Fecha = df_formated.select(df_formated.contenido.alias(\"Fecha\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"        ((df_formated.x0 >= 31.0) & (df_formated.x0 <= 32.0)) & \\\r\n",
+					"        (df_formated.contenido != \"FECHA\")  & \\\r\n",
+					"        (df_formated.contenido != \"\")\r\n",
+					"    )\r\n",
+					"df_Fecha = df_Fecha.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"\r\n",
+					"# Obtener cantidad de transacciones\r\n",
+					"CantidadTransacciones = df_Fecha.count()\r\n",
+					"\r\n",
+					"\r\n",
+					"#Extraer descripcion transacciones\r\n",
+					"\r\n",
+					"df_Descripciones = df_formated.select(df_formated.contenido.alias(\"Fecha\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"        ((df_formated.x0 >= 78.5) & (df_formated.x0 <= 81.0)) & \\\r\n",
+					"        (df_formated.contenido != \"DESCRIPCIÓN\")  & \\\r\n",
+					"        (df_formated.contenido != \"FIN ESTADO DE CUENTA\")  & \\\r\n",
+					"        (df_formated.contenido != \"\")\r\n",
+					"    )\r\n",
+					"df_Descripciones = df_Descripciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"\r\n",
+					"\r\n",
+					"#Extraer sucursal\r\n",
+					"\r\n",
+					"df_Sucursal = df_formated.select(df_formated.contenido.alias(\"Fecha\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"        (df_formated.x0 == 269.516) & \\\r\n",
+					"        (df_formated.contenido != \"SUCURSAL\")  & \\\r\n",
+					"        (df_formated.contenido != \"\")\r\n",
+					"    )\r\n",
+					"\r\n",
+					"if (df_Sucursal.count() !=  CantidadTransacciones):\r\n",
+					"    MaximaCantidadRegistros = df_Sucursal.count()\r\n",
+					"    RegistrosPendintes = CantidadTransacciones - MaximaCantidadRegistros\r\n",
+					"    MaxUniqueID = df_Sucursal.select(max(df_Sucursal.UniqueId)).first()[0]\r\n",
+					"    \r\n",
+					"    if MaxUniqueID is None:\r\n",
+					"        MaxUniqueID = 1\r\n",
+					"\r\n",
+					"    for i in range (RegistrosPendintes):                \r\n",
+					"        newRow = spark.createDataFrame([(\"\",str(MaxUniqueID+(i+1)))])\r\n",
+					"        df_Sucursal = df_Sucursal.union(newRow)\r\n",
+					"\r\n",
+					"df_Sucursal = df_Sucursal.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"df_Sucursal.show(200)"
+				],
+				"execution_count": 96
 			}
 		]
 	}
