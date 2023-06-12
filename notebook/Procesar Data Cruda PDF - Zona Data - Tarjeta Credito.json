@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "89147d0b-f925-4a3e-a503-b6c8d6dda7f0"
+				"spark.autotune.trackingId": "b090777c-7052-4840-8f9b-6118bcdb89cf"
 			}
 		},
 		"metadata": {
@@ -58,6 +58,7 @@
 				},
 				"source": [
 					"#Importar Librerias Necesarias\r\n",
+					"\r\n",
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
