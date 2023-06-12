@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cfab6b09-306a-4529-b58f-2f1071847417"
+				"spark.autotune.trackingId": "31e53cd7-5ac2-4f1e-b4fd-40ddc3ce51fb"
 			}
 		},
 		"metadata": {
@@ -369,16 +369,16 @@
 					"\r\n",
 					"df_Saldo = df_formated.select(df_formated.contenido.alias(\"Saldo\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"        (((df_formated.x0 >= 533.0) & (df_formated.x0 <= 534.0)) | ((df_formated.x0 >= 549.0) & (df_formated.x0 <= 550.0))) & \\\r\n",
+					"        (((df_formated.x0 >= 533.0) & (df_formated.x0 <= 534.0)) | ((df_formated.x0 >= 549.0) & (df_formated.x0 <= 550.0)) | ((df_formated.x0 >= 539.0) & (df_formated.x0 <= 540.0))) & \\\r\n",
 					"        (df_formated.contenido != \"SALDO\")  & \\\r\n",
 					"        (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
 					"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, ',', '')) \r\n",
 					"df_Saldo = df_Saldo.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
-					"df_ValorTransaccion.show(200)"
+					"df_Saldo.show(200)"
 				],
-				"execution_count": 107
+				"execution_count": 109
 			}
 		]
 	}
