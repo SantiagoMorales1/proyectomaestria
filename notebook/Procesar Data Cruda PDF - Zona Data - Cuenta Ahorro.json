@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3e5c6912-66d7-4f35-97db-b5c696491021"
+				"spark.autotune.trackingId": "89584691-3a5d-4461-81ba-46eaf5447688"
 			}
 		},
 		"metadata": {
@@ -279,9 +279,9 @@
 					"\r\n",
 					"Incremental = Window.orderBy(\"UniqueId\")\r\n",
 					"\r\n",
-					"#Extraer id de transacciones\r\n",
+					"#Extraer Fecha de transacciones\r\n",
 					"\r\n",
-					"df_Fecha = df_formated.select(df_formated.contenido.alias(\"Fecha\"), df_formated.UniqueId).where \\\r\n",
+					"df_Fecha = df_formated.select(df_formated.contenido.alias(\"FechaTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
 					"        ((df_formated.x0 >= 31.0) & (df_formated.x0 <= 32.0)) & \\\r\n",
 					"        (df_formated.contenido != \"FECHA\")  & \\\r\n",
@@ -295,7 +295,7 @@
 					"\r\n",
 					"#Extraer descripcion transacciones\r\n",
 					"\r\n",
-					"df_Descripciones = df_formated.select(df_formated.contenido.alias(\"Fecha\"), df_formated.UniqueId).where \\\r\n",
+					"df_Descripciones = df_formated.select(df_formated.contenido.alias(\"DescripcionTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
 					"        ((df_formated.x0 >= 78.5) & (df_formated.x0 <= 81.0)) & \\\r\n",
 					"        (df_formated.contenido != \"DESCRIPCIÓN\")  & \\\r\n",
@@ -307,7 +307,7 @@
 					"\r\n",
 					"#Extraer sucursal\r\n",
 					"\r\n",
-					"df_Sucursal = df_formated.select(df_formated.contenido.alias(\"Fecha\"), df_formated.UniqueId).where \\\r\n",
+					"df_Sucursal = df_formated.select(df_formated.contenido.alias(\"Sucursal\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
 					"        (df_formated.x0 == 269.516) & \\\r\n",
 					"        (df_formated.contenido != \"SUCURSAL\")  & \\\r\n",
@@ -331,7 +331,7 @@
 					"\r\n",
 					"#Extraer descuento\r\n",
 					"\r\n",
-					"df_Descuento = df_formated.select(df_formated.contenido.alias(\"Fecha\"), df_formated.UniqueId).where \\\r\n",
+					"df_Descuento = df_formated.select(df_formated.contenido.alias(\"Descuento\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
 					"        (df_formated.x0 == 355.095) & \\\r\n",
 					"        (df_formated.contenido != \"DCTO.\")  & \\\r\n",
@@ -355,17 +355,18 @@
 					"\r\n",
 					"# Extaer Valor Transaccion\r\n",
 					"\r\n",
-					"df_Descuento = df_formated.select(df_formated.contenido.alias(\"Fecha\"), df_formated.UniqueId).where \\\r\n",
+					"df_ValorTransaccion = df_formated.select(df_formated.contenido.alias(\"ValorTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"        ((df_formated.x0 >= 434.0) & (df_formated.x0 <= 436.0) & \\\r\n",
+					"        (((df_formated.x0 >= 434.0) & (df_formated.x0 <= 439.0)) | ((df_formated.x0 >= 448.1) & (df_formated.x0 <= 448.9))) & \\\r\n",
 					"        (df_formated.contenido != \"VALOR\")  & \\\r\n",
 					"        (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
+					"df_ValorTransaccion = df_ValorTransaccion.withColumn(\"ValorTransaccion\", regexp_replace(df_ValorTransaccion.ValorTransaccion, ',', '')) \r\n",
+					"df_ValorTransaccion = df_ValorTransaccion.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
-					"\r\n",
-					"df_Descuento.show(200)"
+					"df_ValorTransaccion.show(200)"
 				],
-				"execution_count": 98
+				"execution_count": 105
 			}
 		]
 	}
