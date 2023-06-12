@@ -289,7 +289,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8b8e70e7-1527-41f5-88b7-903465b8af6c"
+						"spark.autotune.trackingId": "07b2f95d-c792-4373-b3a6-4ac7b2c7c81b"
 					}
 				},
 				"metadata": {
@@ -314,13 +314,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Importando Librerias\r\n",
 							"\r\n",
@@ -755,7 +757,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "89147d0b-f925-4a3e-a503-b6c8d6dda7f0"
+						"spark.autotune.trackingId": "a6d90eb7-c9d0-4974-bc55-2932ca9fa61f"
 					}
 				},
 				"metadata": {
@@ -780,7 +782,8 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
