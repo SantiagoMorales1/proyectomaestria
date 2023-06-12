@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "89584691-3a5d-4461-81ba-46eaf5447688"
+				"spark.autotune.trackingId": "cfab6b09-306a-4529-b58f-2f1071847417"
 			}
 		},
 		"metadata": {
@@ -353,7 +353,7 @@
 					"df_Descuento = df_Descuento.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
 					"\r\n",
-					"# Extaer Valor Transaccion\r\n",
+					"# Extraer Valor Transaccion\r\n",
 					"\r\n",
 					"df_ValorTransaccion = df_formated.select(df_formated.contenido.alias(\"ValorTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
@@ -364,9 +364,21 @@
 					"df_ValorTransaccion = df_ValorTransaccion.withColumn(\"ValorTransaccion\", regexp_replace(df_ValorTransaccion.ValorTransaccion, ',', '')) \r\n",
 					"df_ValorTransaccion = df_ValorTransaccion.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
+					"\r\n",
+					"# Extraer Saldo\r\n",
+					"\r\n",
+					"df_Saldo = df_formated.select(df_formated.contenido.alias(\"Saldo\"), df_formated.UniqueId).where \\\r\n",
+					"    ( \\\r\n",
+					"        (((df_formated.x0 >= 533.0) & (df_formated.x0 <= 534.0)) | ((df_formated.x0 >= 549.0) & (df_formated.x0 <= 550.0))) & \\\r\n",
+					"        (df_formated.contenido != \"SALDO\")  & \\\r\n",
+					"        (df_formated.contenido != \"\")\r\n",
+					"    )\r\n",
+					"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, ',', '')) \r\n",
+					"df_Saldo = df_Saldo.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"\r\n",
 					"df_ValorTransaccion.show(200)"
 				],
-				"execution_count": 105
+				"execution_count": 107
 			}
 		]
 	}
