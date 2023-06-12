@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "543514c7-5eab-4bc7-ac09-9a6938f20f4d"
+				"spark.autotune.trackingId": "f9f22bb2-f6d6-408d-8f85-e579d5401067"
 			}
 		},
 		"metadata": {
@@ -87,7 +87,7 @@
 					"#name = \"Extracto_307612445_202212_CTA_AHORROS_5557\"\r\n",
 					"#name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 				],
-				"execution_count": 60
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -108,7 +108,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": 61
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -128,7 +128,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 62
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -156,7 +156,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 63
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -175,7 +175,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 64
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -221,10 +221,44 @@
 					"\r\n",
 					"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
 					"\r\n",
-					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)\r\n",
-					"display(df_Cliente)"
+					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 81
+				"execution_count": 87
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Obtener Informacion de Prodcuto\r\n",
+					"\r\n",
+					"\r\n",
+					"TipoProducto = 'Cuenta Ahorros'\r\n",
+					"NumeroProducto = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 16).first()[0]\r\n",
+					"Sucursal = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 14).first()[0]\r\n",
+					"\r\n",
+					"# Crear dataframe para informacion de producto\r\n",
+					"\r\n",
+					"schemaProducto = StructType([ \\\r\n",
+					"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
+					"    StructField(\"NumeroProducto\",StringType(),True), \\\r\n",
+					"    StructField(\"Sucursal\",StringType(),True)\r\n",
+					"  ])\r\n",
+					"\r\n",
+					"data_Producto = [(TipoProducto, NumeroProducto, Sucursal)]\r\n",
+					"\r\n",
+					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
+				],
+				"execution_count": 88
 			}
 		]
 	}
