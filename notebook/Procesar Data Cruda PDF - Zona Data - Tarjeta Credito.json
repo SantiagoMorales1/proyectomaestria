@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b090777c-7052-4840-8f9b-6118bcdb89cf"
+				"spark.autotune.trackingId": "f7f7eea4-c3c2-4214-acc8-9c0d4c1871ed"
 			}
 		},
 		"metadata": {
@@ -354,6 +354,7 @@
 					"        when(df_CostoTransacciones.CostoTransaccion.contains('-'), concat(lit(\"-\"), regexp_replace(df_CostoTransacciones.CostoTransaccion, '-', ''))) \\\r\n",
 					"        .otherwise(df_CostoTransacciones.CostoTransaccion)\r\n",
 					"    )\r\n",
+					"df_CostoTransacciones = df_CostoTransacciones.withColumn(\"CostoTransaccion\", regexp_replace(df_CostoTransacciones.CostoTransaccion, ',', ''))\r\n",
 					"df_CostoTransacciones = df_CostoTransacciones.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
 					"\r\n",
@@ -423,6 +424,7 @@
 					"        when(df_CargosYAbonos.CargosYAbonos.contains('-'), concat(lit(\"-\"), regexp_replace(df_CargosYAbonos.CargosYAbonos, '-', ''))) \\\r\n",
 					"        .otherwise(df_CargosYAbonos.CargosYAbonos)\r\n",
 					"    )\r\n",
+					"df_CargosYAbonos = df_CargosYAbonos.withColumn(\"CargosYAbonos\", regexp_replace(df_CargosYAbonos.CargosYAbonos, ',', ''))\r\n",
 					"df_CargosYAbonos = df_CargosYAbonos.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
 					"\r\n",
