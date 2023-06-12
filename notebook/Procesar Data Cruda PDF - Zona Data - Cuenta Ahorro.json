@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7720305b-125d-4556-846f-84df08b063af"
+				"spark.autotune.trackingId": "543514c7-5eab-4bc7-ac09-9a6938f20f4d"
 			}
 		},
 		"metadata": {
@@ -188,7 +188,8 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"# Obtener Informacion de Cliente\r\n",
@@ -201,11 +202,11 @@
 					"CiudadData = CiudadData.replace(\"$\",\"\")\r\n",
 					"CiudadData = CiudadData.replace(\"D.C.\",\"\")\r\n",
 					"CiudadData = CiudadData.split(\"  \")\r\n",
-					"CiudadData[0] = CiudadData.replace(\"BOGOTA.\",\"BOGOTA D.C\")\r\n",
-					"CiudadData[1] = CiudadData.replace(\"BOGOTA.\",\"BOGOTA D.C\")\r\n",
 					"\r\n",
-					"\r\n",
+					"CiudadData[0] = CiudadData[0].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
 					"Ciudad_1 = CiudadData[0].strip()\r\n",
+					"\r\n",
+					"CiudadData[1] = CiudadData[1].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
 					"Ciudad_2 = CiudadData[1].strip()\r\n",
 					"\r\n",
 					"# Crear dataframe para informacion de cliente\r\n",
@@ -223,7 +224,7 @@
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)\r\n",
 					"display(df_Cliente)"
 				],
-				"execution_count": 78
+				"execution_count": 81
 			}
 		]
 	}
