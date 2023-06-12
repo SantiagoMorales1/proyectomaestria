@@ -289,7 +289,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "ac8dc34b-b245-4c17-806c-f8479da74f04"
+						"spark.autotune.trackingId": "8b8e70e7-1527-41f5-88b7-903465b8af6c"
 					}
 				},
 				"metadata": {
@@ -314,15 +314,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importando Librerias\r\n",
 							"\r\n",
@@ -360,7 +358,7 @@
 							"    .getOrCreate()"
 						],
 						"outputs": [],
-						"execution_count": 37
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -381,20 +379,29 @@
 						"source": [
 							"#Capturar Parametros\r\n",
 							"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
-							"pdf_type = \"Tarjeta Credito\"\r\n",
+							"#pdf_type = \"Tarjeta Credito\"\r\n",
+							"#pdf_type = \"Cuenta Ahorros\"\r\n",
 							"pdf_fecha = \"10012023\"\r\n",
-							"#file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
-							"#file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 							"\r\n",
-							"name = \"Extracto_392576648_202304_TARJETA_VISA_2166.pdf\"\r\n",
+							"#Tarjeta Credito\r\n",
+							"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
+							"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+							"#name = \"Extracto_392576648_202304_TARJETA_VISA_2166.pdf\"\r\n",
 							"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166.pdf\"\r\n",
 							"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166.pdf\"\r\n",
 							"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166.pdf\"\r\n",
 							"\r\n",
+							"#Cuenta de Ahorrros\r\n",
+							"\r\n",
+							"name = \"Extracto_49243429_202112_CTA_AHORROS_5557.pdf\"\r\n",
+							"#name = \"Extracto_240056999_202209_CTA_AHORROS_5557.pdf\"\r\n",
+							"#name = \"Extracto_307612445_202212_CTA_AHORROS_5557.pdf\"\r\n",
+							"#name = \"Extracto_375992443_202303_CTA_AHORROS_5557.pdf\"\r\n",
+							"\r\n",
 							"pdf_password = \"1233491047\""
 						],
 						"outputs": [],
-						"execution_count": 38
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -420,7 +427,7 @@
 							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
 						],
 						"outputs": [],
-						"execution_count": 39
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -454,7 +461,7 @@
 							" "
 						],
 						"outputs": [],
-						"execution_count": 40
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -511,7 +518,7 @@
 							"retstr.close()"
 						],
 						"outputs": [],
-						"execution_count": 41
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -587,7 +594,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 42
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -611,7 +618,7 @@
 							"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
 						],
 						"outputs": [],
-						"execution_count": 43
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -631,7 +638,7 @@
 							"display(df_RawDat)"
 						],
 						"outputs": [],
-						"execution_count": 44
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -646,6 +653,74 @@
 								}
 							}
 						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "LecturaScripts"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "spproymaestria",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "a59bb1ed-e33f-445c-9baf-c60f878b0f77"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Synapse/workspaces/synapseproyectomaestria/bigDataPools/spproymaestria",
+						"name": "spproymaestria",
+						"type": "Spark",
+						"endpoint": "https://synapseproyectomaestria.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spproymaestria",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.3",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							""
 						],
@@ -680,7 +755,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "573919a7-1424-4f90-a862-c143a4318331"
+						"spark.autotune.trackingId": "89147d0b-f925-4a3e-a503-b6c8d6dda7f0"
 					}
 				},
 				"metadata": {
@@ -705,8 +780,7 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -723,7 +797,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 529
+						"execution_count": 619
 					},
 					{
 						"cell_type": "code",
@@ -756,7 +830,7 @@
 							"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 						],
 						"outputs": [],
-						"execution_count": 530
+						"execution_count": 620
 					},
 					{
 						"cell_type": "code",
@@ -778,7 +852,7 @@
 							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": 531
+						"execution_count": 621
 					},
 					{
 						"cell_type": "code",
@@ -800,7 +874,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 532
+						"execution_count": 622
 					},
 					{
 						"cell_type": "code",
@@ -829,7 +903,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 533
+						"execution_count": 623
 					},
 					{
 						"cell_type": "code",
@@ -849,7 +923,7 @@
 							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 534
+						"execution_count": 624
 					},
 					{
 						"cell_type": "code",
@@ -888,7 +962,7 @@
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 535
+						"execution_count": 625
 					},
 					{
 						"cell_type": "code",
@@ -947,7 +1021,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 536
+						"execution_count": 626
 					},
 					{
 						"cell_type": "code",
@@ -974,7 +1048,7 @@
 							"\r\n",
 							"df_idTransacciones = df_formated.select(df_formated.contenido.alias(\"IdTransaccion\"), df_formated.UniqueId).where \\\r\n",
 							"    ( \\\r\n",
-							"        ((df_formated.x0 == 33.0) | (df_formated.x0 == 35.0)) & \\\r\n",
+							"        ((df_formated.x0 >= 33.0) & (df_formated.x0 <= 35.0)) & \\\r\n",
 							"        (df_formated.contenido != \"Número de\")  & \\\r\n",
 							"        (df_formated.contenido != \"Autorización\")  & \\\r\n",
 							"        (df_formated.contenido != \"\") \r\n",
@@ -988,7 +1062,7 @@
 							"\r\n",
 							"df_FechaTransacciones = df_formated.select(df_formated.contenido.alias(\"FechaTransaccion\"), df_formated.UniqueId).where \\\r\n",
 							"    ( \\\r\n",
-							"        ((df_formated.x0 == 90.0) | (df_formated.x0 == 92.0)) & \\\r\n",
+							"        ((df_formated.x0 >= 90.0) & (df_formated.x0 <= 92.0)) & \\\r\n",
 							"        (df_formated.contenido != \"Transacción\")  & \\\r\n",
 							"        (df_formated.contenido != \"Fecha de\")  & \\\r\n",
 							"        (df_formated.contenido != \"ESTADO DE CUENTA EN:\")  & \\\r\n",
@@ -1139,7 +1213,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 537
+						"execution_count": 627
 					},
 					{
 						"cell_type": "code",
@@ -1166,7 +1240,7 @@
 							"#df_Cuotas.show(50)"
 						],
 						"outputs": [],
-						"execution_count": 538
+						"execution_count": 628
 					},
 					{
 						"cell_type": "code",
@@ -1205,7 +1279,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 539
+						"execution_count": 629
 					},
 					{
 						"cell_type": "code",
@@ -1222,12 +1296,12 @@
 							"collapsed": false
 						},
 						"source": [
-							"#display(df_Cliente)\r\n",
-							"#display(df_Producto)\r\n",
-							"#display(df_Transacciones)"
+							"display(df_Cliente)\r\n",
+							"display(df_Producto)\r\n",
+							"display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 540
+						"execution_count": 630
 					},
 					{
 						"cell_type": "code",
@@ -1256,7 +1330,26 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 541
+						"execution_count": 631
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
@@ -1575,18 +1668,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "eastus2"
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/spproymaestria')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -1611,6 +1692,18 @@
 				},
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": true,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "eastus2"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
