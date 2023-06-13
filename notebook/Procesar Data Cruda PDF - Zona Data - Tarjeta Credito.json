@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f7f7eea4-c3c2-4214-acc8-9c0d4c1871ed"
+				"spark.autotune.trackingId": "61dedbc5-8792-4049-9029-0b41cc2d5522"
 			}
 		},
 		"metadata": {
@@ -583,7 +583,7 @@
 					"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
 					"\r\n",
 					"# crear parquet file para transacciones\r\n",
-					"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
+					"df_Transacciones.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
 					""
 				],
 				"execution_count": 631
