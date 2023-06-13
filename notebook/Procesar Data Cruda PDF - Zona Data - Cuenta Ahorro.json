@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2a7df8fe-8960-4fa6-b0c3-318189017763"
+				"spark.autotune.trackingId": "efe009db-092d-44d5-9dc9-fa530ea5eb18"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 112
+				"execution_count": 304
 			},
 			{
 				"cell_type": "code",
@@ -82,12 +82,12 @@
 					"type = \"Cuenta Ahorros\"\r\n",
 					"fecha = \"10012023\"\r\n",
 					"\r\n",
-					"name = \"Extracto_49243429_202112_CTA_AHORROS_5557\"\r\n",
-					"#name = \"Extracto_240056999_202209_CTA_AHORROS_5557\"\r\n",
+					"#name = \"Extracto_49243429_202112_CTA_AHORROS_5557\"\r\n",
+					"name = \"Extracto_240056999_202209_CTA_AHORROS_5557\"\r\n",
 					"#name = \"Extracto_307612445_202212_CTA_AHORROS_5557\"\r\n",
 					"#name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 				],
-				"execution_count": 113
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -108,7 +108,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": 114
+				"execution_count": 292
 			},
 			{
 				"cell_type": "code",
@@ -128,7 +128,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 115
+				"execution_count": 293
 			},
 			{
 				"cell_type": "code",
@@ -156,7 +156,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 116
+				"execution_count": 294
 			},
 			{
 				"cell_type": "code",
@@ -175,7 +175,29 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 117
+				"execution_count": 295
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"\r\n",
+					"443.4\r\n",
+					"501.0\r\n",
+					"73.19999999999999\r\n",
+					"406.79200000000003"
+				],
+				"execution_count": 296
 			},
 			{
 				"cell_type": "code",
@@ -223,7 +245,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 118
+				"execution_count": 297
 			},
 			{
 				"cell_type": "code",
@@ -257,7 +279,7 @@
 					"\r\n",
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 				],
-				"execution_count": 119
+				"execution_count": 298
 			},
 			{
 				"cell_type": "code",
@@ -357,7 +379,10 @@
 					"\r\n",
 					"df_ValorTransaccion = df_formated.select(df_formated.contenido.alias(\"ValorTransaccion\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"        (((df_formated.x0 >= 434.0) & (df_formated.x0 <= 439.0)) | ((df_formated.x0 >= 448.1) & (df_formated.x0 <= 448.9))) & \\\r\n",
+					"        ((df_formated.x1 >= 501.0) & (df_formated.x0 <= 502.0)) & \\\r\n",
+					"        (df_formated.contenido.rlike(\"[0-9]\")) & \\\r\n",
+					"        (~ df_formated.contenido.rlike(\"[a-z]\")) & \\\r\n",
+					"        (~ df_formated.contenido.rlike(\"[A-Z]\")) & \\\r\n",
 					"        (df_formated.contenido != \"VALOR\")  & \\\r\n",
 					"        (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
@@ -371,13 +396,36 @@
 					"    ( \\\r\n",
 					"        (((df_formated.x0 >= 533.0) & (df_formated.x0 <= 534.0)) | ((df_formated.x0 >= 549.0) & (df_formated.x0 <= 550.0)) | ((df_formated.x0 >= 539.0) & (df_formated.x0 <= 540.0))) & \\\r\n",
 					"        (df_formated.contenido != \"SALDO\")  & \\\r\n",
+					"        (df_formated.contenido.rlike(\"[0-9]\")) & \\\r\n",
 					"        (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
 					"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, ',', '')) \r\n",
 					"df_Saldo = df_Saldo.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					""
 				],
-				"execution_count": 120
+				"execution_count": 299
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#df_Fecha.show(200)\r\n",
+					"#df_Sucursal.show(200)\r\n",
+					"#df_Descuento.show(200)\r\n",
+					"#df_ValorTransaccion.show(200)\r\n",
+					"#df_Saldo.show(200)"
+				],
+				"execution_count": 300
 			},
 			{
 				"cell_type": "code",
@@ -407,7 +455,7 @@
 					"                        df_Saldo.Saldo            \r\n",
 					"                        )"
 				],
-				"execution_count": 121
+				"execution_count": 301
 			},
 			{
 				"cell_type": "code",
@@ -428,7 +476,7 @@
 					"display(df_Producto)\r\n",
 					"display(df_Transacciones)"
 				],
-				"execution_count": 122
+				"execution_count": 302
 			},
 			{
 				"cell_type": "code",
@@ -456,7 +504,7 @@
 					"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
 					""
 				],
-				"execution_count": 123
+				"execution_count": 303
 			}
 		]
 	}
