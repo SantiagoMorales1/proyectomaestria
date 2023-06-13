@@ -687,7 +687,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "afc9621b-c8b3-4693-8e3e-b9b3c170168e"
+						"spark.autotune.trackingId": "f9804970-2a36-446a-90e9-cb1618b140ac"
 					}
 				},
 				"metadata": {
@@ -729,7 +729,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 346
+						"execution_count": 360
 					},
 					{
 						"cell_type": "code",
@@ -757,7 +757,7 @@
 							"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 						],
 						"outputs": [],
-						"execution_count": 347
+						"execution_count": 361
 					},
 					{
 						"cell_type": "code",
@@ -779,7 +779,7 @@
 							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": 348
+						"execution_count": 362
 					},
 					{
 						"cell_type": "code",
@@ -800,7 +800,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 349
+						"execution_count": 363
 					},
 					{
 						"cell_type": "code",
@@ -829,7 +829,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 350
+						"execution_count": 364
 					},
 					{
 						"cell_type": "code",
@@ -849,7 +849,7 @@
 							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 351
+						"execution_count": 365
 					},
 					{
 						"cell_type": "code",
@@ -872,7 +872,7 @@
 							"406.79200000000003"
 						],
 						"outputs": [],
-						"execution_count": 352
+						"execution_count": 366
 					},
 					{
 						"cell_type": "code",
@@ -921,7 +921,7 @@
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 353
+						"execution_count": 367
 					},
 					{
 						"cell_type": "code",
@@ -956,7 +956,7 @@
 							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 						],
 						"outputs": [],
-						"execution_count": 354
+						"execution_count": 368
 					},
 					{
 						"cell_type": "code",
@@ -1081,7 +1081,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 355
+						"execution_count": 369
 					},
 					{
 						"cell_type": "code",
@@ -1104,7 +1104,7 @@
 							"#df_Saldo.show(200)"
 						],
 						"outputs": [],
-						"execution_count": 356
+						"execution_count": 370
 					},
 					{
 						"cell_type": "code",
@@ -1135,7 +1135,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 357
+						"execution_count": 371
 					},
 					{
 						"cell_type": "code",
@@ -1157,7 +1157,7 @@
 							"display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 358
+						"execution_count": 372
 					},
 					{
 						"cell_type": "code",
@@ -1186,7 +1186,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 359
+						"execution_count": 373
 					}
 				]
 			},
