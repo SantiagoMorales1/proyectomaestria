@@ -687,7 +687,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f9804970-2a36-446a-90e9-cb1618b140ac"
+						"spark.autotune.trackingId": "72aa2b75-134b-4e48-9b0d-38fb4bcb8525"
 					}
 				},
 				"metadata": {
@@ -850,29 +850,6 @@
 						],
 						"outputs": [],
 						"execution_count": 365
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"\r\n",
-							"443.4\r\n",
-							"501.0\r\n",
-							"73.19999999999999\r\n",
-							"406.79200000000003"
-						],
-						"outputs": [],
-						"execution_count": 366
 					},
 					{
 						"cell_type": "code",
@@ -1182,7 +1159,7 @@
 							"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
 							"\r\n",
 							"# crear parquet file para transacciones\r\n",
-							"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
+							"df_Transacciones.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
 							""
 						],
 						"outputs": [],
@@ -1216,7 +1193,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "3f8f2150-0796-4d59-be32-7bb212a9a75e"
+						"spark.autotune.trackingId": "61dedbc5-8792-4049-9029-0b41cc2d5522"
 					}
 				},
 				"metadata": {
@@ -1791,7 +1768,7 @@
 							"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
 							"\r\n",
 							"# crear parquet file para transacciones\r\n",
-							"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
+							"df_Transacciones.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
 							""
 						],
 						"outputs": [],
