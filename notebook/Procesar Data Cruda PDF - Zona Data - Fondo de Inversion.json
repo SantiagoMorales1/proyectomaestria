@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "18ddfbc2-0496-4aa3-b56f-c527a33aa725"
+				"spark.autotune.trackingId": "807573c4-6f0b-4db9-824c-eb004ca7ccc5"
 			}
 		},
 		"metadata": {
@@ -347,13 +347,13 @@
 					"        ((df_formated.x0 >= 547.0) & (df_formated.x0 <= 548.0)) & \\\r\n",
 					"        (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
-					"df_ValorUnidades = df_ValorUnidades.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, '[.]', ''))  \r\n",
+					"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, ',', '.'))\r\n",
+					"df_Saldo = df_Saldo.withColumn(\"id\", row_number().over(Incremental))\r\n",
 					"\r\n",
-					"\r\n",
-					"display(df_ValorUnidades)\r\n",
 					""
 				],
-				"execution_count": 55
+				"execution_count": 58
 			}
 		]
 	}
