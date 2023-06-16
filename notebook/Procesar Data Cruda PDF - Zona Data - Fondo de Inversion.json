@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2462e8b2-f3ad-47e0-b8d6-1c8b8e02e169"
+				"spark.autotune.trackingId": "8b7b8ce2-8a1a-41d7-81e2-c5fc7e8e597c"
 			}
 		},
 		"metadata": {
@@ -140,6 +140,53 @@
 					"\r\n",
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Obtener Informacion de Cliente\r\n",
+					"\r\n",
+					"Nombre = df_formated.select(df_formated.contenido).where((df_formated.UniqueId == 1)).first()[0]\r\n",
+					"Email = user\r\n",
+					"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 3).first()[0]\r\n",
+					"\r\n",
+					"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 5).first()[0]\r\n",
+					"CiudadData = CiudadData.replace(\"$\",\"\")\r\n",
+					"CiudadData = CiudadData.replace(\"D.C.\",\"\")\r\n",
+					"CiudadData = CiudadData.split(\"  \")\r\n",
+					"\r\n",
+					"CiudadData[0] = CiudadData[0].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
+					"Ciudad_1 = CiudadData[0].strip()\r\n",
+					"\r\n",
+					"CiudadData[1] = CiudadData[1].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
+					"Ciudad_2 = CiudadData[1].strip()\r\n",
+					"\r\n",
+					"# Crear dataframe para informacion de cliente\r\n",
+					"\r\n",
+					"schemaCliente = StructType([ \\\r\n",
+					"    StructField(\"Nombre\",StringType(),True), \\\r\n",
+					"    StructField(\"Email\",StringType(),True), \\\r\n",
+					"    StructField(\"Direccion\",StringType(),True), \\\r\n",
+					"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
+					"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
+					"  ])\r\n",
+					"\r\n",
+					"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
+					"\r\n",
+					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
 				"execution_count": null
 			}
