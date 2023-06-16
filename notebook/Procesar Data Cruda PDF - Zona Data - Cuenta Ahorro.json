@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "97e7af0a-17ba-42ba-91dc-a7e56ad9b773"
+				"spark.autotune.trackingId": "deeb1732-4133-4f10-abf5-3adec14da249"
 			}
 		},
 		"metadata": {
@@ -85,7 +85,7 @@
 					"#name = \"Extracto_49243429_202112_CTA_AHORROS_5557\"\r\n",
 					"#name = \"Extracto_240056999_202209_CTA_AHORROS_5557\"\r\n",
 					"#name = \"Extracto_307612445_202212_CTA_AHORROS_5557\"\r\n",
-					"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
+					"#name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 				],
 				"execution_count": null
 			},
@@ -105,8 +105,7 @@
 				"source": [
 					"# Configurar rutas de origen y destino de archivos\r\n",
 					"\r\n",
-					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
-					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
+					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 				],
 				"execution_count": null
 			},
@@ -472,14 +471,17 @@
 				"source": [
 					"#Generar archivos con informacion\r\n",
 					"\r\n",
+					"Routeadl = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net\"\r\n",
+					"path_sink_comp = fecha+\"/\"+user+\"/\"+name\r\n",
+					"\r\n",
 					"# crear parquet file para cliente\r\n",
-					"df_Cliente.write.mode(\"overwrite\").parquet(path_sink+\"/Cliente\")\r\n",
+					"df_Cliente.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Cliente/\"+path_sink_comp)\r\n",
 					"\r\n",
 					"# crear parquet file para porducto\r\n",
-					"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
+					"df_Producto.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Producto/\"+path_sink_comp)\r\n",
 					"\r\n",
 					"# crear parquet file para transacciones\r\n",
-					"df_Transacciones.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
+					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
 				"execution_count": null
