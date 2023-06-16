@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "ab12061c-c521-43fa-9504-53f13955018c"
+				"spark.autotune.trackingId": "2462e8b2-f3ad-47e0-b8d6-1c8b8e02e169"
 			}
 		},
 		"metadata": {
@@ -35,7 +35,111 @@
 			{
 				"cell_type": "code",
 				"source": [
+					"#Importar Librerias Necesarias\r\n",
+					"\r\n",
+					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
+					"from pyspark.sql.window import Window\r\n",
+					"from pyspark.sql.functions import *"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Configurar parametros aqui\r\n",
+					"\r\n",
+					"user = \"bsmoralesg@outlook.com\"\r\n",
+					"type = \"Fondos de Inversion\"\r\n",
+					"fecha = \"10012023\"\r\n",
+					"\r\n",
+					"name = \"Extracto_8791222_202108_FIDUCUENTA_3940.pdf\"\r\n",
+					"#name = \"Extracto_36546412_202111_FIDUCUENTA_3940.pdf\"\r\n",
+					"#name = \"Extracto_212010590_202208_FIDUCUENTA_3940.pdf\"\r\n",
+					"#name = \"Extracto_254154275_202210_FIDUCUENTA_3940.pdf\"\r\n",
+					"#name = \"Extracto_333733883_202301_FIDUCUENTA_3940.pdf\"\r\n",
+					"#name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
+					"\r\n",
 					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Configurar rutas de origen y destino de archivos\r\n",
+					"\r\n",
+					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
+					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Obtener Datos para Fondo de inversion\r\n",
+					"\r\n",
+					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Dividir los valores por salto de linea\r\n",
+					"\r\n",
+					"df_split = DataCruda.withColumn(\"contenido\", split(DataCruda[\"contenido\"], \"\\n\"))\r\n",
+					"\r\n",
+					"# Transformar la columna array para crear una nueva fila por cada elemento\r\n",
+					"df_formated = df_split.select(df_split.index, df_split.pagenumber, df_split.x0, df_split.x1, df_split.y0, df_split.y1, explode(\"contenido\").alias(\"contenido\"))\r\n",
+					"\r\n",
+					"#Crear identificador unico  basado enel orden de lectura\r\n",
+					"\r\n",
+					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
+					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
 				"execution_count": null
 			}
