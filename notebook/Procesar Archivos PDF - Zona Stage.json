@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "301f189d-2f19-4b1a-958f-3f9945341745"
+				"spark.autotune.trackingId": "fa0fb876-25a0-4acf-b853-b93493afc0d3"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					"import io"
 				],
-				"execution_count": 56
+				"execution_count": 137
 			},
 			{
 				"cell_type": "code",
@@ -88,7 +88,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 57
+				"execution_count": 138
 			},
 			{
 				"cell_type": "code",
@@ -109,9 +109,9 @@
 				"source": [
 					"#Capturar Parametros\r\n",
 					"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
-					"#pdf_type = \"Tarjeta Credito\"\r\n",
+					"pdf_type = \"Tarjeta Credito\"\r\n",
 					"#pdf_type = \"Cuenta Ahorros\"\r\n",
-					"pdf_type = \"Fondos de Inversion\"\r\n",
+					"#pdf_type = \"Fondos de Inversion\"\r\n",
 					"pdf_fecha = \"10012023\"\r\n",
 					"\r\n",
 					"#Tarjeta Credito\r\n",
@@ -136,12 +136,12 @@
 					"#file_name = \"Extracto_212010590_202208_FIDUCUENTA_3940.pdf\"\r\n",
 					"#file_name = \"Extracto_254154275_202210_FIDUCUENTA_3940.pdf\"\r\n",
 					"#file_name = \"Extracto_333733883_202301_FIDUCUENTA_3940.pdf\"\r\n",
-					"file_name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
+					"#file_name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
 					"\r\n",
 					"\r\n",
 					"pdf_password = \"1233491047\""
 				],
-				"execution_count": 58
+				"execution_count": 139
 			},
 			{
 				"cell_type": "code",
@@ -160,13 +160,13 @@
 					"#Consolidar Variables\r\n",
 					"\r\n",
 					"#Ruta Origen\r\n",
-					"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name\r\n",
+					"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+pdf_user+\"/\"+file_name\r\n",
 					"\r\n",
 					"#Ruta Destino\r\n",
 					"file_name = file_name.replace(\".pdf\", \"\")\r\n",
-					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
+					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_type+\"/Raw/\"+pdf_fecha+\"/\"+pdf_user+\"/\"+file_name+\"/\""
 				],
-				"execution_count": 59
+				"execution_count": 140
 			},
 			{
 				"cell_type": "code",
@@ -199,7 +199,7 @@
 					"\r\n",
 					" "
 				],
-				"execution_count": 60
+				"execution_count": 141
 			},
 			{
 				"cell_type": "code",
@@ -255,7 +255,7 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": 61
+				"execution_count": 142
 			},
 			{
 				"cell_type": "code",
@@ -330,7 +330,7 @@
 					"        pageraux = page\r\n",
 					""
 				],
-				"execution_count": 62
+				"execution_count": 143
 			},
 			{
 				"cell_type": "code",
@@ -353,7 +353,7 @@
 					"# crear parquet file\r\n",
 					"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
 				],
-				"execution_count": 63
+				"execution_count": 144
 			},
 			{
 				"cell_type": "code",
@@ -372,7 +372,7 @@
 				"source": [
 					"display(df_RawDat)"
 				],
-				"execution_count": 64
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
