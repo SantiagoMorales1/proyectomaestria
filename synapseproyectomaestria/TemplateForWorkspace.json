@@ -246,6 +246,26 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE extractos.CuentaAhorros_Cliente (\n\t[Nombre] nvarchar(4000),\n\t[Email] nvarchar(4000),\n\t[Direccion] nvarchar(4000),\n\t[Ciudad_1] nvarchar(4000),\n\t[Ciudad_2] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = '/.parquet',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n--puYear=2018/puMonth=*/*.snappy.parquet\n\nSELECT TOP 100 * FROM extractos.CuentaAhorros_Cliente\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/primera carga')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -289,7 +309,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "301f189d-2f19-4b1a-958f-3f9945341745"
+						"spark.autotune.trackingId": "fa0fb876-25a0-4acf-b853-b93493afc0d3"
 					}
 				},
 				"metadata": {
@@ -314,15 +334,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importando Librerias\r\n",
 							"\r\n",
@@ -337,7 +355,7 @@
 							"import io"
 						],
 						"outputs": [],
-						"execution_count": 56
+						"execution_count": 137
 					},
 					{
 						"cell_type": "code",
@@ -360,7 +378,7 @@
 							"    .getOrCreate()"
 						],
 						"outputs": [],
-						"execution_count": 57
+						"execution_count": 138
 					},
 					{
 						"cell_type": "code",
@@ -381,9 +399,9 @@
 						"source": [
 							"#Capturar Parametros\r\n",
 							"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
-							"#pdf_type = \"Tarjeta Credito\"\r\n",
+							"pdf_type = \"Tarjeta Credito\"\r\n",
 							"#pdf_type = \"Cuenta Ahorros\"\r\n",
-							"pdf_type = \"Fondos de Inversion\"\r\n",
+							"#pdf_type = \"Fondos de Inversion\"\r\n",
 							"pdf_fecha = \"10012023\"\r\n",
 							"\r\n",
 							"#Tarjeta Credito\r\n",
@@ -408,13 +426,13 @@
 							"#file_name = \"Extracto_212010590_202208_FIDUCUENTA_3940.pdf\"\r\n",
 							"#file_name = \"Extracto_254154275_202210_FIDUCUENTA_3940.pdf\"\r\n",
 							"#file_name = \"Extracto_333733883_202301_FIDUCUENTA_3940.pdf\"\r\n",
-							"file_name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
+							"#file_name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
 							"\r\n",
 							"\r\n",
 							"pdf_password = \"1233491047\""
 						],
 						"outputs": [],
-						"execution_count": 58
+						"execution_count": 139
 					},
 					{
 						"cell_type": "code",
@@ -433,14 +451,14 @@
 							"#Consolidar Variables\r\n",
 							"\r\n",
 							"#Ruta Origen\r\n",
-							"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name\r\n",
+							"pdf_path_origin = \"abfss://stagefiles@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+pdf_user+\"/\"+file_name\r\n",
 							"\r\n",
 							"#Ruta Destino\r\n",
 							"file_name = file_name.replace(\".pdf\", \"\")\r\n",
-							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
+							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_type+\"/Raw/\"+pdf_fecha+\"/\"+pdf_user+\"/\"+file_name+\"/\""
 						],
 						"outputs": [],
-						"execution_count": 59
+						"execution_count": 140
 					},
 					{
 						"cell_type": "code",
@@ -474,7 +492,7 @@
 							" "
 						],
 						"outputs": [],
-						"execution_count": 60
+						"execution_count": 141
 					},
 					{
 						"cell_type": "code",
@@ -531,7 +549,7 @@
 							"retstr.close()"
 						],
 						"outputs": [],
-						"execution_count": 61
+						"execution_count": 142
 					},
 					{
 						"cell_type": "code",
@@ -607,7 +625,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 62
+						"execution_count": 143
 					},
 					{
 						"cell_type": "code",
@@ -631,7 +649,7 @@
 							"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
 						],
 						"outputs": [],
-						"execution_count": 63
+						"execution_count": 144
 					},
 					{
 						"cell_type": "code",
@@ -651,7 +669,7 @@
 							"display(df_RawDat)"
 						],
 						"outputs": [],
-						"execution_count": 64
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -700,7 +718,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "97e7af0a-17ba-42ba-91dc-a7e56ad9b773"
+						"spark.autotune.trackingId": "dd2576de-9864-4a4b-9709-6b9443b16cba"
 					}
 				},
 				"metadata": {
@@ -725,15 +743,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -742,7 +758,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 44
 					},
 					{
 						"cell_type": "code",
@@ -770,7 +786,7 @@
 							"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 45
 					},
 					{
 						"cell_type": "code",
@@ -788,11 +804,10 @@
 						"source": [
 							"# Configurar rutas de origen y destino de archivos\r\n",
 							"\r\n",
-							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
-							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
+							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 46
 					},
 					{
 						"cell_type": "code",
@@ -813,7 +828,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 47
 					},
 					{
 						"cell_type": "code",
@@ -842,7 +857,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 48
 					},
 					{
 						"cell_type": "code",
@@ -862,7 +877,7 @@
 							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 49
 					},
 					{
 						"cell_type": "code",
@@ -911,7 +926,7 @@
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 50
 					},
 					{
 						"cell_type": "code",
@@ -946,7 +961,7 @@
 							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 51
 					},
 					{
 						"cell_type": "code",
@@ -1071,7 +1086,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 52
 					},
 					{
 						"cell_type": "code",
@@ -1094,7 +1109,7 @@
 							"#df_Saldo.show(200)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 53
 					},
 					{
 						"cell_type": "code",
@@ -1125,7 +1140,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 54
 					},
 					{
 						"cell_type": "code",
@@ -1142,12 +1157,12 @@
 							"collapsed": false
 						},
 						"source": [
-							"display(df_Cliente)\r\n",
-							"display(df_Producto)\r\n",
-							"display(df_Transacciones)"
+							"#display(df_Cliente)\r\n",
+							"#display(df_Producto)\r\n",
+							"#display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 55
 					},
 					{
 						"cell_type": "code",
@@ -1165,18 +1180,500 @@
 						"source": [
 							"#Generar archivos con informacion\r\n",
 							"\r\n",
+							"Routeadl = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net\"\r\n",
+							"path_sink_comp = fecha+\"/\"+user+\"/\"+name\r\n",
+							"\r\n",
 							"# crear parquet file para cliente\r\n",
-							"df_Cliente.write.mode(\"overwrite\").parquet(path_sink+\"/Cliente\")\r\n",
+							"df_Cliente.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Cliente/\"+path_sink_comp)\r\n",
 							"\r\n",
 							"# crear parquet file para porducto\r\n",
-							"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
+							"df_Producto.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Producto/\"+path_sink_comp)\r\n",
 							"\r\n",
 							"# crear parquet file para transacciones\r\n",
-							"df_Transacciones.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
+							"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 56
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Procesar Data Cruda PDF - Zona Data - Fondo de Inversion')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "LecturaScripts"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "spproymaestria",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "3681981e-313e-45fc-a553-18c67e966a9f"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Synapse/workspaces/synapseproyectomaestria/bigDataPools/spproymaestria",
+						"name": "spproymaestria",
+						"type": "Spark",
+						"endpoint": "https://synapseproyectomaestria.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spproymaestria",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.3",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"#Importar Librerias Necesarias\r\n",
+							"\r\n",
+							"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
+							"from pyspark.sql.window import Window\r\n",
+							"from pyspark.sql.functions import *"
+						],
+						"outputs": [],
+						"execution_count": 67
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Configurar parametros aqui\r\n",
+							"\r\n",
+							"user = \"bsmoralesg@outlook.com\"\r\n",
+							"type = \"Fondos de Inversion\"\r\n",
+							"fecha = \"10012023\"\r\n",
+							"\r\n",
+							"#name = \"Extracto_8791222_202108_FIDUCUENTA_3940\"\r\n",
+							"#name = \"Extracto_36546412_202111_FIDUCUENTA_3940\"\r\n",
+							"#name = \"Extracto_212010590_202208_FIDUCUENTA_3940\"\r\n",
+							"#name = \"Extracto_254154275_202210_FIDUCUENTA_3940\"\r\n",
+							"#name = \"Extracto_333733883_202301_FIDUCUENTA_3940\"\r\n",
+							"name = \"Extracto_395097292_202304_FIDUCUENTA_3940\"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 68
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Configurar rutas de origen de archivos\r\n",
+							"\r\n",
+							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
+						],
+						"outputs": [],
+						"execution_count": 69
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Obtener Datos para Fondo de inversion\r\n",
+							"\r\n",
+							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
+						],
+						"outputs": [],
+						"execution_count": 70
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Dividir los valores por salto de linea\r\n",
+							"\r\n",
+							"df_split = DataCruda.withColumn(\"contenido\", split(DataCruda[\"contenido\"], \"\\n\"))\r\n",
+							"\r\n",
+							"# Transformar la columna array para crear una nueva fila por cada elemento\r\n",
+							"df_formated = df_split.select(df_split.index, df_split.pagenumber, df_split.x0, df_split.x1, df_split.y0, df_split.y1, explode(\"contenido\").alias(\"contenido\"))\r\n",
+							"\r\n",
+							"#Crear identificador unico  basado enel orden de lectura\r\n",
+							"\r\n",
+							"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
+							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
+						],
+						"outputs": [],
+						"execution_count": 71
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display(df_formated)"
+						],
+						"outputs": [],
+						"execution_count": 72
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Obtener Informacion de Cliente\r\n",
+							"\r\n",
+							"Nombre = df_formated.select(df_formated.contenido).where((df_formated.UniqueId == 1)).first()[0]\r\n",
+							"Email = user\r\n",
+							"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 3).first()[0]\r\n",
+							"\r\n",
+							"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
+							"CiudadData = CiudadData.replace(\"$\",\"\")\r\n",
+							"CiudadData = CiudadData.replace(\"D.C.\",\"\")\r\n",
+							"CiudadData = CiudadData.replace(\"  \",\" \")\r\n",
+							"CiudadData = CiudadData.split(\" \")\r\n",
+							"\r\n",
+							"CiudadData[0] = CiudadData[0].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
+							"Ciudad_1 = CiudadData[0].strip()\r\n",
+							"\r\n",
+							"CiudadData[1] = CiudadData[1].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
+							"Ciudad_2 = CiudadData[1].strip()\r\n",
+							"\r\n",
+							"# Crear dataframe para informacion de cliente\r\n",
+							"\r\n",
+							"schemaCliente = StructType([ \\\r\n",
+							"    StructField(\"Nombre\",StringType(),True), \\\r\n",
+							"    StructField(\"Email\",StringType(),True), \\\r\n",
+							"    StructField(\"Direccion\",StringType(),True), \\\r\n",
+							"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
+							"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
+							"  ])\r\n",
+							"\r\n",
+							"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
+							"\r\n",
+							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 73
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Obtener Informacion de Prodcuto\r\n",
+							"\r\n",
+							"TipoProducto = 'Fiducuenta'\r\n",
+							"NumeroProducto = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 19).first()[0]\r\n",
+							"Desde = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 12).first()[0]\r\n",
+							"Hasta = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 20).first()[0]\r\n",
+							"ValorUnidad = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 21).first()[0]\r\n",
+							"\r\n",
+							"Rentabilidad = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 22).first()[0]\r\n",
+							"if \"-\" in Rentabilidad: Rentabilidad = \"-\"+Rentabilidad.replace(\"-\",\"\")\r\n",
+							"\r\n",
+							"Comision = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 17).first()[0]\r\n",
+							"\r\n",
+							"\r\n",
+							"# Crear dataframe para informacion de producto\r\n",
+							"\r\n",
+							"schemaProducto = StructType([ \\\r\n",
+							"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
+							"    StructField(\"NumeroProducto\",StringType(),True), \\\r\n",
+							"    StructField(\"Desde\",StringType(),True), \\\r\n",
+							"    StructField(\"Hasta\",StringType(),True), \\\r\n",
+							"    StructField(\"ValorUnidad\",StringType(),True), \\\r\n",
+							"    StructField(\"Rentabilidad\",StringType(),True), \\\r\n",
+							"    StructField(\"Comision\",StringType(),True)\r\n",
+							"  ])\r\n",
+							"\r\n",
+							"data_Producto = [(TipoProducto, NumeroProducto, Desde, Hasta, ValorUnidad, Rentabilidad, Comision)]\r\n",
+							"\r\n",
+							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 74
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Extraer informacion de transacciones\r\n",
+							"\r\n",
+							"# Definir incrementales basado en el uniqueid\r\n",
+							"\r\n",
+							"Incremental = Window.orderBy(\"UniqueId\")\r\n",
+							"\r\n",
+							"#Extraer Fecha de transacciones\r\n",
+							"\r\n",
+							"df_Fecha = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '').alias(\"FechaTransaccion\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"        ((df_formated.x0 >= 27.0) & (df_formated.x0 <= 28.0)) & \\\r\n",
+							"        (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
+							"df_Fecha = df_Fecha.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"#Extraer Descripcion de transacciones\r\n",
+							"\r\n",
+							"df_Descripcion = df_formated.select(regexp_replace(df_formated.contenido, '\\d', '').alias(\"Descripcion\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"        ((df_formated.x0 >= 27.0) & (df_formated.x0 <= 28.0)) & \\\r\n",
+							"        (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
+							"df_Descripcion = df_Descripcion.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"#Extraer Valor en $\r\n",
+							"\r\n",
+							"df_ValorPesos = df_formated.select(df_formated.contenido.alias(\"ValorPesos\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"        ((df_formated.x0 >= 343.0) & (df_formated.x0 <= 344.0)) & \\\r\n",
+							"        (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
+							"df_ValorPesos = df_ValorPesos.withColumn(\"ValorPesos\", regexp_replace(df_ValorPesos.ValorPesos, '[.]', ''))  \r\n",
+							"df_ValorPesos = df_ValorPesos.withColumn(\"ValorPesos\", regexp_replace(df_ValorPesos.ValorPesos, ',', '.'))\r\n",
+							"df_ValorPesos = df_ValorPesos.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"#Extraer Valor en unidades\r\n",
+							"\r\n",
+							"df_ValorUnidades = df_formated.select(df_formated.contenido.alias(\"ValorUnidades\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"        ((df_formated.x1 >= 501.5) & (df_formated.x1 <= 502.5)) & \\\r\n",
+							"        (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
+							"df_ValorUnidades = df_ValorUnidades.withColumn(\"ValorUnidades\", regexp_replace(df_ValorUnidades.ValorUnidades, '[.]', ''))  \r\n",
+							"df_ValorUnidades = df_ValorUnidades.withColumn(\"ValorUnidades\", regexp_replace(df_ValorUnidades.ValorUnidades, ',', '.'))\r\n",
+							"df_ValorUnidades = df_ValorUnidades.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"#Extraer Saldo\r\n",
+							"\r\n",
+							"df_Saldo = df_formated.select(df_formated.contenido.alias(\"Saldo\"), df_formated.UniqueId).where \\\r\n",
+							"    ( \\\r\n",
+							"        ((df_formated.x1 >= 593.5) & (df_formated.x1 <= 594.5)) & \\\r\n",
+							"        (df_formated.contenido != \"\")\r\n",
+							"    )\r\n",
+							"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, '[.]', ''))  \r\n",
+							"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, ',', '.'))\r\n",
+							"df_Saldo = df_Saldo.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 75
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_Fecha.show()\r\n",
+							"df_Descripcion.show()\r\n",
+							"df_ValorPesos.show()\r\n",
+							"df_ValorUnidades.show()\r\n",
+							"df_Saldo.show()"
+						],
+						"outputs": [],
+						"execution_count": 76
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df_Transacciones = df_Fecha.join(df_Descripcion, df_Fecha.id == df_Descripcion.id, \"inner\") \\\r\n",
+							"                  .join(df_ValorPesos , df_Fecha.id == df_ValorPesos.id, \"inner\") \\\r\n",
+							"                  .join(df_ValorUnidades, df_Fecha.id == df_ValorUnidades.id, \"inner\") \\\r\n",
+							"                  .join(df_Saldo, df_Fecha.id == df_Saldo.id, \"inner\") \\\r\n",
+							"                  .select( \\\r\n",
+							"                        df_Fecha.FechaTransaccion, \\\r\n",
+							"                        df_Descripcion.Descripcion, \\\r\n",
+							"                        df_ValorPesos.ValorPesos, \\\r\n",
+							"                        df_ValorUnidades.ValorUnidades, \\\r\n",
+							"                        df_Saldo.Saldo\r\n",
+							"                        )"
+						],
+						"outputs": [],
+						"execution_count": 77
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"#display(df_Cliente)\r\n",
+							"#display(df_Producto)\r\n",
+							"#display(df_Transacciones)"
+						],
+						"outputs": [],
+						"execution_count": 78
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Generar archivos con informacion\r\n",
+							"\r\n",
+							"Routeadl = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net\"\r\n",
+							"path_sink_comp = fecha+\"/\"+user+\"/\"+name\r\n",
+							"\r\n",
+							"# crear parquet file para cliente\r\n",
+							"df_Cliente.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Cliente/\"+path_sink_comp)\r\n",
+							"\r\n",
+							"# crear parquet file para porducto\r\n",
+							"df_Producto.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Producto/\"+path_sink_comp)\r\n",
+							"\r\n",
+							"# crear parquet file para transacciones\r\n",
+							"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 79
 					}
 				]
 			},
@@ -1206,7 +1703,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "61dedbc5-8792-4049-9029-0b41cc2d5522"
+						"spark.autotune.trackingId": "f1ce4b81-de16-429a-aed1-53d04f21db43"
 					}
 				},
 				"metadata": {
@@ -1249,7 +1746,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 619
+						"execution_count": 54
 					},
 					{
 						"cell_type": "code",
@@ -1282,7 +1779,7 @@
 							"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 						],
 						"outputs": [],
-						"execution_count": 620
+						"execution_count": 55
 					},
 					{
 						"cell_type": "code",
@@ -1298,13 +1795,13 @@
 							}
 						},
 						"source": [
-							"# Configurar rutas de origen y destino de archivos\r\n",
+							"# Configurar rutas de origen de archivos\r\n",
 							"\r\n",
-							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
-							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
+							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name\r\n",
+							""
 						],
 						"outputs": [],
-						"execution_count": 621
+						"execution_count": 56
 					},
 					{
 						"cell_type": "code",
@@ -1326,7 +1823,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 622
+						"execution_count": 57
 					},
 					{
 						"cell_type": "code",
@@ -1355,7 +1852,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 623
+						"execution_count": 58
 					},
 					{
 						"cell_type": "code",
@@ -1375,7 +1872,7 @@
 							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 624
+						"execution_count": 59
 					},
 					{
 						"cell_type": "code",
@@ -1414,7 +1911,7 @@
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 625
+						"execution_count": 60
 					},
 					{
 						"cell_type": "code",
@@ -1473,7 +1970,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 626
+						"execution_count": 61
 					},
 					{
 						"cell_type": "code",
@@ -1667,7 +2164,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 627
+						"execution_count": 62
 					},
 					{
 						"cell_type": "code",
@@ -1694,7 +2191,7 @@
 							"#df_Cuotas.show(50)"
 						],
 						"outputs": [],
-						"execution_count": 628
+						"execution_count": 63
 					},
 					{
 						"cell_type": "code",
@@ -1733,7 +2230,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 629
+						"execution_count": 64
 					},
 					{
 						"cell_type": "code",
@@ -1750,12 +2247,12 @@
 							"collapsed": false
 						},
 						"source": [
-							"display(df_Cliente)\r\n",
-							"display(df_Producto)\r\n",
-							"display(df_Transacciones)"
+							"#display(df_Cliente)\r\n",
+							"#display(df_Producto)\r\n",
+							"#display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 630
+						"execution_count": 65
 					},
 					{
 						"cell_type": "code",
@@ -1773,18 +2270,21 @@
 						"source": [
 							"#Generar archivos con informacion\r\n",
 							"\r\n",
+							"Routeadl = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net\"\r\n",
+							"path_sink_comp = fecha+\"/\"+user+\"/\"+name\r\n",
+							"\r\n",
 							"# crear parquet file para cliente\r\n",
-							"df_Cliente.write.mode(\"overwrite\").parquet(path_sink+\"/Cliente\")\r\n",
+							"df_Cliente.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Cliente/\"+path_sink_comp)\r\n",
 							"\r\n",
 							"# crear parquet file para porducto\r\n",
-							"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
+							"df_Producto.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Producto/\"+path_sink_comp)\r\n",
 							"\r\n",
 							"# crear parquet file para transacciones\r\n",
-							"df_Transacciones.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
+							"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 631
+						"execution_count": 66
 					},
 					{
 						"cell_type": "code",
@@ -2162,485 +2662,6 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/Procesar Data Cruda PDF - Zona Data - Fondo de Inversion')]",
-			"type": "Microsoft.Synapse/workspaces/notebooks",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "LecturaScripts"
-				},
-				"nbformat": 4,
-				"nbformat_minor": 2,
-				"bigDataPool": {
-					"referenceName": "spproymaestria",
-					"type": "BigDataPoolReference"
-				},
-				"sessionProperties": {
-					"driverMemory": "28g",
-					"driverCores": 4,
-					"executorMemory": "28g",
-					"executorCores": 4,
-					"numExecutors": 2,
-					"conf": {
-						"spark.dynamicAllocation.enabled": "false",
-						"spark.dynamicAllocation.minExecutors": "2",
-						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "acb5d87b-2827-4b38-89bb-863f94f95cb8"
-					}
-				},
-				"metadata": {
-					"saveOutput": true,
-					"enableDebugMode": false,
-					"kernelspec": {
-						"name": "synapse_pyspark",
-						"display_name": "Synapse PySpark"
-					},
-					"language_info": {
-						"name": "python"
-					},
-					"a365ComputeOptions": {
-						"id": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Synapse/workspaces/synapseproyectomaestria/bigDataPools/spproymaestria",
-						"name": "spproymaestria",
-						"type": "Spark",
-						"endpoint": "https://synapseproyectomaestria.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spproymaestria",
-						"auth": {
-							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net"
-						},
-						"sparkVersion": "3.3",
-						"nodeCount": 3,
-						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
-					},
-					"sessionKeepAliveTimeout": 30
-				},
-				"cells": [
-					{
-						"cell_type": "code",
-						"metadata": {},
-						"source": [
-							"#Importar Librerias Necesarias\r\n",
-							"\r\n",
-							"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
-							"from pyspark.sql.window import Window\r\n",
-							"from pyspark.sql.functions import *"
-						],
-						"outputs": [],
-						"execution_count": 213
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"#Configurar parametros aqui\r\n",
-							"\r\n",
-							"user = \"bsmoralesg@outlook.com\"\r\n",
-							"type = \"Fondos de Inversion\"\r\n",
-							"fecha = \"10012023\"\r\n",
-							"\r\n",
-							"#name = \"Extracto_8791222_202108_FIDUCUENTA_3940\"\r\n",
-							"#name = \"Extracto_36546412_202111_FIDUCUENTA_3940\"\r\n",
-							"#name = \"Extracto_212010590_202208_FIDUCUENTA_3940\"\r\n",
-							"#name = \"Extracto_254154275_202210_FIDUCUENTA_3940\"\r\n",
-							"#name = \"Extracto_333733883_202301_FIDUCUENTA_3940\"\r\n",
-							"name = \"Extracto_395097292_202304_FIDUCUENTA_3940\"\r\n",
-							"\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 214
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"# Configurar rutas de origen y destino de archivos\r\n",
-							"\r\n",
-							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
-							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
-						],
-						"outputs": [],
-						"execution_count": 215
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"#Obtener Datos para Fondo de inversion\r\n",
-							"\r\n",
-							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
-						],
-						"outputs": [],
-						"execution_count": 216
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"# Dividir los valores por salto de linea\r\n",
-							"\r\n",
-							"df_split = DataCruda.withColumn(\"contenido\", split(DataCruda[\"contenido\"], \"\\n\"))\r\n",
-							"\r\n",
-							"# Transformar la columna array para crear una nueva fila por cada elemento\r\n",
-							"df_formated = df_split.select(df_split.index, df_split.pagenumber, df_split.x0, df_split.x1, df_split.y0, df_split.y1, explode(\"contenido\").alias(\"contenido\"))\r\n",
-							"\r\n",
-							"#Crear identificador unico  basado enel orden de lectura\r\n",
-							"\r\n",
-							"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
-							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
-						],
-						"outputs": [],
-						"execution_count": 217
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							},
-							"collapsed": false
-						},
-						"source": [
-							"display(df_formated)"
-						],
-						"outputs": [],
-						"execution_count": 218
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"# Obtener Informacion de Cliente\r\n",
-							"\r\n",
-							"Nombre = df_formated.select(df_formated.contenido).where((df_formated.UniqueId == 1)).first()[0]\r\n",
-							"Email = user\r\n",
-							"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 3).first()[0]\r\n",
-							"\r\n",
-							"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
-							"CiudadData = CiudadData.replace(\"$\",\"\")\r\n",
-							"CiudadData = CiudadData.replace(\"D.C.\",\"\")\r\n",
-							"CiudadData = CiudadData.replace(\"  \",\" \")\r\n",
-							"CiudadData = CiudadData.split(\" \")\r\n",
-							"\r\n",
-							"CiudadData[0] = CiudadData[0].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
-							"Ciudad_1 = CiudadData[0].strip()\r\n",
-							"\r\n",
-							"CiudadData[1] = CiudadData[1].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
-							"Ciudad_2 = CiudadData[1].strip()\r\n",
-							"\r\n",
-							"# Crear dataframe para informacion de cliente\r\n",
-							"\r\n",
-							"schemaCliente = StructType([ \\\r\n",
-							"    StructField(\"Nombre\",StringType(),True), \\\r\n",
-							"    StructField(\"Email\",StringType(),True), \\\r\n",
-							"    StructField(\"Direccion\",StringType(),True), \\\r\n",
-							"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
-							"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
-							"  ])\r\n",
-							"\r\n",
-							"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
-							"\r\n",
-							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)\r\n",
-							"\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 219
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"#Obtener Informacion de Prodcuto\r\n",
-							"\r\n",
-							"TipoProducto = 'Fiducuenta'\r\n",
-							"NumeroProducto = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 19).first()[0]\r\n",
-							"Desde = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 12).first()[0]\r\n",
-							"Hasta = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 20).first()[0]\r\n",
-							"ValorUnidad = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 21).first()[0]\r\n",
-							"\r\n",
-							"Rentabilidad = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 22).first()[0]\r\n",
-							"if \"-\" in Rentabilidad: Rentabilidad = \"-\"+Rentabilidad.replace(\"-\",\"\")\r\n",
-							"\r\n",
-							"Comision = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 17).first()[0]\r\n",
-							"\r\n",
-							"\r\n",
-							"# Crear dataframe para informacion de producto\r\n",
-							"\r\n",
-							"schemaProducto = StructType([ \\\r\n",
-							"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
-							"    StructField(\"NumeroProducto\",StringType(),True), \\\r\n",
-							"    StructField(\"Desde\",StringType(),True), \\\r\n",
-							"    StructField(\"Hasta\",StringType(),True), \\\r\n",
-							"    StructField(\"ValorUnidad\",StringType(),True), \\\r\n",
-							"    StructField(\"Rentabilidad\",StringType(),True), \\\r\n",
-							"    StructField(\"Comision\",StringType(),True)\r\n",
-							"  ])\r\n",
-							"\r\n",
-							"data_Producto = [(TipoProducto, NumeroProducto, Desde, Hasta, ValorUnidad, Rentabilidad, Comision)]\r\n",
-							"\r\n",
-							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 220
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							},
-							"collapsed": false
-						},
-						"source": [
-							"# Extraer informacion de transacciones\r\n",
-							"\r\n",
-							"# Definir incrementales basado en el uniqueid\r\n",
-							"\r\n",
-							"Incremental = Window.orderBy(\"UniqueId\")\r\n",
-							"\r\n",
-							"#Extraer Fecha de transacciones\r\n",
-							"\r\n",
-							"df_Fecha = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '').alias(\"FechaTransaccion\"), df_formated.UniqueId).where \\\r\n",
-							"    ( \\\r\n",
-							"        ((df_formated.x0 >= 27.0) & (df_formated.x0 <= 28.0)) & \\\r\n",
-							"        (df_formated.contenido != \"\")\r\n",
-							"    )\r\n",
-							"df_Fecha = df_Fecha.withColumn(\"id\", row_number().over(Incremental))\r\n",
-							"\r\n",
-							"\r\n",
-							"#Extraer Descripcion de transacciones\r\n",
-							"\r\n",
-							"df_Descripcion = df_formated.select(regexp_replace(df_formated.contenido, '\\d', '').alias(\"Descripcion\"), df_formated.UniqueId).where \\\r\n",
-							"    ( \\\r\n",
-							"        ((df_formated.x0 >= 27.0) & (df_formated.x0 <= 28.0)) & \\\r\n",
-							"        (df_formated.contenido != \"\")\r\n",
-							"    )\r\n",
-							"df_Descripcion = df_Descripcion.withColumn(\"id\", row_number().over(Incremental))\r\n",
-							"\r\n",
-							"\r\n",
-							"#Extraer Valor en $\r\n",
-							"\r\n",
-							"df_ValorPesos = df_formated.select(df_formated.contenido.alias(\"ValorPesos\"), df_formated.UniqueId).where \\\r\n",
-							"    ( \\\r\n",
-							"        ((df_formated.x0 >= 343.0) & (df_formated.x0 <= 344.0)) & \\\r\n",
-							"        (df_formated.contenido != \"\")\r\n",
-							"    )\r\n",
-							"df_ValorPesos = df_ValorPesos.withColumn(\"ValorPesos\", regexp_replace(df_ValorPesos.ValorPesos, '[.]', ''))  \r\n",
-							"df_ValorPesos = df_ValorPesos.withColumn(\"ValorPesos\", regexp_replace(df_ValorPesos.ValorPesos, ',', '.'))\r\n",
-							"df_ValorPesos = df_ValorPesos.withColumn(\"id\", row_number().over(Incremental))\r\n",
-							"\r\n",
-							"\r\n",
-							"#Extraer Valor en unidades\r\n",
-							"\r\n",
-							"df_ValorUnidades = df_formated.select(df_formated.contenido.alias(\"ValorUnidades\"), df_formated.UniqueId).where \\\r\n",
-							"    ( \\\r\n",
-							"        ((df_formated.x1 >= 501.5) & (df_formated.x1 <= 502.5)) & \\\r\n",
-							"        (df_formated.contenido != \"\")\r\n",
-							"    )\r\n",
-							"df_ValorUnidades = df_ValorUnidades.withColumn(\"ValorUnidades\", regexp_replace(df_ValorUnidades.ValorUnidades, '[.]', ''))  \r\n",
-							"df_ValorUnidades = df_ValorUnidades.withColumn(\"ValorUnidades\", regexp_replace(df_ValorUnidades.ValorUnidades, ',', '.'))\r\n",
-							"df_ValorUnidades = df_ValorUnidades.withColumn(\"id\", row_number().over(Incremental))\r\n",
-							"\r\n",
-							"\r\n",
-							"#Extraer Saldo\r\n",
-							"\r\n",
-							"df_Saldo = df_formated.select(df_formated.contenido.alias(\"Saldo\"), df_formated.UniqueId).where \\\r\n",
-							"    ( \\\r\n",
-							"        ((df_formated.x1 >= 593.5) & (df_formated.x1 <= 594.5)) & \\\r\n",
-							"        (df_formated.contenido != \"\")\r\n",
-							"    )\r\n",
-							"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, '[.]', ''))  \r\n",
-							"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, ',', '.'))\r\n",
-							"df_Saldo = df_Saldo.withColumn(\"id\", row_number().over(Incremental))\r\n",
-							"\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 221
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"df_Fecha.show()\r\n",
-							"df_Descripcion.show()\r\n",
-							"df_ValorPesos.show()\r\n",
-							"df_ValorUnidades.show()\r\n",
-							"df_Saldo.show()"
-						],
-						"outputs": [],
-						"execution_count": 222
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"df_Transacciones = df_Fecha.join(df_Descripcion, df_Fecha.id == df_Descripcion.id, \"inner\") \\\r\n",
-							"                  .join(df_ValorPesos , df_Fecha.id == df_ValorPesos.id, \"inner\") \\\r\n",
-							"                  .join(df_ValorUnidades, df_Fecha.id == df_ValorUnidades.id, \"inner\") \\\r\n",
-							"                  .join(df_Saldo, df_Fecha.id == df_Saldo.id, \"inner\") \\\r\n",
-							"                  .select( \\\r\n",
-							"                        df_Fecha.FechaTransaccion, \\\r\n",
-							"                        df_Descripcion.Descripcion, \\\r\n",
-							"                        df_ValorPesos.ValorPesos, \\\r\n",
-							"                        df_ValorUnidades.ValorUnidades, \\\r\n",
-							"                        df_Saldo.Saldo\r\n",
-							"                        )"
-						],
-						"outputs": [],
-						"execution_count": 223
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							},
-							"collapsed": false
-						},
-						"source": [
-							"display(df_Cliente)\r\n",
-							"display(df_Producto)\r\n",
-							"display(df_Transacciones)"
-						],
-						"outputs": [],
-						"execution_count": 224
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"#Generar archivos con informacion\r\n",
-							"\r\n",
-							"# crear parquet file para cliente\r\n",
-							"df_Cliente.write.mode(\"overwrite\").parquet(path_sink+\"/Cliente\")\r\n",
-							"\r\n",
-							"# crear parquet file para porducto\r\n",
-							"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
-							"\r\n",
-							"# crear parquet file para transacciones\r\n",
-							"df_Transacciones.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 225
-					}
-				]
-			},
-			"dependsOn": []
 		}
 	]
 }
