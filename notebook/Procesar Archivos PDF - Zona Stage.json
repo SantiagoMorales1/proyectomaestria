@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0f4d2afc-e1ce-49a2-a16e-9af064847611"
+				"spark.autotune.trackingId": "301f189d-2f19-4b1a-958f-3f9945341745"
 			}
 		},
 		"metadata": {
@@ -66,7 +66,7 @@
 					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType, DoubleType\r\n",
 					"import io"
 				],
-				"execution_count": 11
+				"execution_count": 56
 			},
 			{
 				"cell_type": "code",
@@ -88,7 +88,7 @@
 					"    .appName(\"PDF Extraction\") \\\r\n",
 					"    .getOrCreate()"
 				],
-				"execution_count": 12
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -131,17 +131,17 @@
 					"\r\n",
 					"#Fiducuenta\r\n",
 					"\r\n",
-					"file_name = \"Extracto_8791222_202108_FIDUCUENTA_3940.pdf\"\r\n",
+					"#file_name = \"Extracto_8791222_202108_FIDUCUENTA_3940.pdf\"\r\n",
 					"#file_name = \"Extracto_36546412_202111_FIDUCUENTA_3940.pdf\"\r\n",
 					"#file_name = \"Extracto_212010590_202208_FIDUCUENTA_3940.pdf\"\r\n",
 					"#file_name = \"Extracto_254154275_202210_FIDUCUENTA_3940.pdf\"\r\n",
 					"#file_name = \"Extracto_333733883_202301_FIDUCUENTA_3940.pdf\"\r\n",
-					"#file_name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
+					"file_name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
 					"\r\n",
 					"\r\n",
 					"pdf_password = \"1233491047\""
 				],
-				"execution_count": 13
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -166,7 +166,7 @@
 					"file_name = file_name.replace(\".pdf\", \"\")\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_user+\"/\"+pdf_type+\"/\"+pdf_fecha+\"/\"+file_name+\"/Raw\""
 				],
-				"execution_count": 14
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -199,7 +199,7 @@
 					"\r\n",
 					" "
 				],
-				"execution_count": 15
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -255,7 +255,7 @@
 					"device.close()\r\n",
 					"retstr.close()"
 				],
-				"execution_count": 16
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",
@@ -330,7 +330,7 @@
 					"        pageraux = page\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 62
 			},
 			{
 				"cell_type": "code",
@@ -353,7 +353,7 @@
 					"# crear parquet file\r\n",
 					"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
 				],
-				"execution_count": null
+				"execution_count": 63
 			},
 			{
 				"cell_type": "code",
@@ -372,7 +372,7 @@
 				"source": [
 					"display(df_RawDat)"
 				],
-				"execution_count": null
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
