@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "807573c4-6f0b-4db9-824c-eb004ca7ccc5"
+				"spark.autotune.trackingId": "f20b2ff9-9663-4a52-ab7b-90ea4ec9a248"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 3
+				"execution_count": 213
 			},
 			{
 				"cell_type": "code",
@@ -82,16 +82,16 @@
 					"type = \"Fondos de Inversion\"\r\n",
 					"fecha = \"10012023\"\r\n",
 					"\r\n",
-					"name = \"Extracto_8791222_202108_FIDUCUENTA_3940\"\r\n",
+					"#name = \"Extracto_8791222_202108_FIDUCUENTA_3940\"\r\n",
 					"#name = \"Extracto_36546412_202111_FIDUCUENTA_3940\"\r\n",
-					"#name = \"Extracto_212010590_202208_FIDUCUENTA_3940f\"\r\n",
+					"#name = \"Extracto_212010590_202208_FIDUCUENTA_3940\"\r\n",
 					"#name = \"Extracto_254154275_202210_FIDUCUENTA_3940\"\r\n",
 					"#name = \"Extracto_333733883_202301_FIDUCUENTA_3940\"\r\n",
-					"#name = \"Extracto_395097292_202304_FIDUCUENTA_3940\"\r\n",
+					"name = \"Extracto_395097292_202304_FIDUCUENTA_3940\"\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": 7
+				"execution_count": 214
 			},
 			{
 				"cell_type": "code",
@@ -112,7 +112,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": 8
+				"execution_count": 215
 			},
 			{
 				"cell_type": "code",
@@ -132,7 +132,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 9
+				"execution_count": 216
 			},
 			{
 				"cell_type": "code",
@@ -160,7 +160,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 10
+				"execution_count": 217
 			},
 			{
 				"cell_type": "code",
@@ -179,7 +179,7 @@
 				"source": [
 					"display(df_formated)"
 				],
-				"execution_count": 11
+				"execution_count": 218
 			},
 			{
 				"cell_type": "code",
@@ -229,7 +229,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 23
+				"execution_count": 219
 			},
 			{
 				"cell_type": "code",
@@ -252,7 +252,10 @@
 					"Desde = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 12).first()[0]\r\n",
 					"Hasta = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 20).first()[0]\r\n",
 					"ValorUnidad = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 21).first()[0]\r\n",
+					"\r\n",
 					"Rentabilidad = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 22).first()[0]\r\n",
+					"if \"-\" in Rentabilidad: Rentabilidad = \"-\"+Rentabilidad.replace(\"-\",\"\")\r\n",
+					"\r\n",
 					"Comision = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 17).first()[0]\r\n",
 					"\r\n",
 					"\r\n",
@@ -273,7 +276,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 43
+				"execution_count": 220
 			},
 			{
 				"cell_type": "code",
@@ -332,7 +335,7 @@
 					"\r\n",
 					"df_ValorUnidades = df_formated.select(df_formated.contenido.alias(\"ValorUnidades\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"        ((df_formated.x0 >= 450.0) & (df_formated.x0 <= 451.0)) & \\\r\n",
+					"        ((df_formated.x1 >= 501.5) & (df_formated.x1 <= 502.5)) & \\\r\n",
 					"        (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
 					"df_ValorUnidades = df_ValorUnidades.withColumn(\"ValorUnidades\", regexp_replace(df_ValorUnidades.ValorUnidades, '[.]', ''))  \r\n",
@@ -344,7 +347,7 @@
 					"\r\n",
 					"df_Saldo = df_formated.select(df_formated.contenido.alias(\"Saldo\"), df_formated.UniqueId).where \\\r\n",
 					"    ( \\\r\n",
-					"        ((df_formated.x0 >= 547.0) & (df_formated.x0 <= 548.0)) & \\\r\n",
+					"        ((df_formated.x1 >= 593.5) & (df_formated.x1 <= 594.5)) & \\\r\n",
 					"        (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
 					"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, '[.]', ''))  \r\n",
@@ -353,7 +356,106 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 58
+				"execution_count": 221
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_Fecha.show()\r\n",
+					"df_Descripcion.show()\r\n",
+					"df_ValorPesos.show()\r\n",
+					"df_ValorUnidades.show()\r\n",
+					"df_Saldo.show()"
+				],
+				"execution_count": 222
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_Transacciones = df_Fecha.join(df_Descripcion, df_Fecha.id == df_Descripcion.id, \"inner\") \\\r\n",
+					"                  .join(df_ValorPesos , df_Fecha.id == df_ValorPesos.id, \"inner\") \\\r\n",
+					"                  .join(df_ValorUnidades, df_Fecha.id == df_ValorUnidades.id, \"inner\") \\\r\n",
+					"                  .join(df_Saldo, df_Fecha.id == df_Saldo.id, \"inner\") \\\r\n",
+					"                  .select( \\\r\n",
+					"                        df_Fecha.FechaTransaccion, \\\r\n",
+					"                        df_Descripcion.Descripcion, \\\r\n",
+					"                        df_ValorPesos.ValorPesos, \\\r\n",
+					"                        df_ValorUnidades.ValorUnidades, \\\r\n",
+					"                        df_Saldo.Saldo\r\n",
+					"                        )"
+				],
+				"execution_count": 223
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"display(df_Cliente)\r\n",
+					"display(df_Producto)\r\n",
+					"display(df_Transacciones)"
+				],
+				"execution_count": 224
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Generar archivos con informacion\r\n",
+					"\r\n",
+					"# crear parquet file para cliente\r\n",
+					"df_Cliente.write.mode(\"overwrite\").parquet(path_sink+\"/Cliente\")\r\n",
+					"\r\n",
+					"# crear parquet file para porducto\r\n",
+					"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
+					"\r\n",
+					"# crear parquet file para transacciones\r\n",
+					"df_Transacciones.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
+					""
+				],
+				"execution_count": 225
 			}
 		]
 	}
