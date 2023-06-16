@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "1ec32ff4-3316-4733-9eed-120a2e88c368"
+				"spark.autotune.trackingId": "f1ce4b81-de16-429a-aed1-53d04f21db43"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 1
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -95,7 +95,7 @@
 					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
 					"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 				],
-				"execution_count": 620
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -113,10 +113,10 @@
 				"source": [
 					"# Configurar rutas de origen de archivos\r\n",
 					"\r\n",
-					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
-					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
+					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name\r\n",
+					""
 				],
-				"execution_count": 621
+				"execution_count": 56
 			},
 			{
 				"cell_type": "code",
@@ -137,7 +137,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 622
+				"execution_count": 57
 			},
 			{
 				"cell_type": "code",
@@ -165,7 +165,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 623
+				"execution_count": 58
 			},
 			{
 				"cell_type": "code",
@@ -184,7 +184,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 624
+				"execution_count": 59
 			},
 			{
 				"cell_type": "code",
@@ -222,7 +222,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 625
+				"execution_count": 60
 			},
 			{
 				"cell_type": "code",
@@ -280,7 +280,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 626
+				"execution_count": 61
 			},
 			{
 				"cell_type": "code",
@@ -473,7 +473,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 627
+				"execution_count": 62
 			},
 			{
 				"cell_type": "code",
@@ -499,7 +499,7 @@
 					"#df_SaldoADiferir.show(50)\r\n",
 					"#df_Cuotas.show(50)"
 				],
-				"execution_count": 628
+				"execution_count": 63
 			},
 			{
 				"cell_type": "code",
@@ -537,7 +537,7 @@
 					"                        df_Cuotas.Cuotas                       \r\n",
 					"                        )"
 				],
-				"execution_count": 629
+				"execution_count": 64
 			},
 			{
 				"cell_type": "code",
@@ -554,11 +554,11 @@
 					"collapsed": false
 				},
 				"source": [
-					"display(df_Cliente)\r\n",
-					"display(df_Producto)\r\n",
-					"display(df_Transacciones)"
+					"#display(df_Cliente)\r\n",
+					"#display(df_Producto)\r\n",
+					"#display(df_Transacciones)"
 				],
-				"execution_count": 630
+				"execution_count": 65
 			},
 			{
 				"cell_type": "code",
@@ -576,17 +576,20 @@
 				"source": [
 					"#Generar archivos con informacion\r\n",
 					"\r\n",
+					"Routeadl = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net\"\r\n",
+					"path_sink_comp = fecha+\"/\"+user+\"/\"+name\r\n",
+					"\r\n",
 					"# crear parquet file para cliente\r\n",
-					"df_Cliente.write.mode(\"overwrite\").parquet(path_sink+\"/Cliente\")\r\n",
+					"df_Cliente.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Cliente/\"+path_sink_comp)\r\n",
 					"\r\n",
 					"# crear parquet file para porducto\r\n",
-					"df_Producto.write.mode(\"overwrite\").parquet(path_sink+\"/Producto\")\r\n",
+					"df_Producto.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Producto/\"+path_sink_comp)\r\n",
 					"\r\n",
 					"# crear parquet file para transacciones\r\n",
-					"df_Transacciones.write.mode(\"overwrite\").parquet(path_sink+\"/Transacciones\")\r\n",
+					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 631
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
