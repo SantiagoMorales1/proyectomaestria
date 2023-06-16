@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "spproymaestria",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8b7b8ce2-8a1a-41d7-81e2-c5fc7e8e597c"
+				"spark.autotune.trackingId": "34664eac-3f0b-41ab-a683-7d914c0de6e1"
 			}
 		},
 		"metadata": {
@@ -24,10 +28,25 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Synapse/workspaces/synapseproyectomaestria/bigDataPools/spproymaestria",
+				"name": "spproymaestria",
+				"type": "Spark",
+				"endpoint": "https://synapseproyectomaestria.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/spproymaestria",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.3",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -41,7 +60,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -63,16 +82,16 @@
 					"type = \"Fondos de Inversion\"\r\n",
 					"fecha = \"10012023\"\r\n",
 					"\r\n",
-					"name = \"Extracto_8791222_202108_FIDUCUENTA_3940.pdf\"\r\n",
-					"#name = \"Extracto_36546412_202111_FIDUCUENTA_3940.pdf\"\r\n",
-					"#name = \"Extracto_212010590_202208_FIDUCUENTA_3940.pdf\"\r\n",
-					"#name = \"Extracto_254154275_202210_FIDUCUENTA_3940.pdf\"\r\n",
-					"#name = \"Extracto_333733883_202301_FIDUCUENTA_3940.pdf\"\r\n",
-					"#name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
+					"name = \"Extracto_8791222_202108_FIDUCUENTA_3940\"\r\n",
+					"#name = \"Extracto_36546412_202111_FIDUCUENTA_3940\"\r\n",
+					"#name = \"Extracto_212010590_202208_FIDUCUENTA_3940f\"\r\n",
+					"#name = \"Extracto_254154275_202210_FIDUCUENTA_3940\"\r\n",
+					"#name = \"Extracto_333733883_202301_FIDUCUENTA_3940\"\r\n",
+					"#name = \"Extracto_395097292_202304_FIDUCUENTA_3940\"\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -93,7 +112,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name+\"/Raw\"\r\n",
 					"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+user+\"/\"+type+\"/\"+fecha+\"/\"+name"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "code",
@@ -113,7 +132,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": null
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -141,7 +160,26 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": null
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"display(df_formated)"
+				],
+				"execution_count": 11
 			},
 			{
 				"cell_type": "code",
@@ -163,10 +201,11 @@
 					"Email = user\r\n",
 					"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 3).first()[0]\r\n",
 					"\r\n",
-					"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 5).first()[0]\r\n",
+					"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
 					"CiudadData = CiudadData.replace(\"$\",\"\")\r\n",
 					"CiudadData = CiudadData.replace(\"D.C.\",\"\")\r\n",
-					"CiudadData = CiudadData.split(\"  \")\r\n",
+					"CiudadData = CiudadData.replace(\"  \",\" \")\r\n",
+					"CiudadData = CiudadData.split(\" \")\r\n",
 					"\r\n",
 					"CiudadData[0] = CiudadData[0].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
 					"Ciudad_1 = CiudadData[0].strip()\r\n",
@@ -186,9 +225,74 @@
 					"\r\n",
 					"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
 					"\r\n",
-					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
+					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)\r\n",
+					"\r\n",
+					""
 				],
-				"execution_count": null
+				"execution_count": 23
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#Obtener Informacion de Prodcuto\r\n",
+					"\r\n",
+					"TipoProducto = 'Fiducuenta'\r\n",
+					"NumeroProducto = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 19).first()[0]\r\n",
+					"Desde = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 12).first()[0]\r\n",
+					"Hasta = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 20).first()[0]\r\n",
+					"ValorUnidad = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 21).first()[0]\r\n",
+					"Rentabilidad = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 22).first()[0]\r\n",
+					"Comision = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 17).first()[0]\r\n",
+					"\r\n",
+					"\r\n",
+					"# Crear dataframe para informacion de producto\r\n",
+					"\r\n",
+					"schemaProducto = StructType([ \\\r\n",
+					"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
+					"    StructField(\"NumeroProducto\",StringType(),True), \\\r\n",
+					"    StructField(\"Desde\",StringType(),True), \\\r\n",
+					"    StructField(\"Hasta\",StringType(),True), \\\r\n",
+					"    StructField(\"ValorUnidad\",StringType(),True), \\\r\n",
+					"    StructField(\"Rentabilidad\",StringType(),True), \\\r\n",
+					"    StructField(\"Comision\",StringType(),True)\r\n",
+					"  ])\r\n",
+					"\r\n",
+					"data_Producto = [(TipoProducto, NumeroProducto, Desde, Hasta, ValorUnidad, Rentabilidad, Comision)]\r\n",
+					"\r\n",
+					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
+					""
+				],
+				"execution_count": 43
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"display(df_Producto)"
+				],
+				"execution_count": 44
 			}
 		]
 	}
