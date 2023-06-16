@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "b725aae1-2ec9-4ef3-b399-dd38f0f6ddd2"
+				"spark.autotune.trackingId": "7e213d1f-d39e-498d-8a5a-901fa1faa159"
 			}
 		},
 		"metadata": {
@@ -402,7 +402,7 @@
 					"#df_ValorTransaccion.show(200)\r\n",
 					"#df_Saldo.show(200)"
 				],
-				"execution_count": null
+				"execution_count": 53
 			},
 			{
 				"cell_type": "code",
@@ -432,7 +432,7 @@
 					"                        df_Saldo.Saldo            \r\n",
 					"                        )"
 				],
-				"execution_count": null
+				"execution_count": 54
 			},
 			{
 				"cell_type": "code",
@@ -453,7 +453,7 @@
 					"#display(df_Producto)\r\n",
 					"#display(df_Transacciones)"
 				],
-				"execution_count": null
+				"execution_count": 55
 			},
 			{
 				"cell_type": "code",
@@ -484,7 +484,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 56
 			}
 		]
 	}
