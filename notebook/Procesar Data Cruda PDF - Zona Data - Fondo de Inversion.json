@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2b6785ab-cc0f-42bc-ad74-4dd1298491f1"
+				"spark.autotune.trackingId": "3681981e-313e-45fc-a553-18c67e966a9f"
 			}
 		},
 		"metadata": {
@@ -131,7 +131,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": null
+				"execution_count": 70
 			},
 			{
 				"cell_type": "code",
@@ -159,7 +159,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": null
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -178,7 +178,7 @@
 				"source": [
 					"display(df_formated)"
 				],
-				"execution_count": null
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -228,7 +228,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
@@ -275,7 +275,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -355,7 +355,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -377,7 +377,7 @@
 					"df_ValorUnidades.show()\r\n",
 					"df_Saldo.show()"
 				],
-				"execution_count": null
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -405,7 +405,7 @@
 					"                        df_Saldo.Saldo\r\n",
 					"                        )"
 				],
-				"execution_count": 64
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -426,7 +426,7 @@
 					"#display(df_Producto)\r\n",
 					"#display(df_Transacciones)"
 				],
-				"execution_count": 65
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -457,7 +457,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 66
+				"execution_count": 79
 			}
 		]
 	}
