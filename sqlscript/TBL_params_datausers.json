@@ -1,8 +1,8 @@
 {
-	"name": "SQL script 1",
+	"name": "TBL_params_datausers",
 	"properties": {
 		"content": {
-			"query": "\ncreate schema modelo\n\ncreate schema params\n\n--drop table params.datausers \nCreate table params.datausers (\n    id bigint identity (1, 1),\n    usuario varchar(150) not null,\n    fecha varchar(12)  not null,\n    type varchar(20)  not null,\n    pdfname varchar(150)  not null,\n    password varchar(150) null,\n    fecha_registro datetime  not null\n)\n\n",
+			"query": "\n--drop table params.datausers \nCreate table params.datausers (\n    id bigint identity (1, 1),\n    usuario varchar(150) not null,\n    fecha varchar(12)  not null,\n    type varchar(20)  not null,\n    pdfname varchar(150)  not null,\n    password varchar(150) null,\n    fecha_registro datetime  not null\n)\n\n",
 			"metadata": {
 				"language": "sql"
 			},
