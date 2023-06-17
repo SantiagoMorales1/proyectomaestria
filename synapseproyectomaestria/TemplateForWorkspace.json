@@ -246,12 +246,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"name": "[concat(parameters('workspaceName'), '/ET_CuentaAhorros_Cliente')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE extractos.CuentaAhorros_Cliente (\n\t[Nombre] nvarchar(4000),\n\t[Email] nvarchar(4000),\n\t[Direccion] nvarchar(4000),\n\t[Ciudad_1] nvarchar(4000),\n\t[Ciudad_2] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = '/.parquet',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n--puYear=2018/puMonth=*/*.snappy.parquet\n\nSELECT TOP 100 * FROM extractos.CuentaAhorros_Cliente\nGO",
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE extractos.CuentaAhorros_Cliente (\n\t[Nombre] nvarchar(4000),\n\t[Email] nvarchar(4000),\n\t[Direccion] nvarchar(4000),\n\t[Ciudad_1] nvarchar(4000),\n\t[Ciudad_2] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Cuenta Ahorros/Cliente/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -2662,6 +2662,66 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ET_CuentaAhorros_Transacciones')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE extractos.CuentaAhorros_Transacciones (\n\t[FechaTransaccion] nvarchar(4000),\n\t[DescripcionTransaccion] nvarchar(4000),\n\t[Sucursal] nvarchar(4000),\n\t[Descuento] nvarchar(4000),\n\t[ValorTransaccion] nvarchar(4000),\t\n\t[Saldo] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Cuenta Ahorros/Transacciones/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TBL_params_datausers')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\n--drop table params.datausers \nCreate table params.datausers (\n    id bigint identity (1, 1),\n    usuario varchar(150) not null,\n    fecha varchar(12)  not null,\n    type varchar(20)  not null,\n    pdfname varchar(150)  not null,\n    password varchar(150) null,\n    fecha_registro datetime  not null\n)\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SCH_params')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "create schema params\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
 		}
 	]
 }
