@@ -1,0 +1,17 @@
+{
+	"name": "SCH_params",
+	"properties": {
+		"content": {
+			"query": "create schema params\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
