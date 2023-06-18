@@ -1,6 +1,9 @@
 {
 	"name": "SCH_params",
 	"properties": {
+		"folder": {
+			"name": "Schemas"
+		},
 		"content": {
 			"query": "create schema params\n",
 			"metadata": {

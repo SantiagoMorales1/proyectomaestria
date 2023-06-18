@@ -1,6 +1,9 @@
 {
 	"name": "SCH_stage",
 	"properties": {
+		"folder": {
+			"name": "Schemas"
+		},
 		"content": {
 			"query": "create schema stage",
 			"metadata": {
