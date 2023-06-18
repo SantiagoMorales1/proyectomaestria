@@ -4,12 +4,12 @@
 	"parameters": {
 		"workspaceName": {
 			"type": "string",
-			"metadata": "Workspace name",
+			"metadata": "Nombre del área de trabajo",
 			"defaultValue": "synapseproyectomaestria"
 		},
 		"synapseproyectomaestria-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'synapseproyectomaestria-WorkspaceDefaultSqlServer'",
+			"metadata": "Cadena protegida para \"connectionString\"de \"synapseproyectomaestria-WorkspaceDefaultSqlServer\"",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapseproyectomaestria.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
 		"synapseproyectomaestria-WorkspaceDefaultStorage_properties_typeProperties_url": {
@@ -252,6 +252,66 @@
 			"properties": {
 				"content": {
 					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE extractos.CuentaAhorros_Cliente (\n\t[Nombre] nvarchar(4000),\n\t[Email] nvarchar(4000),\n\t[Direccion] nvarchar(4000),\n\t[Ciudad_1] nvarchar(4000),\n\t[Ciudad_2] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Cuenta Ahorros/Cliente/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ET_CuentaAhorros_Transacciones')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE extractos.CuentaAhorros_Transacciones (\n\t[FechaTransaccion] nvarchar(4000),\n\t[DescripcionTransaccion] nvarchar(4000),\n\t[Sucursal] nvarchar(4000),\n\t[Descuento] nvarchar(4000),\n\t[ValorTransaccion] nvarchar(4000),\t\n\t[Saldo] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Cuenta Ahorros/Transacciones/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SCH_params')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "create schema params\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TBL_params_datausers')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\n--drop table params.datausers \nCreate table params.datausers (\n    id bigint identity (1, 1),\n    usuario varchar(150) not null,\n    fecha varchar(12)  not null,\n    type varchar(20)  not null,\n    pdfname varchar(150)  not null,\n    password varchar(150) null,\n    fecha_registro datetime  not null\n)\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -718,7 +778,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "dd2576de-9864-4a4b-9709-6b9443b16cba"
+						"spark.autotune.trackingId": "caaa6054-a678-4767-bc22-334987beba67"
 					}
 				},
 				"metadata": {
@@ -743,13 +803,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -758,7 +820,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 44
+						"execution_count": 86
 					},
 					{
 						"cell_type": "code",
@@ -786,7 +848,7 @@
 							"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 						],
 						"outputs": [],
-						"execution_count": 45
+						"execution_count": 87
 					},
 					{
 						"cell_type": "code",
@@ -807,7 +869,7 @@
 							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": 46
+						"execution_count": 88
 					},
 					{
 						"cell_type": "code",
@@ -828,7 +890,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 47
+						"execution_count": 89
 					},
 					{
 						"cell_type": "code",
@@ -857,7 +919,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 48
+						"execution_count": 90
 					},
 					{
 						"cell_type": "code",
@@ -877,7 +939,7 @@
 							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 49
+						"execution_count": 91
 					},
 					{
 						"cell_type": "code",
@@ -918,15 +980,16 @@
 							"    StructField(\"Email\",StringType(),True), \\\r\n",
 							"    StructField(\"Direccion\",StringType(),True), \\\r\n",
 							"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
-							"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
+							"    StructField(\"Ciudad_2\", StringType(), True), \\\r\n",
+							"    StructField(\"File_name\", StringType(), True) \\\r\n",
 							"  ])\r\n",
 							"\r\n",
-							"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
+							"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2, name)]\r\n",
 							"\r\n",
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 50
+						"execution_count": 92
 					},
 					{
 						"cell_type": "code",
@@ -953,15 +1016,16 @@
 							"schemaProducto = StructType([ \\\r\n",
 							"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
 							"    StructField(\"NumeroProducto\",StringType(),True), \\\r\n",
-							"    StructField(\"Sucursal\",StringType(),True)\r\n",
+							"    StructField(\"Sucursal\",StringType(),True), \\\r\n",
+							"    StructField(\"File_name\", StringType(), True) \\\r\n",
 							"  ])\r\n",
 							"\r\n",
-							"data_Producto = [(TipoProducto, NumeroProducto, Sucursal)]\r\n",
+							"data_Producto = [(TipoProducto, NumeroProducto, Sucursal, name)]\r\n",
 							"\r\n",
 							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 						],
 						"outputs": [],
-						"execution_count": 51
+						"execution_count": 93
 					},
 					{
 						"cell_type": "code",
@@ -1083,10 +1147,24 @@
 							"    )\r\n",
 							"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, ',', '')) \r\n",
 							"df_Saldo = df_Saldo.withColumn(\"id\", row_number().over(Incremental))\r\n",
+							"\r\n",
+							"\r\n",
+							"#Agregar pdf name \r\n",
+							"\r\n",
+							"schema_pdf_name = StructType([\r\n",
+							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+							"    StructField(\"pdfname\", StringType(), nullable=True)    \r\n",
+							"])\r\n",
+							"\r\n",
+							"df_file_name = spark.createDataFrame([], schema_pdf_name)\r\n",
+							"\r\n",
+							"for i in range (CantidadTransacciones):                \r\n",
+							"    newRow = spark.createDataFrame([(i+1,name)])\r\n",
+							"    df_file_name = df_file_name.union(newRow) \r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 52
+						"execution_count": 94
 					},
 					{
 						"cell_type": "code",
@@ -1106,10 +1184,11 @@
 							"#df_Sucursal.show(200)\r\n",
 							"#df_Descuento.show(200)\r\n",
 							"#df_ValorTransaccion.show(200)\r\n",
-							"#df_Saldo.show(200)"
+							"#df_Saldo.show(200)\r\n",
+							"#df_file_name.show(200)"
 						],
 						"outputs": [],
-						"execution_count": 53
+						"execution_count": 95
 					},
 					{
 						"cell_type": "code",
@@ -1130,17 +1209,19 @@
 							"                  .join(df_Descuento, df_Fecha.id == df_Descuento.id, \"inner\") \\\r\n",
 							"                  .join(df_ValorTransaccion, df_Fecha.id == df_ValorTransaccion.id, \"inner\") \\\r\n",
 							"                  .join(df_Saldo, df_Fecha.id == df_Saldo.id, \"inner\") \\\r\n",
+							"                  .join(df_file_name, df_Fecha.id == df_file_name.id, \"inner\") \\\r\n",
 							"                  .select( \\\r\n",
 							"                        df_Fecha.FechaTransaccion, \\\r\n",
 							"                        df_Descripciones.DescripcionTransaccion, \\\r\n",
 							"                        df_Sucursal.Sucursal, \\\r\n",
 							"                        df_Descuento.Descuento, \\\r\n",
 							"                        df_ValorTransaccion.ValorTransaccion, \\\r\n",
-							"                        df_Saldo.Saldo            \r\n",
+							"                        df_Saldo.Saldo, \\\r\n",
+							"                        df_file_name.pdfname\r\n",
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 54
+						"execution_count": 96
 					},
 					{
 						"cell_type": "code",
@@ -1162,7 +1243,7 @@
 							"#display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 55
+						"execution_count": 97
 					},
 					{
 						"cell_type": "code",
@@ -1194,7 +1275,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 56
+						"execution_count": 98
 					}
 				]
 			},
@@ -1224,7 +1305,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "3681981e-313e-45fc-a553-18c67e966a9f"
+						"spark.autotune.trackingId": "17740c57-7b59-41bd-8c44-046a0453e21c"
 					}
 				},
 				"metadata": {
@@ -1249,13 +1330,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -1264,7 +1347,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 67
+						"execution_count": 85
 					},
 					{
 						"cell_type": "code",
@@ -1296,7 +1379,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 68
+						"execution_count": 86
 					},
 					{
 						"cell_type": "code",
@@ -1317,7 +1400,7 @@
 							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": 69
+						"execution_count": 87
 					},
 					{
 						"cell_type": "code",
@@ -1338,7 +1421,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 70
+						"execution_count": 88
 					},
 					{
 						"cell_type": "code",
@@ -1367,7 +1450,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 71
+						"execution_count": 89
 					},
 					{
 						"cell_type": "code",
@@ -1387,7 +1470,7 @@
 							"display(df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 72
+						"execution_count": 90
 					},
 					{
 						"cell_type": "code",
@@ -1428,17 +1511,18 @@
 							"    StructField(\"Email\",StringType(),True), \\\r\n",
 							"    StructField(\"Direccion\",StringType(),True), \\\r\n",
 							"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
-							"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
+							"    StructField(\"Ciudad_2\", StringType(), True), \\\r\n",
+							"    StructField(\"File_name\", StringType(), True) \\\r\n",
 							"  ])\r\n",
 							"\r\n",
-							"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
+							"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2, name)]\r\n",
 							"\r\n",
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)\r\n",
 							"\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 73
+						"execution_count": 91
 					},
 					{
 						"cell_type": "code",
@@ -1477,16 +1561,17 @@
 							"    StructField(\"Hasta\",StringType(),True), \\\r\n",
 							"    StructField(\"ValorUnidad\",StringType(),True), \\\r\n",
 							"    StructField(\"Rentabilidad\",StringType(),True), \\\r\n",
-							"    StructField(\"Comision\",StringType(),True)\r\n",
+							"    StructField(\"Comision\",StringType(),True), \\\r\n",
+							"    StructField(\"File_name\", StringType(), True)\r\n",
 							"  ])\r\n",
 							"\r\n",
-							"data_Producto = [(TipoProducto, NumeroProducto, Desde, Hasta, ValorUnidad, Rentabilidad, Comision)]\r\n",
+							"data_Producto = [(TipoProducto, NumeroProducto, Desde, Hasta, ValorUnidad, Rentabilidad, Comision, name)]\r\n",
 							"\r\n",
 							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 74
+						"execution_count": 92
 					},
 					{
 						"cell_type": "code",
@@ -1518,6 +1603,8 @@
 							"    )\r\n",
 							"df_Fecha = df_Fecha.withColumn(\"id\", row_number().over(Incremental))\r\n",
 							"\r\n",
+							"# Obtener cantidad de transacciones\r\n",
+							"CantidadTransacciones = df_Fecha.count()\r\n",
 							"\r\n",
 							"#Extraer Descripcion de transacciones\r\n",
 							"\r\n",
@@ -1564,10 +1651,23 @@
 							"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, ',', '.'))\r\n",
 							"df_Saldo = df_Saldo.withColumn(\"id\", row_number().over(Incremental))\r\n",
 							"\r\n",
+							"\r\n",
+							"#Agregar pdf name \r\n",
+							"\r\n",
+							"schema_pdf_name = StructType([\r\n",
+							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+							"    StructField(\"pdfname\", StringType(), nullable=True)    \r\n",
+							"])\r\n",
+							"\r\n",
+							"df_file_name = spark.createDataFrame([], schema_pdf_name)\r\n",
+							"\r\n",
+							"for i in range (CantidadTransacciones):                \r\n",
+							"    newRow = spark.createDataFrame([(i+1,name)])\r\n",
+							"    df_file_name = df_file_name.union(newRow) \r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 75
+						"execution_count": 93
 					},
 					{
 						"cell_type": "code",
@@ -1583,14 +1683,14 @@
 							}
 						},
 						"source": [
-							"df_Fecha.show()\r\n",
-							"df_Descripcion.show()\r\n",
-							"df_ValorPesos.show()\r\n",
-							"df_ValorUnidades.show()\r\n",
-							"df_Saldo.show()"
+							"#df_Fecha.show()\r\n",
+							"#df_Descripcion.show()\r\n",
+							"#df_ValorPesos.show()\r\n",
+							"#df_ValorUnidades.show()\r\n",
+							"#df_Saldo.show()"
 						],
 						"outputs": [],
-						"execution_count": 76
+						"execution_count": 94
 					},
 					{
 						"cell_type": "code",
@@ -1610,16 +1710,18 @@
 							"                  .join(df_ValorPesos , df_Fecha.id == df_ValorPesos.id, \"inner\") \\\r\n",
 							"                  .join(df_ValorUnidades, df_Fecha.id == df_ValorUnidades.id, \"inner\") \\\r\n",
 							"                  .join(df_Saldo, df_Fecha.id == df_Saldo.id, \"inner\") \\\r\n",
+							"                  .join(df_file_name, df_Fecha.id == df_file_name.id, \"inner\") \\\r\n",
 							"                  .select( \\\r\n",
 							"                        df_Fecha.FechaTransaccion, \\\r\n",
 							"                        df_Descripcion.Descripcion, \\\r\n",
 							"                        df_ValorPesos.ValorPesos, \\\r\n",
 							"                        df_ValorUnidades.ValorUnidades, \\\r\n",
-							"                        df_Saldo.Saldo\r\n",
+							"                        df_Saldo.Saldo, \\\r\n",
+							"                        df_file_name.pdfname\r\n",
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 77
+						"execution_count": 95
 					},
 					{
 						"cell_type": "code",
@@ -1638,10 +1740,10 @@
 						"source": [
 							"#display(df_Cliente)\r\n",
 							"#display(df_Producto)\r\n",
-							"#display(df_Transacciones)"
+							"display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 78
+						"execution_count": 96
 					},
 					{
 						"cell_type": "code",
@@ -1673,7 +1775,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 79
+						"execution_count": 97
 					}
 				]
 			},
@@ -1703,7 +1805,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f1ce4b81-de16-429a-aed1-53d04f21db43"
+						"spark.autotune.trackingId": "9df28662-2069-46a5-b643-7e14919748cd"
 					}
 				},
 				"metadata": {
@@ -1728,7 +1830,8 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1746,7 +1849,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 54
+						"execution_count": 79
 					},
 					{
 						"cell_type": "code",
@@ -1770,16 +1873,16 @@
 							"user = \"bsmoralesg@outlook.com\"\r\n",
 							"type = \"Tarjeta Credito\"\r\n",
 							"fecha = \"10012023\"\r\n",
+							"\r\n",
 							"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
-							"\r\n",
 							"#name = \"Extracto_392576648_202304_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
 							"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 						],
 						"outputs": [],
-						"execution_count": 55
+						"execution_count": 80
 					},
 					{
 						"cell_type": "code",
@@ -1801,7 +1904,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 56
+						"execution_count": 81
 					},
 					{
 						"cell_type": "code",
@@ -1823,7 +1926,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 57
+						"execution_count": 82
 					},
 					{
 						"cell_type": "code",
@@ -1852,7 +1955,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 58
+						"execution_count": 83
 					},
 					{
 						"cell_type": "code",
@@ -1872,7 +1975,7 @@
 							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 59
+						"execution_count": 84
 					},
 					{
 						"cell_type": "code",
@@ -1903,15 +2006,16 @@
 							"    StructField(\"Email\",StringType(),True), \\\r\n",
 							"    StructField(\"Direccion\",StringType(),True), \\\r\n",
 							"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
-							"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
+							"    StructField(\"Ciudad_2\", StringType(), True), \\\r\n",
+							"    StructField(\"File_name\", StringType(), True) \\\r\n",
 							"  ])\r\n",
 							"\r\n",
-							"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
+							"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2, name)]\r\n",
 							"\r\n",
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 60
+						"execution_count": 85
 					},
 					{
 						"cell_type": "code",
@@ -1959,18 +2063,19 @@
 							"    StructField(\"TasaInteresEACompra2MesOMas\", StringType(), True), \\\r\n",
 							"    StructField(\"TasaInteresEAImpuestos\", StringType(), True), \\\r\n",
 							"    StructField(\"TasaInteresEAAvances\", StringType(), True), \\\r\n",
-							"    StructField(\"TasaInteresEAMora\", StringType(), True) \\\r\n",
+							"    StructField(\"TasaInteresEAMora\", StringType(), True), \\\r\n",
+							"    StructField(\"File_name\", StringType(), True) \\\r\n",
 							"  ])\r\n",
 							"\r\n",
 							"data_Producto = [(TipoProducto, CupoTotal, NumeroTarjeta, TasaInteresMVCompra1Mes, TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, \\\r\n",
-							"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra1Mes, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora\r\n",
+							"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra1Mes, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, name\r\n",
 							")]\r\n",
 							"\r\n",
 							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 61
+						"execution_count": 86
 					},
 					{
 						"cell_type": "code",
@@ -2161,10 +2266,24 @@
 							"    .select(df_Cuotas.Cuotas, df_Cuotas.UniqueId, df_DescripcionTransacciones.id) \\\r\n",
 							"    .fillna(0).fillna(\"\") \r\n",
 							"\r\n",
+							"\r\n",
+							"#Agregar pdf name \r\n",
+							"\r\n",
+							"schema_pdf_name = StructType([\r\n",
+							"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+							"    StructField(\"pdfname\", StringType(), nullable=True)    \r\n",
+							"])\r\n",
+							"\r\n",
+							"df_file_name = spark.createDataFrame([], schema_pdf_name)\r\n",
+							"\r\n",
+							"for i in range (CantidadTransacciones):                \r\n",
+							"    newRow = spark.createDataFrame([(i+1,name)])\r\n",
+							"    df_file_name = df_file_name.union(newRow) \r\n",
+							"\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 62
+						"execution_count": 87
 					},
 					{
 						"cell_type": "code",
@@ -2191,7 +2310,7 @@
 							"#df_Cuotas.show(50)"
 						],
 						"outputs": [],
-						"execution_count": 63
+						"execution_count": 88
 					},
 					{
 						"cell_type": "code",
@@ -2217,6 +2336,7 @@
 							"                  .join(df_CargosYAbonos, df_idTransacciones.id == df_CargosYAbonos.id, \"inner\") \\\r\n",
 							"                  .join(df_SaldoADiferir, df_idTransacciones.id == df_SaldoADiferir.id, \"inner\") \\\r\n",
 							"                  .join(df_Cuotas, df_idTransacciones.id == df_Cuotas.id, \"inner\") \\\r\n",
+							"                  .join(df_file_name, df_idTransacciones.id == df_file_name.id, \"inner\") \\\r\n",
 							"                  .select( \\\r\n",
 							"                        df_idTransacciones.IdTransaccion, \\\r\n",
 							"                        df_FechaTransacciones.FechaTransaccion, \\\r\n",
@@ -2226,11 +2346,12 @@
 							"                        df_TasaFacturada.TasaFacturada, \\\r\n",
 							"                        df_CargosYAbonos.CargosYAbonos, \\\r\n",
 							"                        df_SaldoADiferir.SaldoADiferir, \\\r\n",
-							"                        df_Cuotas.Cuotas                       \r\n",
+							"                        df_Cuotas.Cuotas, \\\r\n",
+							"                        df_file_name.pdfname\r\n",
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 64
+						"execution_count": 89
 					},
 					{
 						"cell_type": "code",
@@ -2249,10 +2370,10 @@
 						"source": [
 							"#display(df_Cliente)\r\n",
 							"#display(df_Producto)\r\n",
-							"#display(df_Transacciones)"
+							"display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 65
+						"execution_count": 90
 					},
 					{
 						"cell_type": "code",
@@ -2284,7 +2405,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 66
+						"execution_count": 91
 					},
 					{
 						"cell_type": "code",
@@ -2662,66 +2783,6 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/ET_CuentaAhorros_Transacciones')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE extractos.CuentaAhorros_Transacciones (\n\t[FechaTransaccion] nvarchar(4000),\n\t[DescripcionTransaccion] nvarchar(4000),\n\t[Sucursal] nvarchar(4000),\n\t[Descuento] nvarchar(4000),\n\t[ValorTransaccion] nvarchar(4000),\t\n\t[Saldo] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Cuenta Ahorros/Transacciones/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "sqlpoolproyectomaestria",
-						"poolName": "sqlpoolproyectomaestria"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/TBL_params_datausers')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "\n--drop table params.datausers \nCreate table params.datausers (\n    id bigint identity (1, 1),\n    usuario varchar(150) not null,\n    fecha varchar(12)  not null,\n    type varchar(20)  not null,\n    pdfname varchar(150)  not null,\n    password varchar(150) null,\n    fecha_registro datetime  not null\n)\n\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "sqlpoolproyectomaestria",
-						"poolName": "sqlpoolproyectomaestria"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SCH_params')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "create schema params\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
 		}
 	]
 }
