@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "dd2576de-9864-4a4b-9709-6b9443b16cba"
+				"spark.autotune.trackingId": "01c39d6d-8f70-4bcf-ac5c-61bd4e79f3f3"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 44
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -87,7 +87,7 @@
 					"#name = \"Extracto_307612445_202212_CTA_AHORROS_5557\"\r\n",
 					"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 				],
-				"execution_count": 45
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -107,7 +107,7 @@
 					"\r\n",
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 				],
-				"execution_count": 46
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -127,7 +127,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 47
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 48
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -174,7 +174,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 49
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -215,14 +215,15 @@
 					"    StructField(\"Email\",StringType(),True), \\\r\n",
 					"    StructField(\"Direccion\",StringType(),True), \\\r\n",
 					"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
-					"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
+					"    StructField(\"Ciudad_2\", StringType(), True), \\\r\n",
+					"    StructField(\"File_name\", StringType(), True) \\\r\n",
 					"  ])\r\n",
 					"\r\n",
-					"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
+					"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2, name)]\r\n",
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 50
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -249,14 +250,15 @@
 					"schemaProducto = StructType([ \\\r\n",
 					"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
 					"    StructField(\"NumeroProducto\",StringType(),True), \\\r\n",
-					"    StructField(\"Sucursal\",StringType(),True)\r\n",
+					"    StructField(\"Sucursal\",StringType(),True), \\\r\n",
+					"    StructField(\"File_name\", StringType(), True) \\\r\n",
 					"  ])\r\n",
 					"\r\n",
-					"data_Producto = [(TipoProducto, NumeroProducto, Sucursal)]\r\n",
+					"data_Producto = [(TipoProducto, NumeroProducto, Sucursal, name)]\r\n",
 					"\r\n",
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 				],
-				"execution_count": 51
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -378,9 +380,23 @@
 					"    )\r\n",
 					"df_Saldo = df_Saldo.withColumn(\"Saldo\", regexp_replace(df_Saldo.Saldo, ',', '')) \r\n",
 					"df_Saldo = df_Saldo.withColumn(\"id\", row_number().over(Incremental))\r\n",
+					"\r\n",
+					"\r\n",
+					"#Agregar pdf name \r\n",
+					"\r\n",
+					"schema_pdf_name = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"pdfname\", StringType(), nullable=True)    \r\n",
+					"])\r\n",
+					"\r\n",
+					"df_file_name = spark.createDataFrame([], schema_pdf_name)\r\n",
+					"\r\n",
+					"for i in range (CantidadTransacciones):                \r\n",
+					"    newRow = spark.createDataFrame([(i+1,name)])\r\n",
+					"    df_file_name = df_file_name.union(newRow) \r\n",
 					""
 				],
-				"execution_count": 52
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
@@ -400,9 +416,10 @@
 					"#df_Sucursal.show(200)\r\n",
 					"#df_Descuento.show(200)\r\n",
 					"#df_ValorTransaccion.show(200)\r\n",
-					"#df_Saldo.show(200)"
+					"#df_Saldo.show(200)\r\n",
+					"#df_file_name.show(200)"
 				],
-				"execution_count": 53
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -423,16 +440,18 @@
 					"                  .join(df_Descuento, df_Fecha.id == df_Descuento.id, \"inner\") \\\r\n",
 					"                  .join(df_ValorTransaccion, df_Fecha.id == df_ValorTransaccion.id, \"inner\") \\\r\n",
 					"                  .join(df_Saldo, df_Fecha.id == df_Saldo.id, \"inner\") \\\r\n",
+					"                  .join(df_file_name, df_Fecha.id == df_file_name.id, \"inner\") \\\r\n",
 					"                  .select( \\\r\n",
 					"                        df_Fecha.FechaTransaccion, \\\r\n",
 					"                        df_Descripciones.DescripcionTransaccion, \\\r\n",
 					"                        df_Sucursal.Sucursal, \\\r\n",
 					"                        df_Descuento.Descuento, \\\r\n",
 					"                        df_ValorTransaccion.ValorTransaccion, \\\r\n",
-					"                        df_Saldo.Saldo            \r\n",
+					"                        df_Saldo.Saldo, \\\r\n",
+					"                        df_file_name.pdfname\r\n",
 					"                        )"
 				],
-				"execution_count": 54
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -453,7 +472,7 @@
 					"#display(df_Producto)\r\n",
 					"#display(df_Transacciones)"
 				],
-				"execution_count": 55
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -484,7 +503,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 56
+				"execution_count": 85
 			}
 		]
 	}
