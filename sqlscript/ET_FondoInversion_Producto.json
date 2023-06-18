@@ -1,0 +1,17 @@
+{
+	"name": "ET_FondoInversion_Producto",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE stage.FondoInversion_Producto (\n\t[TipoProducto] nvarchar(4000),\n\t[NumeroProducto] nvarchar(4000),\n\t[Desde] nvarchar(4000),\n\t[Hasta] nvarchar(4000),\n\t[ValorUnidad] nvarchar(4000),\n\t[Rentabilidad] nvarchar(4000),\n\t[Comision] nvarchar(4000),\n\t[File_name] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Fondos de Inversion/Producto/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
