@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f1ce4b81-de16-429a-aed1-53d04f21db43"
+				"spark.autotune.trackingId": "9df28662-2069-46a5-b643-7e14919748cd"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 54
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -87,15 +87,15 @@
 					"user = \"bsmoralesg@outlook.com\"\r\n",
 					"type = \"Tarjeta Credito\"\r\n",
 					"fecha = \"10012023\"\r\n",
+					"\r\n",
 					"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
-					"\r\n",
 					"#name = \"Extracto_392576648_202304_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
 					"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 				],
-				"execution_count": 55
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -116,7 +116,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name\r\n",
 					""
 				],
-				"execution_count": 56
+				"execution_count": 81
 			},
 			{
 				"cell_type": "code",
@@ -137,7 +137,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 57
+				"execution_count": 82
 			},
 			{
 				"cell_type": "code",
@@ -165,7 +165,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 58
+				"execution_count": 83
 			},
 			{
 				"cell_type": "code",
@@ -184,7 +184,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 59
+				"execution_count": 84
 			},
 			{
 				"cell_type": "code",
@@ -215,14 +215,15 @@
 					"    StructField(\"Email\",StringType(),True), \\\r\n",
 					"    StructField(\"Direccion\",StringType(),True), \\\r\n",
 					"    StructField(\"Ciudad_1\",StringType(),True), \\\r\n",
-					"    StructField(\"Ciudad_2\", StringType(), True) \\\r\n",
+					"    StructField(\"Ciudad_2\", StringType(), True), \\\r\n",
+					"    StructField(\"File_name\", StringType(), True) \\\r\n",
 					"  ])\r\n",
 					"\r\n",
-					"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2)]\r\n",
+					"data_Cliente = [(Nombre, Email, Direccion, Ciudad_1, Ciudad_2, name)]\r\n",
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 60
+				"execution_count": 85
 			},
 			{
 				"cell_type": "code",
@@ -270,17 +271,18 @@
 					"    StructField(\"TasaInteresEACompra2MesOMas\", StringType(), True), \\\r\n",
 					"    StructField(\"TasaInteresEAImpuestos\", StringType(), True), \\\r\n",
 					"    StructField(\"TasaInteresEAAvances\", StringType(), True), \\\r\n",
-					"    StructField(\"TasaInteresEAMora\", StringType(), True) \\\r\n",
+					"    StructField(\"TasaInteresEAMora\", StringType(), True), \\\r\n",
+					"    StructField(\"File_name\", StringType(), True) \\\r\n",
 					"  ])\r\n",
 					"\r\n",
 					"data_Producto = [(TipoProducto, CupoTotal, NumeroTarjeta, TasaInteresMVCompra1Mes, TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, \\\r\n",
-					"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra1Mes, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora\r\n",
+					"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra1Mes, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, name\r\n",
 					")]\r\n",
 					"\r\n",
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 61
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -471,9 +473,23 @@
 					"    .select(df_Cuotas.Cuotas, df_Cuotas.UniqueId, df_DescripcionTransacciones.id) \\\r\n",
 					"    .fillna(0).fillna(\"\") \r\n",
 					"\r\n",
+					"\r\n",
+					"#Agregar pdf name \r\n",
+					"\r\n",
+					"schema_pdf_name = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"pdfname\", StringType(), nullable=True)    \r\n",
+					"])\r\n",
+					"\r\n",
+					"df_file_name = spark.createDataFrame([], schema_pdf_name)\r\n",
+					"\r\n",
+					"for i in range (CantidadTransacciones):                \r\n",
+					"    newRow = spark.createDataFrame([(i+1,name)])\r\n",
+					"    df_file_name = df_file_name.union(newRow) \r\n",
+					"\r\n",
 					""
 				],
-				"execution_count": 62
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -499,7 +515,7 @@
 					"#df_SaldoADiferir.show(50)\r\n",
 					"#df_Cuotas.show(50)"
 				],
-				"execution_count": 63
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -525,6 +541,7 @@
 					"                  .join(df_CargosYAbonos, df_idTransacciones.id == df_CargosYAbonos.id, \"inner\") \\\r\n",
 					"                  .join(df_SaldoADiferir, df_idTransacciones.id == df_SaldoADiferir.id, \"inner\") \\\r\n",
 					"                  .join(df_Cuotas, df_idTransacciones.id == df_Cuotas.id, \"inner\") \\\r\n",
+					"                  .join(df_file_name, df_idTransacciones.id == df_file_name.id, \"inner\") \\\r\n",
 					"                  .select( \\\r\n",
 					"                        df_idTransacciones.IdTransaccion, \\\r\n",
 					"                        df_FechaTransacciones.FechaTransaccion, \\\r\n",
@@ -534,10 +551,11 @@
 					"                        df_TasaFacturada.TasaFacturada, \\\r\n",
 					"                        df_CargosYAbonos.CargosYAbonos, \\\r\n",
 					"                        df_SaldoADiferir.SaldoADiferir, \\\r\n",
-					"                        df_Cuotas.Cuotas                       \r\n",
+					"                        df_Cuotas.Cuotas, \\\r\n",
+					"                        df_file_name.pdfname\r\n",
 					"                        )"
 				],
-				"execution_count": 64
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -556,9 +574,9 @@
 				"source": [
 					"#display(df_Cliente)\r\n",
 					"#display(df_Producto)\r\n",
-					"#display(df_Transacciones)"
+					"display(df_Transacciones)"
 				],
-				"execution_count": 65
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -589,7 +607,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 66
+				"execution_count": 91
 			},
 			{
 				"cell_type": "code",
