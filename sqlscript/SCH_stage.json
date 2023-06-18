@@ -7,8 +7,8 @@
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
-				"poolName": "Built-in"
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
 			},
 			"resultLimit": 5000
 		},
