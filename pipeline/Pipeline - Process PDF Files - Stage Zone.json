@@ -85,7 +85,7 @@
 							"value": "Tarjeta Credito",
 							"activities": [
 								{
-									"name": "Reading Raw Data - StageData Zone",
+									"name": "Reading Raw Data - StageData Zone - Tarjeta de Credito",
 									"type": "SynapseNotebook",
 									"dependsOn": [],
 									"policy": {
