@@ -1,0 +1,17 @@
+{
+	"name": "TBL_modelo_transacciones_Cliente",
+	"properties": {
+		"content": {
+			"query": "Create table modelo_transacciones.Cliente (\n    Cliente_Key bigint identity (1,100) not null,\n    [User] varchar(150) not null,\n    Direccion varchar(200) not null,\n    Ciudad varchar(150)  not null,\n    Departamento varchar(150) not null,\n    Fecha_Insert DATETIME NOT NULL,\n    ValidoDesde DATETIME not null,\n    ValidaoHasta DATETIME null\n)\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
