@@ -144,6 +144,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlPoolSource",
+						"sqlReaderQuery": "select * from params.datausers",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
