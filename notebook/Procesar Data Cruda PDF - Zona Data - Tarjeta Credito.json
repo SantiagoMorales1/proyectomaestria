@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "9df28662-2069-46a5-b643-7e14919748cd"
+				"spark.autotune.trackingId": "2b130732-87ed-4b90-a7dd-5200da0cf7ad"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 79
+				"execution_count": 102
 			},
 			{
 				"cell_type": "code",
@@ -87,7 +87,6 @@
 					"user = \"bsmoralesg@outlook.com\"\r\n",
 					"type = \"Tarjeta Credito\"\r\n",
 					"fecha = \"10012023\"\r\n",
-					"\r\n",
 					"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_392576648_202304_TARJETA_VISA_2166\"\r\n",
@@ -95,7 +94,7 @@
 					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
 					"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 				],
-				"execution_count": 80
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -116,7 +115,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name\r\n",
 					""
 				],
-				"execution_count": 81
+				"execution_count": 104
 			},
 			{
 				"cell_type": "code",
@@ -137,7 +136,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 82
+				"execution_count": 105
 			},
 			{
 				"cell_type": "code",
@@ -165,7 +164,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 83
+				"execution_count": 106
 			},
 			{
 				"cell_type": "code",
@@ -184,7 +183,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 84
+				"execution_count": 107
 			},
 			{
 				"cell_type": "code",
@@ -223,7 +222,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 85
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
@@ -241,20 +240,72 @@
 				"source": [
 					"#Obtener Informacion de Prodcuto\r\n",
 					"\r\n",
-					"\r\n",
 					"TipoProducto = 'Tarjeta Credito'\r\n",
+					"\r\n",
 					"CupoTotal =  df_formated.select(df_formated.contenido).where(df_formated.x0 == 65.0).first()[0]\r\n",
+					"CupoTotal = CupoTotal.replace(\"$\", \"\") \r\n",
+					"CupoTotal = CupoTotal.replace(\",\", \"\") \r\n",
+					"CupoTotal = CupoTotal.strip()\r\n",
+					"\r\n",
 					"NumeroTarjeta = df_formated.select(df_formated.contenido).where(df_formated.x0 == 465.0).first()[0]\r\n",
+					"\r\n",
 					"TasaInteresMVCompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[0].__getitem__('contenido')\r\n",
+					"TasaInteresMVCompra1Mes = TasaInteresMVCompra1Mes.replace (\"%\", \"\")\r\n",
+					"TasaInteresMVCompra1Mes = TasaInteresMVCompra1Mes.replace (\",\", \".\")\r\n",
+					"TasaInteresMVCompra1Mes = TasaInteresMVCompra1Mes.strip()\r\n",
+					"\r\n",
+					"Desde = df_formated.select(df_formated.contenido).where(df_formated.x0 == 353.0).collect()[0].__getitem__('contenido')\r\n",
+					"Desde = Desde.replace(\"Desde:\", \"\")\r\n",
+					"Desde = Desde.strip()\r\n",
+					"\r\n",
+					"Hasta = df_formated.select(df_formated.contenido).where(df_formated.x0 == 500.0).collect()[0].__getitem__('contenido')\r\n",
+					"Hasta = Hasta.replace(\"Hasta:\", \"\")\r\n",
+					"Hasta = Hasta.strip()\r\n",
+					"\r\n",
 					"TasaInteresMVCompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[1].__getitem__('contenido')\r\n",
+					"TasaInteresMVCompra2MesOMas = TasaInteresMVCompra2MesOMas.replace (\"%\", \"\")\r\n",
+					"TasaInteresMVCompra2MesOMas = TasaInteresMVCompra2MesOMas.replace (\",\", \".\")\r\n",
+					"TasaInteresMVCompra2MesOMas = TasaInteresMVCompra2MesOMas.strip()\r\n",
+					"\r\n",
 					"TasaInteresMVImpuestos = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[2].__getitem__('contenido')\r\n",
+					"TasaInteresMVImpuestos = TasaInteresMVImpuestos.replace (\"%\", \"\")\r\n",
+					"TasaInteresMVImpuestos = TasaInteresMVImpuestos.replace (\",\", \".\")\r\n",
+					"TasaInteresMVImpuestos = TasaInteresMVImpuestos.strip()\r\n",
+					"\r\n",
 					"TasaInteresMVAvances = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[3].__getitem__('contenido')\r\n",
+					"TasaInteresMVAvances = TasaInteresMVAvances.replace (\"%\", \"\")\r\n",
+					"TasaInteresMVAvances = TasaInteresMVAvances.replace (\",\", \".\")\r\n",
+					"TasaInteresMVAvances = TasaInteresMVAvances.strip()\r\n",
+					"\r\n",
 					"TasaInteresMVMora = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[4].__getitem__('contenido')\r\n",
+					"TasaInteresMVMora = TasaInteresMVMora.replace (\"%\", \"\")\r\n",
+					"TasaInteresMVMora = TasaInteresMVMora.replace (\",\", \".\")\r\n",
+					"TasaInteresMVMora = TasaInteresMVMora.strip()\r\n",
+					"\r\n",
 					"TasaInteresEACompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[0].__getitem__('contenido')\r\n",
+					"TasaInteresEACompra1Mes = TasaInteresEACompra1Mes.replace (\"%\", \"\")\r\n",
+					"TasaInteresEACompra1Mes = TasaInteresEACompra1Mes.replace (\",\", \".\")\r\n",
+					"TasaInteresEACompra1Mes = TasaInteresEACompra1Mes.strip()\r\n",
+					"\r\n",
 					"TasaInteresEACompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[1].__getitem__('contenido')\r\n",
+					"TasaInteresEACompra2MesOMas = TasaInteresEACompra2MesOMas.replace (\"%\", \"\")\r\n",
+					"TasaInteresEACompra2MesOMas = TasaInteresEACompra2MesOMas.replace (\",\", \".\")\r\n",
+					"TasaInteresEACompra2MesOMas = TasaInteresEACompra2MesOMas.strip()\r\n",
+					"\r\n",
 					"TasaInteresEAImpuestos = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[2].__getitem__('contenido')\r\n",
+					"TasaInteresEAImpuestos = TasaInteresEAImpuestos.replace (\"%\", \"\")\r\n",
+					"TasaInteresEAImpuestos = TasaInteresEAImpuestos.replace (\",\", \".\")\r\n",
+					"TasaInteresEAImpuestos = TasaInteresEAImpuestos.strip()\r\n",
+					"\r\n",
 					"TasaInteresEAAvances = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[3].__getitem__('contenido')\r\n",
+					"TasaInteresEAAvances = TasaInteresEAAvances.replace (\"%\", \"\")\r\n",
+					"TasaInteresEAAvances = TasaInteresEAAvances.replace (\",\", \".\")\r\n",
+					"TasaInteresEAAvances = TasaInteresEAAvances.strip()\r\n",
+					"\r\n",
 					"TasaInteresEAMora = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[4].__getitem__('contenido')\r\n",
+					"TasaInteresEAMora = TasaInteresEAMora.replace (\"%\", \"\")\r\n",
+					"TasaInteresEAMora = TasaInteresEAMora.replace (\",\", \".\")\r\n",
+					"TasaInteresEAMora = TasaInteresEAMora.strip()\r\n",
 					"\r\n",
 					"# Crear dataframe para informacion de producto\r\n",
 					"\r\n",
@@ -262,6 +313,8 @@
 					"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
 					"    StructField(\"CupoTotal\",StringType(),True), \\\r\n",
 					"    StructField(\"NumeroTarjeta\",StringType(),True), \\\r\n",
+					"    StructField(\"Desde\",StringType(),True), \\\r\n",
+					"    StructField(\"Hasta\",StringType(),True), \\\r\n",
 					"    StructField(\"TasaInteresMVCompra1Mes\", StringType(), True), \\\r\n",
 					"    StructField(\"TasaInteresMVCompra2MesOMas\", StringType(), True), \\\r\n",
 					"    StructField(\"TasaInteresMVImpuestos\", StringType(), True), \\\r\n",
@@ -275,14 +328,14 @@
 					"    StructField(\"File_name\", StringType(), True) \\\r\n",
 					"  ])\r\n",
 					"\r\n",
-					"data_Producto = [(TipoProducto, CupoTotal, NumeroTarjeta, TasaInteresMVCompra1Mes, TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, \\\r\n",
+					"data_Producto = [(TipoProducto, CupoTotal, NumeroTarjeta, Desde, Hasta, TasaInteresMVCompra1Mes, TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, \\\r\n",
 					"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra1Mes, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, name\r\n",
 					")]\r\n",
 					"\r\n",
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 86
+				"execution_count": 109
 			},
 			{
 				"cell_type": "code",
@@ -489,7 +542,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 87
+				"execution_count": 110
 			},
 			{
 				"cell_type": "code",
@@ -515,7 +568,7 @@
 					"#df_SaldoADiferir.show(50)\r\n",
 					"#df_Cuotas.show(50)"
 				],
-				"execution_count": 88
+				"execution_count": 111
 			},
 			{
 				"cell_type": "code",
@@ -555,7 +608,7 @@
 					"                        df_file_name.pdfname\r\n",
 					"                        )"
 				],
-				"execution_count": 89
+				"execution_count": 112
 			},
 			{
 				"cell_type": "code",
@@ -572,11 +625,11 @@
 					"collapsed": false
 				},
 				"source": [
-					"#display(df_Cliente)\r\n",
-					"#display(df_Producto)\r\n",
-					"display(df_Transacciones)"
+					"display(df_Cliente)\r\n",
+					"display(df_Producto)\r\n",
+					"#display(df_Transacciones)"
 				],
-				"execution_count": 90
+				"execution_count": 113
 			},
 			{
 				"cell_type": "code",
@@ -607,7 +660,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 91
+				"execution_count": 114
 			},
 			{
 				"cell_type": "code",
