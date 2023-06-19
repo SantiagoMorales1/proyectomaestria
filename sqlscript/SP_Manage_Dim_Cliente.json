@@ -1,0 +1,17 @@
+{
+	"name": "SP_Manage_Dim_Cliente",
+	"properties": {
+		"content": {
+			"query": "\n\n-- Procesmaiento informacion clientes\n\n--Extraer Fechas de PDF - Todas las entidades de cliente\n\nIF OBJECT_ID(N'tempdb..#Data_Fechas') IS NOT NULL\nBEGIN\n    DROP TABLE #Customer\nEND\n\nSelect \n    File_name, \n    Fecha = convert(date,Fecha+'01')\ninto #Data_Fechas    \nFROM \n    (\n        SELECT \n            mt.File_name,\n            ss.value AS Fecha\n        FROM \n            stage.CuentaAhorros_Cliente mt\n        CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n        UNION ALL\n        SELECT \n            mt.File_name,\n            ss.value AS Fecha\n        FROM \n            stage.FondoInversion_Cliente mt\n        CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n        UNION ALL\n        SELECT \n            mt.File_name,\n            ss.value AS Fecha\n        FROM \n            stage.TarjetaCredito_Cliente mt\n        CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n    ) fechas\nWHERE LEN(Fecha) = 6\n\n\n--Consultar informacion de clientes\n    Select \n        cli.[Nombre]\n        ,cli.[Email]\n        ,cli.[Direccion]\n        ,cli.[Ciudad_1]\n        ,cli.[Ciudad_2]\n        ,cli.[File_name]  \n        ,fec.Fecha\n        ,ROW_NUMBER ()  OVER ( PARTITION BY Email order by fec.Fecha desc ) \n    --into \n    --    #Raw_Clientes\n    from \n    (\n        select \n            [Nombre]\n            ,[Email]\n            ,[Direccion]\n            ,[Ciudad_1]\n            ,[Ciudad_2]\n            ,[File_name]           \n        from stage.CuentaAhorros_Cliente\n        UNION ALL\n        select \n            [Nombre]\n            ,[Email]\n            ,[Direccion]\n            ,[Ciudad_1]\n            ,[Ciudad_2]\n            ,[File_name] \n        from stage.FondoInversion_Cliente\n        UNION ALL\n        select \n            [Nombre]\n            ,[Email]\n            ,[Direccion]\n            ,[Ciudad_1]\n            ,[Ciudad_2]\n            ,[File_name]\n        from stage.TarjetaCredito_Cliente\n    ) cli\n    INNER JOIN #Data_Fechas fec on (fec.File_name = cli.File_name)\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
