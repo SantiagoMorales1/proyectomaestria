@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8091024d-6cfa-4888-84dc-ed9dec45ee4d"
+				"spark.autotune.trackingId": "baa61bc9-7204-4a20-b702-5a094492cd4c"
 			}
 		},
 		"metadata": {
@@ -107,7 +107,7 @@
 					"\r\n",
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 				],
-				"execution_count": null
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -127,7 +127,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 59
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -155,7 +155,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 60
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
@@ -174,7 +174,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 61
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -223,7 +223,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 62
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -268,7 +268,7 @@
 					"\r\n",
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 				],
-				"execution_count": 63
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -406,7 +406,7 @@
 					"    df_file_name = df_file_name.union(newRow) \r\n",
 					""
 				],
-				"execution_count": 64
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -429,7 +429,7 @@
 					"#df_Saldo.show(200)\r\n",
 					"#df_file_name.show(200)"
 				],
-				"execution_count": 65
+				"execution_count": 78
 			},
 			{
 				"cell_type": "code",
@@ -461,7 +461,7 @@
 					"                        df_file_name.pdfname\r\n",
 					"                        )"
 				],
-				"execution_count": 66
+				"execution_count": 79
 			},
 			{
 				"cell_type": "code",
@@ -478,11 +478,11 @@
 					"collapsed": false
 				},
 				"source": [
-					"display(df_Cliente)\r\n",
-					"display(df_Producto)\r\n",
+					"#display(df_Cliente)\r\n",
+					"#display(df_Producto)\r\n",
 					"#display(df_Transacciones)"
 				],
-				"execution_count": 67
+				"execution_count": 80
 			},
 			{
 				"cell_type": "code",
@@ -513,7 +513,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 68
+				"execution_count": 81
 			}
 		]
 	}
