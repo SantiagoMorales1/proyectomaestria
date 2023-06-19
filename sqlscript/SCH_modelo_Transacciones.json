@@ -1,0 +1,17 @@
+{
+	"name": "SCH_modelo_Transacciones",
+	"properties": {
+		"content": {
+			"query": "create schema modelo_transacciones\npt 2",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
