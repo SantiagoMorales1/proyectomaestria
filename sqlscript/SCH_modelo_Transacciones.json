@@ -1,6 +1,9 @@
 {
 	"name": "SCH_modelo_Transacciones",
 	"properties": {
+		"folder": {
+			"name": "Schemas"
+		},
 		"content": {
 			"query": "create schema modelo_transacciones\npt 2",
 			"metadata": {
