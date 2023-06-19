@@ -28,7 +28,10 @@
 					},
 					"parameters": {
 						"pdf_user": {
-							"value": "bsmoralesg@outlook.com",
+							"value": {
+								"value": "bsmoralesg@outlook.com",
+								"type": "Expression"
+							},
 							"type": "string"
 						},
 						"pdf_type": {
