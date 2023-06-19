@@ -325,6 +325,9 @@
 					"secureInput": false
 				},
 				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
+				},
 				"linkedServiceName": {
 					"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
 					"type": "LinkedServiceReference",
