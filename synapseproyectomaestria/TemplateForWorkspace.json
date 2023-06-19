@@ -30,7 +30,14 @@
 					{
 						"name": "Reading PDF Files - Stagefiles Zone",
 						"type": "SynapseNotebook",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Capturar ultima invocacion",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -46,7 +53,10 @@
 							},
 							"parameters": {
 								"pdf_user": {
-									"value": "bsmoralesg@outlook.com",
+									"value": {
+										"value": "bsmoralesg@outlook.com",
+										"type": "Expression"
+									},
 									"type": "string"
 								},
 								"pdf_type": {
@@ -82,8 +92,8 @@
 						}
 					},
 					{
-						"name": "Reading Raw Data - StageData Zone",
-						"type": "SynapseNotebook",
+						"name": "Validar Tipo Producto",
+						"type": "Switch",
 						"dependsOn": [
 							{
 								"activity": "Reading PDF Files - Stagefiles Zone",
@@ -92,6 +102,185 @@
 								]
 							}
 						],
+						"userProperties": [],
+						"typeProperties": {
+							"on": {
+								"value": "@activity('Capturar ultima invocacion').output.firstRow.type",
+								"type": "Expression"
+							},
+							"cases": [
+								{
+									"value": "Tarjeta Credito",
+									"activities": [
+										{
+											"name": "Reading Raw Data - StageData Zone - Tarjeta de Credito",
+											"type": "SynapseNotebook",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"notebook": {
+													"referenceName": "Procesar Data Cruda PDF - Zona Data - Tarjeta Credito",
+													"type": "NotebookReference"
+												},
+												"parameters": {
+													"user": {
+														"value": "bsmoralesg@outlook.com",
+														"type": "string"
+													},
+													"type": {
+														"value": "Tarjeta Credito",
+														"type": "string"
+													},
+													"fecha": {
+														"value": "10012023",
+														"type": "string"
+													},
+													"name": {
+														"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
+														"type": "string"
+													}
+												},
+												"snapshot": true,
+												"sparkPool": {
+													"referenceName": "spproymaestria",
+													"type": "BigDataPoolReference"
+												},
+												"executorSize": "Small",
+												"conf": {
+													"spark.dynamicAllocation.enabled": false,
+													"spark.dynamicAllocation.minExecutors": 1,
+													"spark.dynamicAllocation.maxExecutors": 1
+												},
+												"driverSize": "Small",
+												"numExecutors": 1
+											}
+										}
+									]
+								},
+								{
+									"value": "Cuenta Ahorros",
+									"activities": [
+										{
+											"name": "Reading Raw Data - StageData Zone - Cuenta Ahorro",
+											"type": "SynapseNotebook",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"notebook": {
+													"referenceName": "Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro",
+													"type": "NotebookReference"
+												},
+												"parameters": {
+													"user": {
+														"value": "bsmoralesg@outlook.com",
+														"type": "string"
+													},
+													"type": {
+														"value": "Tarjeta Credito",
+														"type": "string"
+													},
+													"fecha": {
+														"value": "10012023",
+														"type": "string"
+													},
+													"name": {
+														"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
+														"type": "string"
+													}
+												},
+												"snapshot": true,
+												"sparkPool": {
+													"referenceName": "spproymaestria",
+													"type": "BigDataPoolReference"
+												},
+												"executorSize": "Small",
+												"conf": {
+													"spark.dynamicAllocation.enabled": false,
+													"spark.dynamicAllocation.minExecutors": 1,
+													"spark.dynamicAllocation.maxExecutors": 1
+												},
+												"driverSize": "Small",
+												"numExecutors": 1
+											}
+										}
+									]
+								},
+								{
+									"value": "Fondos de Inversion",
+									"activities": [
+										{
+											"name": "Reading Raw Data - StageData Zone - Fondo de Inversion",
+											"type": "SynapseNotebook",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"notebook": {
+													"referenceName": "Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro",
+													"type": "NotebookReference"
+												},
+												"parameters": {
+													"user": {
+														"value": "bsmoralesg@outlook.com",
+														"type": "string"
+													},
+													"type": {
+														"value": "Tarjeta Credito",
+														"type": "string"
+													},
+													"fecha": {
+														"value": "10012023",
+														"type": "string"
+													},
+													"name": {
+														"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
+														"type": "string"
+													}
+												},
+												"snapshot": true,
+												"sparkPool": {
+													"referenceName": "spproymaestria",
+													"type": "BigDataPoolReference"
+												},
+												"executorSize": "Small",
+												"conf": {
+													"spark.dynamicAllocation.enabled": false,
+													"spark.dynamicAllocation.minExecutors": 1,
+													"spark.dynamicAllocation.maxExecutors": 1
+												},
+												"driverSize": "Small",
+												"numExecutors": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "Capturar ultima invocacion",
+						"type": "Lookup",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -101,41 +290,16 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebook": {
-								"referenceName": "Procesar Data Cruda PDF - Zona Data - Tarjeta Credito",
-								"type": "NotebookReference"
+							"source": {
+								"type": "SqlPoolSource",
+								"sqlReaderQuery": "select top 1 * from params.datausers \norder by fecha_registro desc",
+								"queryTimeout": "02:00:00"
 							},
-							"parameters": {
-								"user": {
-									"value": "bsmoralesg@outlook.com",
-									"type": "string"
-								},
-								"type": {
-									"value": "Tarjeta Credito",
-									"type": "string"
-								},
-								"fecha": {
-									"value": "10012023",
-									"type": "string"
-								},
-								"name": {
-									"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
-									"type": "string"
-								}
-							},
-							"snapshot": true,
-							"sparkPool": {
-								"referenceName": "spproymaestria",
-								"type": "BigDataPoolReference"
-							},
-							"executorSize": "Small",
-							"conf": {
-								"spark.dynamicAllocation.enabled": false,
-								"spark.dynamicAllocation.minExecutors": 1,
-								"spark.dynamicAllocation.maxExecutors": 1
-							},
-							"driverSize": "Small",
-							"numExecutors": 1
+							"dataset": {
+								"referenceName": "Synapse_ProyectoMaestria",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
 						}
 					}
 				],
@@ -148,7 +312,9 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/notebooks/Procesar Archivos PDF - Zona Stage')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/spproymaestria')]",
-				"[concat(variables('workspaceId'), '/notebooks/Procesar Data Cruda PDF - Zona Data - Tarjeta Credito')]"
+				"[concat(variables('workspaceId'), '/datasets/Synapse_ProyectoMaestria')]",
+				"[concat(variables('workspaceId'), '/notebooks/Procesar Data Cruda PDF - Zona Data - Tarjeta Credito')]",
+				"[concat(variables('workspaceId'), '/notebooks/Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro')]"
 			]
 		},
 		{
@@ -171,6 +337,59 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/synapseproyectomaestria-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Synapse_ProyectoMaestria')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "SqlPoolTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "usuario",
+						"type": "varchar"
+					},
+					{
+						"name": "fecha",
+						"type": "varchar"
+					},
+					{
+						"name": "type",
+						"type": "varchar"
+					},
+					{
+						"name": "pdfname",
+						"type": "varchar"
+					},
+					{
+						"name": "password",
+						"type": "varchar"
+					},
+					{
+						"name": "fecha_registro",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "params",
+					"table": "datausers"
+				},
+				"sqlPool": {
+					"referenceName": "sqlpoolproyectomaestria",
+					"type": "SqlPoolReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/sqlPools/sqlpoolproyectomaestria')]"
 			]
 		},
 		{
@@ -277,7 +496,7 @@
 					"name": "External Tables"
 				},
 				"content": {
-					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE stage.CuentaAhorros_Producto (\n\t[TipoProducto] nvarchar(4000),\n\t[NumeroProducto] nvarchar(4000),\n\t[Sucursal] nvarchar(4000),\n\t[File_name] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Cuenta Ahorros/Producto/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n",
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE stage.CuentaAhorros_Producto (\n\t[TipoProducto] nvarchar(4000),\n\t[NumeroProducto] nvarchar(4000),\n\t[Sucursal] nvarchar(4000),\n\t[Desde] nvarchar(4000),\n\t[Hasta] nvarchar(4000),\n\t[File_name] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Cuenta Ahorros/Producto/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -415,7 +634,7 @@
 					"name": "External Tables"
 				},
 				"content": {
-					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE stage.TarjetaCredito_Producto (\n\t[TipoProducto] nvarchar(4000),\n\t[CupoTotal] nvarchar(4000),\n\t[NumeroTarjeta] nvarchar(4000),\n\t[TasaInteresMVCompra1Mes] nvarchar(4000),\n\t[TasaInteresMVCompra2MesOMas] nvarchar(4000),\n\t[TasaInteresMVImpuestos] nvarchar(4000),\n\t[TasaInteresMVAvances] nvarchar(4000),\n\t[TasaInteresMVMora] nvarchar(4000),\n\t[TasaInteresEACompra1Mes] nvarchar(4000),\n\t[TasaInteresEACompra2MesOMas] nvarchar(4000),\n\t[TasaInteresEAImpuestos] nvarchar(4000),\n\t[TasaInteresEAAvances] nvarchar(4000),\n\t[TasaInteresEAMora] nvarchar(4000),\n\t[File_name] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Tarjeta Credito/Producto/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n\nSELECT TOP 100 * FROM stage.TarjetaCredito_Producto\nGO",
+					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE stage.TarjetaCredito_Producto (\n\t[TipoProducto] nvarchar(4000),\n\t[CupoTotal] nvarchar(4000),\n\t[NumeroTarjeta] nvarchar(4000),\n\t[Desde] nvarchar(4000),\n\t[Hasta] nvarchar(4000),\n\t[TasaInteresMVCompra1Mes] nvarchar(4000),\n\t[TasaInteresMVCompra2MesOMas] nvarchar(4000),\n\t[TasaInteresMVImpuestos] nvarchar(4000),\n\t[TasaInteresMVAvances] nvarchar(4000),\n\t[TasaInteresMVMora] nvarchar(4000),\n\t[TasaInteresEACompra1Mes] nvarchar(4000),\n\t[TasaInteresEACompra2MesOMas] nvarchar(4000),\n\t[TasaInteresEAImpuestos] nvarchar(4000),\n\t[TasaInteresEAAvances] nvarchar(4000),\n\t[TasaInteresEAMora] nvarchar(4000),\n\t[File_name] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Tarjeta Credito/Producto/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n\n\nSELECT TOP 100 * FROM stage.TarjetaCredito_Producto\nGO",
 					"metadata": {
 						"language": "sql"
 					},
@@ -439,6 +658,29 @@
 				},
 				"content": {
 					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseParquetFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'stagedata_datalakeproyectomaestria_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net' \n\t)\nGO\n\nCREATE EXTERNAL TABLE stage.TarjetaCredito_Transacciones (\n\t[IdTransaccion] nvarchar(4000),\n\t[FechaTransaccion] nvarchar(4000),\n\t[DescripcionTransaccion] nvarchar(4000),\n\t[CostoTransaccion] nvarchar(4000),\n\t[TasaPactada] nvarchar(4000),\n\t[TasaFacturada] nvarchar(4000),\n\t[CargosYAbonos] nvarchar(4000),\n\t[SaldoADiferir] nvarchar(4000),\n\t[Cuotas] nvarchar(4000),\n\t[pdfname] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Tarjeta Credito/Transacciones/',\n\tDATA_SOURCE = [stagedata_datalakeproyectomaestria_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseParquetFormat]\n\t)\nGO\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SCH_modelo_Transacciones')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Schemas"
+				},
+				"content": {
+					"query": "create schema modelo_transacciones\npt 2",
 					"metadata": {
 						"language": "sql"
 					},
@@ -491,6 +733,86 @@
 					"currentConnection": {
 						"databaseName": "sqlpoolproyectomaestria",
 						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SP_Manage_Dim_Cliente')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\n\n-- Procesamiento informacion clientes\n\nCREATE PROCEDURE modelo_transacciones.SP_Manage_Dim_Cliente\nAS BEGIN\n    --Extraer Fechas de PDF - Todas las entidades de cliente\n\n    IF OBJECT_ID(N'tempdb..#Data_Fechas') IS NOT NULL\n    BEGIN\n        DROP TABLE #Data_Fechas\n    END\n\n    Select \n        File_name, \n        Fecha = convert(date,Fecha+'01')\n    into #Data_Fechas    \n    FROM \n        (\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.CuentaAhorros_Cliente mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.FondoInversion_Cliente mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.TarjetaCredito_Cliente mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n        ) fechas\n    WHERE LEN(Fecha) = 6\n\n\n    --Consultar informacion de clientes\n\n    IF OBJECT_ID(N'tempdb..#Raw_Clientes') IS NOT NULL\n    BEGIN\n        DROP TABLE #Raw_Clientes\n    END\n\n    select         \n        [Nombre]\n        ,[Email]\n        ,[Direccion]\n        ,[Ciudad_1]\n        ,[Ciudad_2]\n        ,[File_name]          \n        ,Fecha \n        ,ROW_NUMBER ()  OVER ( PARTITION BY Email order by Fecha desc ) Incremental\n    into \n        #Raw_Clientes\n    from\n    (\n        Select \n            cli.[Nombre]\n            ,cli.[Email]\n            ,cli.[Direccion]\n            ,cli.[Ciudad_1]\n            ,cli.[Ciudad_2]\n            ,cli.[File_name]  \n            ,fec.Fecha\n            --,ROW_NUMBER ()  OVER ( PARTITION BY Email order by fec.Fecha desc ) Incremental\n        --into \n        --    #Raw_Clientes\n        from \n        (\n            select \n                [Nombre]\n                ,[Email]\n                ,[Direccion]\n                ,[Ciudad_1]\n                ,[Ciudad_2]\n                ,[File_name]           \n            from stage.CuentaAhorros_Cliente\n            UNION ALL\n            select \n                [Nombre]\n                ,[Email]\n                ,[Direccion]\n                ,[Ciudad_1]\n                ,[Ciudad_2]\n                ,[File_name] \n            from stage.FondoInversion_Cliente\n            UNION ALL\n            select \n                [Nombre]\n                ,[Email]\n                ,[Direccion]\n                ,[Ciudad_1]\n                ,[Ciudad_2]\n                ,[File_name]\n            from stage.TarjetaCredito_Cliente\n        ) cli\n        INNER JOIN #Data_Fechas fec on (fec.File_name = cli.File_name)\n        --UNION ALL\n        --    select 'andres', 'adreacorreo@hotmail.com', 'clle flasa 123', 'boyaca', 'boyaca', 'file123.pdf', '2023-05-06' \n        --    UNION ALL\n        --    select 'pablo', 'pablocorreo@hotmail.com', 'clle flasa 123', 'boyaca', 'boyaca', 'file123.pdf', '2023-05-06' \n        --    UNION ALL\n        --    select 'andres', 'adreacorreo@hotmail.com', 'clle flasa 123', 'boyaca', 'boyaca', 'file123.pdf', '2023-05-06' \n        --    UNION ALL\n        --    select 'andres uppda', 'adreacorreo@hotmail.com', 'clle flasa 123', 'boyaca', 'boyaca', 'file123.pdf', '2023-05-07' \n    ) dat2\n\n\n    -- Insertar data si No existe\n\n    insert into modelo_transacciones.Cliente (Nombre, [User], Direccion, Ciudad, Departamento, Fecha_Insert, ValidoDesde, ValidoHasta)\n    SELECT   \n        [Nombre]\n        ,[Email]\n        ,[Direccion]\n        ,[Ciudad_1]\n        ,[Ciudad_2]        \n        ,DATEADD(HOUR, -5, GETUTCDATE())\n        ,DATEADD(HOUR, -5, GETUTCDATE())\n        ,null\n    FROM \n        #Raw_Clientes raw\n    where \n        raw.Incremental = 1 AND\n        not exists (select top 1 1 from modelo_transacciones.Cliente cli where cli.[User] = raw.[Email])\n\n    --Actualizar si existe las fechas de los registors vigentes anteriores\n\n    UPDATE \n        cli\n    SET \n        cli.ValidoHasta = DATEADD(HOUR, -5, GETUTCDATE())\n    FROM \n        modelo_transacciones.Cliente cli\n    INNER JOIN \n        #Raw_Clientes raw\n        on \n            (cli.[User] = raw.[Email])\n     where \n        exists (select top 1 1 from modelo_transacciones.Cliente cli where cli.[User] = raw.[Email])\n        and raw.Incremental = 1\n        and cli.validoHasta  is null\n        and (cli.[Nombre] <> raw.[Nombre] or cli.[Direccion] <> raw.[Direccion] or cli.[Ciudad] <> raw.Ciudad_1 or cli.[Departamento] <> raw.Ciudad_2)\n\n\n    -- insertar nuevo registro de cambio\n\n    insert into modelo_transacciones.Cliente (Nombre, [User], Direccion, Ciudad, Departamento, Fecha_Insert, ValidoDesde, ValidoHasta)\n    SELECT   \n        raw.[Nombre]\n        ,raw.[Email]\n        ,raw.[Direccion]\n        ,raw.[Ciudad_1]\n        ,raw.[Ciudad_2]        \n        ,DATEADD(HOUR, -5, GETUTCDATE())\n        ,DATEADD(HOUR, -5, GETUTCDATE())\n        ,null\n    FROM\n        modelo_transacciones.Cliente cli\n    INNER JOIN\n        #Raw_Clientes raw\n        on \n            (cli.[User] = raw.[Email])\n    where\n        exists (select top 1 1 from modelo_transacciones.Cliente cli where cli.[User] = raw.[Email])\n        and raw.Incremental = 1\n        and (cli.[Nombre] <> raw.[Nombre] or cli.[Direccion] <> raw.[Direccion] or cli.[Ciudad] <> raw.Ciudad_1 or cli.[Departamento] <> raw.Ciudad_2)\n\nEND\n\n    --select * from modelo_transacciones.Cliente\n\n\n\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SP_Manage_Dim_Producto')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "-- Procesamiento informacion productos\n\n    --Extraer Fechas de PDF - Todas las entidades de cliente\n\n    IF OBJECT_ID(N'tempdb..#Data_Fechas') IS NOT NULL\n    BEGIN\n        DROP TABLE #Data_Fechas\n    END\n\n    Select \n        File_name, \n        Fecha = convert(date,Fecha+'01')\n    into #Data_Fechas    \n    FROM \n        (\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha            \n            FROM    \n                stage.CuentaAhorros_Producto mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.FondoInversion_Producto mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.TarjetaCredito_Producto mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n        ) fechas\n    WHERE LEN(Fecha) = 6\n\n\n    --Consultar informacion de productos\n\n    IF OBJECT_ID(N'tempdb..#Raw_Productos') IS NOT NULL\n    BEGIN\n        DROP TABLE #Raw_Productos\n    END\n    \n    SELECT         \n        TipoProducto,\n        NumeroProducto,\n        Sucursal,\n        Desde,\n        Hasta,\n        ValorUnidad,\n        Rentabilidad,\n        Comision,\n        TasaInteresMVCompra1Mes,\n        TasaInteresMVCompra2MesOMas,\n        TasaInteresMVImpuestos,\n        TasaInteresMVAvances,\n        TasaInteresMVMora,\n        TasaInteresEACompra1Mes,\n        TasaInteresEACompra2MesOMas,\n        TasaInteresEAImpuestos,\n        TasaInteresEAAvances,\n        TasaInteresEAMora,\n        File_name,\n        Fecha,\n        ROW_NUMBER ()  OVER ( PARTITION BY TipoProducto order by Fecha desc ) Incremental\n    into \n        #Raw_Productos\n    from\n    (        \n        Select \n            prd.TipoProducto,\n            prd.NumeroProducto,\n            prd.Sucursal,\n            convert(date,prd.Desde) Desde,\n            convert(date,prd.Hasta) Hasta,\n            convert(float,prd.ValorUnidad) ValorUnidad,\n            convert(float,prd.Rentabilidad) Rentabilidad,\n            convert(float,CupoTotal) CupoTotal,\n            convert(float,prd.Comision) Comision,\n            convert(float,prd.TasaInteresMVCompra1Mes) TasaInteresMVCompra1Mes,\n            convert(float,prd.TasaInteresMVCompra2MesOMas) TasaInteresMVCompra2MesOMas,\n            convert(float,prd.TasaInteresMVImpuestos) TasaInteresMVImpuestos,\n            convert(float,prd.TasaInteresMVAvances) TasaInteresMVAvances,\n            convert(float,prd.TasaInteresMVMora) TasaInteresMVMora,\n            convert(float,prd.TasaInteresEACompra1Mes) TasaInteresEACompra1Mes,\n            convert(float,prd.TasaInteresEACompra2MesOMas) TasaInteresEACompra2MesOMas,\n            convert(float,prd.TasaInteresEAImpuestos) TasaInteresEAImpuestos,\n            convert(float,prd.TasaInteresEAAvances) TasaInteresEAAvances,\n            convert(float,prd.TasaInteresEAMora) TasaInteresEAMora,\n            prd.File_name,\n            fec.Fecha\n        from \n        (\n            select\n                TipoProducto = TipoProducto,\n                NumeroProducto = NumeroProducto,\n                Sucursal = sucursal,\n                Desde = Desde,\n                Hasta = Hasta,\n                ValorUnidad = null,\n                Rentabilidad = null,\n                Comision = null,\n                CupoTotal = null,\n                TasaInteresMVCompra1Mes = null,\n                TasaInteresMVCompra2MesOMas = null,\n                TasaInteresMVImpuestos = null, \n                TasaInteresMVAvances = null,\n                TasaInteresMVMora = null,\n                TasaInteresEACompra1Mes = null,\n                TasaInteresEACompra2MesOMas = null,\n                TasaInteresEAImpuestos = null,\n                TasaInteresEAAvances = null,\n                TasaInteresEAMora = null,\n                File_name = File_name\n            from stage.CuentaAhorros_Producto\n            UNION ALL\n            select \n                TipoProducto = TipoProducto,\n                NumeroProducto = NumeroProducto,\n                Sucursal = null,\n                Desde = convert(date,Desde),\n                Hasta = convert(date,Hasta),\n                ValorUnidad = ValorUnidad,\n                Rentabilidad = Rentabilidad,\n                Comision = Comision,\n                CupoTotal = null,\n                TasaInteresMVCompra1Mes = null,\n                TasaInteresMVCompra2MesOMas = null,\n                TasaInteresMVImpuestos = null, \n                TasaInteresMVAvances = null,\n                TasaInteresMVMora = null,\n                TasaInteresEACompra1Mes = null,\n                TasaInteresEACompra2MesOMas = null,\n                TasaInteresEAImpuestos = null,\n                TasaInteresEAAvances = null,\n                TasaInteresEAMora = null,\n                File_name = File_name\n            from stage.FondoInversion_Producto\n            UNION ALL\n            select \n                TipoProducto = TipoProducto,\n                NumeroProducto = NumeroTarjeta,\n                Sucursal = null,\n                Desde = convert(date, Desde, 103),\n                Hasta = convert(date, Hasta, 103),\n                ValorUnidad = null,\n                Rentabilidad = null,\n                Comision = null,\n                CupoTotal = CupoTotal,\n                TasaInteresMVCompra1Mes = TasaInteresMVCompra1Mes,\n                TasaInteresMVCompra2MesOMas = TasaInteresMVCompra2MesOMas,\n                TasaInteresMVImpuestos = TasaInteresMVImpuestos, \n                TasaInteresMVAvances = TasaInteresMVAvances,\n                TasaInteresMVMora = TasaInteresMVMora,\n                TasaInteresEACompra1Mes = TasaInteresEACompra1Mes,\n                TasaInteresEACompra2MesOMas =TasaInteresEACompra2MesOMas,\n                TasaInteresEAImpuestos = TasaInteresEAImpuestos,\n                TasaInteresEAAvances = TasaInteresEAAvances,\n                TasaInteresEAMora = TasaInteresEAMora,\n                File_name = File_name\n            from stage.TarjetaCredito_Producto\n        ) prd\n        INNER JOIN #Data_Fechas fec on (fec.File_name = prd.File_name)\n    ) dat2\n\n    -- Insertar data si No existe\n\n    insert into modelo_transacciones.Cliente (TipoProducto, NumeroProducto, Sucursal, Desde, Hasta, ValorUnidad, Rentabilidad, Comision, TasaInteresMVCompra1Mes,\n            TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra2MesOMas,\n            TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, Fecha_Insert, ValidoDesde, ValidoHasta)\n    SELECT   \n        TipoProducto,\n        NumeroProducto,\n        Sucursal,\n        Desde,\n        Hasta,\n        ValorUnidad,\n        Rentabilidad,\n        Comision,\n        TasaInteresMVCompra1Mes,\n        TasaInteresMVCompra2MesOMas,\n        TasaInteresMVImpuestos,\n        TasaInteresMVAvances,\n        TasaInteresMVMora,\n        TasaInteresEACompra1Mes,\n        TasaInteresEACompra2MesOMas,\n        TasaInteresEAImpuestos,\n        TasaInteresEAAvances,\n        TasaInteresEAMora,      \n        DATEADD(HOUR, -5, GETUTCDATE()),\n        DATEADD(HOUR, -5, GETUTCDATE()),\n        null\n    FROM \n        #Raw_Productos raw\n    where \n        raw.Incremental = 1 AND\n        not exists (select top 1 1 from modelo_transacciones.Productos prd where prd.TipoProducto = raw.TipoProducto)\n\n\n        --select * from modelo_transacciones.Cliente\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TBL_modelo_transacciones_Cliente')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\nCreate table modelo_transacciones.Cliente (\n    Cliente_Key bigint identity (100,1) not null,\n    Nombre varchar (100) not null,\n    [User] varchar(150) not null,\n    Direccion varchar(200) not null,\n    Ciudad varchar(150)  not null,\n    Departamento varchar(150) not null,\n    Fecha_Insert DATETIME NOT NULL,\n    ValidoDesde DATETIME not null,\n    ValidoHasta DATETIME null\n)\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TBL_modelo_transacciones_Producto')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\nCreate table modelo_transacciones.Productos (\n    Producto_Key bigint identity (100,1) not null,\n    TipoProducto varchar(50) not null,\n    NumeroProducto varchar(50) not null,\n    Sucursal varchar(50) null,\n    Desde date null,\n    Hasta date null,\n    ValorUnidad float null,\n    Rentabilidad float null,\n    Comision float null,\n    TasaInteresMVCompra1Mes float null,\n    TasaInteresMVCompra2MesOMas float null,\n    TasaInteresMVImpuestos float null,\n    TasaInteresMVAvances float null,\n    TasaInteresMVMora float null,\n    TasaInteresEACompra1Mes float null,\n    TasaInteresEACompra2MesOMas float null,\n    TasaInteresEAImpuestos float null,\n    TasaInteresEAAvances float null,\n    TasaInteresEAMora float null,\n    Fecha_Insert DATETIME NOT NULL,\n    ValidoDesde DATETIME not null,\n    ValidoHasta DATETIME null\n    \n)\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
 				},
@@ -951,7 +1273,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8273b0c6-76bb-4703-bc5d-7326cd3b65c1"
+						"spark.autotune.trackingId": "61dd506a-13ad-47e7-9897-c47062be5755"
 					}
 				},
 				"metadata": {
@@ -976,15 +1298,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -993,7 +1313,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 86
+						"execution_count": 69
 					},
 					{
 						"cell_type": "code",
@@ -1021,7 +1341,7 @@
 							"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 						],
 						"outputs": [],
-						"execution_count": 87
+						"execution_count": 70
 					},
 					{
 						"cell_type": "code",
@@ -1042,7 +1362,7 @@
 							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": 88
+						"execution_count": 71
 					},
 					{
 						"cell_type": "code",
@@ -1063,7 +1383,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 89
+						"execution_count": 72
 					},
 					{
 						"cell_type": "code",
@@ -1092,7 +1412,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 90
+						"execution_count": 73
 					},
 					{
 						"cell_type": "code",
@@ -1112,7 +1432,7 @@
 							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 91
+						"execution_count": 74
 					},
 					{
 						"cell_type": "code",
@@ -1162,7 +1482,7 @@
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 92
+						"execution_count": 75
 					},
 					{
 						"cell_type": "code",
@@ -1184,21 +1504,31 @@
 							"NumeroProducto = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 16).first()[0]\r\n",
 							"Sucursal = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 14).first()[0]\r\n",
 							"\r\n",
+							"Desde = df_formated.select(df_formated.contenido).where(df_formated.x0 == 332.0).collect()[0].__getitem__('contenido')\r\n",
+							"Desde = Desde.replace(\"DESDE:\", \"\")\r\n",
+							"Desde = Desde.strip()\r\n",
+							"\r\n",
+							"Hasta = df_formated.select(df_formated.contenido).where(df_formated.x0 == 450.0).collect()[0].__getitem__('contenido')\r\n",
+							"Hasta = Hasta.replace(\"HASTA:\", \"\")\r\n",
+							"Hasta = Hasta.strip()\r\n",
+							"\r\n",
 							"# Crear dataframe para informacion de producto\r\n",
 							"\r\n",
 							"schemaProducto = StructType([ \\\r\n",
 							"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
 							"    StructField(\"NumeroProducto\",StringType(),True), \\\r\n",
 							"    StructField(\"Sucursal\",StringType(),True), \\\r\n",
+							"    StructField(\"Desde\",StringType(),True), \\\r\n",
+							"    StructField(\"Hasta\",StringType(),True), \\\r\n",
 							"    StructField(\"File_name\", StringType(), True) \\\r\n",
 							"  ])\r\n",
 							"\r\n",
-							"data_Producto = [(TipoProducto, NumeroProducto, Sucursal, name)]\r\n",
+							"data_Producto = [(TipoProducto, NumeroProducto, Sucursal, Desde, Hasta, name)]\r\n",
 							"\r\n",
 							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 						],
 						"outputs": [],
-						"execution_count": 93
+						"execution_count": 76
 					},
 					{
 						"cell_type": "code",
@@ -1337,7 +1667,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 94
+						"execution_count": 77
 					},
 					{
 						"cell_type": "code",
@@ -1361,7 +1691,7 @@
 							"#df_file_name.show(200)"
 						],
 						"outputs": [],
-						"execution_count": 95
+						"execution_count": 78
 					},
 					{
 						"cell_type": "code",
@@ -1394,7 +1724,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 96
+						"execution_count": 79
 					},
 					{
 						"cell_type": "code",
@@ -1416,7 +1746,7 @@
 							"#display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 97
+						"execution_count": 80
 					},
 					{
 						"cell_type": "code",
@@ -1448,7 +1778,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 98
+						"execution_count": 81
 					}
 				]
 			},
@@ -1478,7 +1808,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "17740c57-7b59-41bd-8c44-046a0453e21c"
+						"spark.autotune.trackingId": "0f40b283-4e00-413c-aede-2cb475380cb0"
 					}
 				},
 				"metadata": {
@@ -1518,7 +1848,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 85
+						"execution_count": 80
 					},
 					{
 						"cell_type": "code",
@@ -1550,7 +1880,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 86
+						"execution_count": 81
 					},
 					{
 						"cell_type": "code",
@@ -1571,7 +1901,7 @@
 							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": 87
+						"execution_count": 82
 					},
 					{
 						"cell_type": "code",
@@ -1592,7 +1922,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 88
+						"execution_count": 83
 					},
 					{
 						"cell_type": "code",
@@ -1621,7 +1951,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 89
+						"execution_count": 84
 					},
 					{
 						"cell_type": "code",
@@ -1641,7 +1971,7 @@
 							"display(df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 90
+						"execution_count": 85
 					},
 					{
 						"cell_type": "code",
@@ -1693,7 +2023,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 91
+						"execution_count": 86
 					},
 					{
 						"cell_type": "code",
@@ -1715,13 +2045,17 @@
 							"NumeroProducto = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 19).first()[0]\r\n",
 							"Desde = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 12).first()[0]\r\n",
 							"Hasta = df_formated.select(regexp_replace(df_formated.contenido, '\\D', '')).where(df_formated.UniqueId == 20).first()[0]\r\n",
+							"\r\n",
 							"ValorUnidad = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 21).first()[0]\r\n",
+							"ValorUnidad = ValorUnidad.replace(\".\",\"\") \r\n",
+							"ValorUnidad = ValorUnidad.replace(\",\",\".\") \r\n",
 							"\r\n",
 							"Rentabilidad = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 22).first()[0]\r\n",
 							"if \"-\" in Rentabilidad: Rentabilidad = \"-\"+Rentabilidad.replace(\"-\",\"\")\r\n",
+							"Rentabilidad = Rentabilidad.replace(\",\",\".\") \r\n",
 							"\r\n",
 							"Comision = df_formated.select(regexp_replace(df_formated.contenido, '[aA-zZ]|%|\\s', '')).where(df_formated.UniqueId == 17).first()[0]\r\n",
-							"\r\n",
+							"Comision = Comision.replace(\",\",\".\") \r\n",
 							"\r\n",
 							"# Crear dataframe para informacion de producto\r\n",
 							"\r\n",
@@ -1742,7 +2076,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 92
+						"execution_count": 87
 					},
 					{
 						"cell_type": "code",
@@ -1838,7 +2172,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 93
+						"execution_count": 88
 					},
 					{
 						"cell_type": "code",
@@ -1861,7 +2195,7 @@
 							"#df_Saldo.show()"
 						],
 						"outputs": [],
-						"execution_count": 94
+						"execution_count": 89
 					},
 					{
 						"cell_type": "code",
@@ -1892,7 +2226,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 95
+						"execution_count": 90
 					},
 					{
 						"cell_type": "code",
@@ -1909,12 +2243,12 @@
 							"collapsed": false
 						},
 						"source": [
-							"#display(df_Cliente)\r\n",
-							"#display(df_Producto)\r\n",
-							"display(df_Transacciones)"
+							"display(df_Cliente)\r\n",
+							"display(df_Producto)\r\n",
+							"#display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 96
+						"execution_count": 91
 					},
 					{
 						"cell_type": "code",
@@ -1946,7 +2280,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 97
+						"execution_count": 92
 					}
 				]
 			},
@@ -1976,7 +2310,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9df28662-2069-46a5-b643-7e14919748cd"
+						"spark.autotune.trackingId": "81737823-09f6-488c-9336-73f8b9a0d626"
 					}
 				},
 				"metadata": {
@@ -2019,7 +2353,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 79
+						"execution_count": 186
 					},
 					{
 						"cell_type": "code",
@@ -2044,15 +2378,15 @@
 							"type = \"Tarjeta Credito\"\r\n",
 							"fecha = \"10012023\"\r\n",
 							"\r\n",
-							"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
+							"name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_392576648_202304_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
-							"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
+							"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 						],
 						"outputs": [],
-						"execution_count": 80
+						"execution_count": 187
 					},
 					{
 						"cell_type": "code",
@@ -2074,7 +2408,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 81
+						"execution_count": 188
 					},
 					{
 						"cell_type": "code",
@@ -2096,7 +2430,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 82
+						"execution_count": 189
 					},
 					{
 						"cell_type": "code",
@@ -2125,7 +2459,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 83
+						"execution_count": 190
 					},
 					{
 						"cell_type": "code",
@@ -2145,7 +2479,7 @@
 							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 84
+						"execution_count": 191
 					},
 					{
 						"cell_type": "code",
@@ -2185,7 +2519,7 @@
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 85
+						"execution_count": 192
 					},
 					{
 						"cell_type": "code",
@@ -2203,20 +2537,72 @@
 						"source": [
 							"#Obtener Informacion de Prodcuto\r\n",
 							"\r\n",
-							"\r\n",
 							"TipoProducto = 'Tarjeta Credito'\r\n",
+							"\r\n",
 							"CupoTotal =  df_formated.select(df_formated.contenido).where(df_formated.x0 == 65.0).first()[0]\r\n",
+							"CupoTotal = CupoTotal.replace(\"$\", \"\") \r\n",
+							"CupoTotal = CupoTotal.replace(\",\", \"\") \r\n",
+							"CupoTotal = CupoTotal.strip()\r\n",
+							"\r\n",
 							"NumeroTarjeta = df_formated.select(df_formated.contenido).where(df_formated.x0 == 465.0).first()[0]\r\n",
+							"\r\n",
 							"TasaInteresMVCompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[0].__getitem__('contenido')\r\n",
+							"TasaInteresMVCompra1Mes = TasaInteresMVCompra1Mes.replace (\"%\", \"\")\r\n",
+							"TasaInteresMVCompra1Mes = TasaInteresMVCompra1Mes.replace (\",\", \".\")\r\n",
+							"TasaInteresMVCompra1Mes = TasaInteresMVCompra1Mes.strip()\r\n",
+							"\r\n",
+							"Desde = df_formated.select(df_formated.contenido).where(df_formated.x0 == 353.0).collect()[0].__getitem__('contenido')\r\n",
+							"Desde = Desde.replace(\"Desde:\", \"\")\r\n",
+							"Desde = Desde.strip()\r\n",
+							"\r\n",
+							"Hasta = df_formated.select(df_formated.contenido).where(df_formated.x0 == 500.0).collect()[0].__getitem__('contenido')\r\n",
+							"Hasta = Hasta.replace(\"Hasta:\", \"\")\r\n",
+							"Hasta = Hasta.strip()\r\n",
+							"\r\n",
 							"TasaInteresMVCompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[1].__getitem__('contenido')\r\n",
+							"TasaInteresMVCompra2MesOMas = TasaInteresMVCompra2MesOMas.replace (\"%\", \"\")\r\n",
+							"TasaInteresMVCompra2MesOMas = TasaInteresMVCompra2MesOMas.replace (\",\", \".\")\r\n",
+							"TasaInteresMVCompra2MesOMas = TasaInteresMVCompra2MesOMas.strip()\r\n",
+							"\r\n",
 							"TasaInteresMVImpuestos = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[2].__getitem__('contenido')\r\n",
+							"TasaInteresMVImpuestos = TasaInteresMVImpuestos.replace (\"%\", \"\")\r\n",
+							"TasaInteresMVImpuestos = TasaInteresMVImpuestos.replace (\",\", \".\")\r\n",
+							"TasaInteresMVImpuestos = TasaInteresMVImpuestos.strip()\r\n",
+							"\r\n",
 							"TasaInteresMVAvances = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[3].__getitem__('contenido')\r\n",
+							"TasaInteresMVAvances = TasaInteresMVAvances.replace (\"%\", \"\")\r\n",
+							"TasaInteresMVAvances = TasaInteresMVAvances.replace (\",\", \".\")\r\n",
+							"TasaInteresMVAvances = TasaInteresMVAvances.strip()\r\n",
+							"\r\n",
 							"TasaInteresMVMora = df_formated.select(df_formated.contenido).where(df_formated.x0 == 113.0).collect()[4].__getitem__('contenido')\r\n",
+							"TasaInteresMVMora = TasaInteresMVMora.replace (\"%\", \"\")\r\n",
+							"TasaInteresMVMora = TasaInteresMVMora.replace (\",\", \".\")\r\n",
+							"TasaInteresMVMora = TasaInteresMVMora.strip()\r\n",
+							"\r\n",
 							"TasaInteresEACompra1Mes = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[0].__getitem__('contenido')\r\n",
+							"TasaInteresEACompra1Mes = TasaInteresEACompra1Mes.replace (\"%\", \"\")\r\n",
+							"TasaInteresEACompra1Mes = TasaInteresEACompra1Mes.replace (\",\", \".\")\r\n",
+							"TasaInteresEACompra1Mes = TasaInteresEACompra1Mes.strip()\r\n",
+							"\r\n",
 							"TasaInteresEACompra2MesOMas = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[1].__getitem__('contenido')\r\n",
+							"TasaInteresEACompra2MesOMas = TasaInteresEACompra2MesOMas.replace (\"%\", \"\")\r\n",
+							"TasaInteresEACompra2MesOMas = TasaInteresEACompra2MesOMas.replace (\",\", \".\")\r\n",
+							"TasaInteresEACompra2MesOMas = TasaInteresEACompra2MesOMas.strip()\r\n",
+							"\r\n",
 							"TasaInteresEAImpuestos = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[2].__getitem__('contenido')\r\n",
+							"TasaInteresEAImpuestos = TasaInteresEAImpuestos.replace (\"%\", \"\")\r\n",
+							"TasaInteresEAImpuestos = TasaInteresEAImpuestos.replace (\",\", \".\")\r\n",
+							"TasaInteresEAImpuestos = TasaInteresEAImpuestos.strip()\r\n",
+							"\r\n",
 							"TasaInteresEAAvances = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[3].__getitem__('contenido')\r\n",
+							"TasaInteresEAAvances = TasaInteresEAAvances.replace (\"%\", \"\")\r\n",
+							"TasaInteresEAAvances = TasaInteresEAAvances.replace (\",\", \".\")\r\n",
+							"TasaInteresEAAvances = TasaInteresEAAvances.strip()\r\n",
+							"\r\n",
 							"TasaInteresEAMora = df_formated.select(df_formated.contenido).where(df_formated.x0 == 153.0).collect()[4].__getitem__('contenido')\r\n",
+							"TasaInteresEAMora = TasaInteresEAMora.replace (\"%\", \"\")\r\n",
+							"TasaInteresEAMora = TasaInteresEAMora.replace (\",\", \".\")\r\n",
+							"TasaInteresEAMora = TasaInteresEAMora.strip()\r\n",
 							"\r\n",
 							"# Crear dataframe para informacion de producto\r\n",
 							"\r\n",
@@ -2224,6 +2610,8 @@
 							"    StructField(\"TipoProducto\",StringType(),True), \\\r\n",
 							"    StructField(\"CupoTotal\",StringType(),True), \\\r\n",
 							"    StructField(\"NumeroTarjeta\",StringType(),True), \\\r\n",
+							"    StructField(\"Desde\",StringType(),True), \\\r\n",
+							"    StructField(\"Hasta\",StringType(),True), \\\r\n",
 							"    StructField(\"TasaInteresMVCompra1Mes\", StringType(), True), \\\r\n",
 							"    StructField(\"TasaInteresMVCompra2MesOMas\", StringType(), True), \\\r\n",
 							"    StructField(\"TasaInteresMVImpuestos\", StringType(), True), \\\r\n",
@@ -2237,15 +2625,15 @@
 							"    StructField(\"File_name\", StringType(), True) \\\r\n",
 							"  ])\r\n",
 							"\r\n",
-							"data_Producto = [(TipoProducto, CupoTotal, NumeroTarjeta, TasaInteresMVCompra1Mes, TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, \\\r\n",
-							"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra1Mes, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, name\r\n",
+							"data_Producto = [(TipoProducto, CupoTotal, NumeroTarjeta, Desde, Hasta, TasaInteresMVCompra1Mes, TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, \\\r\n",
+							"    TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra2MesOMas, TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, name\r\n",
 							")]\r\n",
 							"\r\n",
 							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 86
+						"execution_count": 193
 					},
 					{
 						"cell_type": "code",
@@ -2453,7 +2841,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 87
+						"execution_count": 194
 					},
 					{
 						"cell_type": "code",
@@ -2480,7 +2868,7 @@
 							"#df_Cuotas.show(50)"
 						],
 						"outputs": [],
-						"execution_count": 88
+						"execution_count": 195
 					},
 					{
 						"cell_type": "code",
@@ -2521,7 +2909,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 89
+						"execution_count": 196
 					},
 					{
 						"cell_type": "code",
@@ -2540,10 +2928,10 @@
 						"source": [
 							"#display(df_Cliente)\r\n",
 							"#display(df_Producto)\r\n",
-							"display(df_Transacciones)"
+							"#display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 90
+						"execution_count": 197
 					},
 					{
 						"cell_type": "code",
@@ -2575,7 +2963,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 91
+						"execution_count": 198
 					},
 					{
 						"cell_type": "code",
@@ -2913,6 +3301,18 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "eastus2"
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/spproymaestria')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -2941,81 +3341,6 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "eastus2"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/TBL_modelo_transacciones_Cliente')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "\nCreate table modelo_transacciones.Cliente (\n    Cliente_Key bigint identity (100,1) not null,\n    Nombre varchar (100) not null,\n    [User] varchar(150) not null,\n    Direccion varchar(200) not null,\n    Ciudad varchar(150)  not null,\n    Departamento varchar(150) not null,\n    Fecha_Insert DATETIME NOT NULL,\n    ValidoDesde DATETIME not null,\n    ValidoHasta DATETIME null\n)\n\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "sqlpoolproyectomaestria",
-						"poolName": "sqlpoolproyectomaestria"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SP_Manage_Dim_Cliente')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "\n\n-- Procesamiento informacion clientes\n\n    --Extraer Fechas de PDF - Todas las entidades de cliente\n\n    IF OBJECT_ID(N'tempdb..#Data_Fechas') IS NOT NULL\n    BEGIN\n        DROP TABLE #Customer\n    END\n\n    Select \n        File_name, \n        Fecha = convert(date,Fecha+'01')\n    into #Data_Fechas    \n    FROM \n        (\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.CuentaAhorros_Cliente mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.FondoInversion_Cliente mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.TarjetaCredito_Cliente mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n        ) fechas\n    WHERE LEN(Fecha) = 6\n\n\n    --Consultar informacion de clientes\n\n    IF OBJECT_ID(N'tempdb..#Raw_Clientes') IS NOT NULL\n    BEGIN\n        DROP TABLE #Raw_Clientes\n    END\n\n    select         \n        [Nombre]\n        ,[Email]\n        ,[Direccion]\n        ,[Ciudad_1]\n        ,[Ciudad_2]\n        ,[File_name]          \n        ,Fecha \n        ,ROW_NUMBER ()  OVER ( PARTITION BY Email order by Fecha desc ) Incremental\n    into \n        #Raw_Clientes\n    from\n    (\n        Select \n            cli.[Nombre]\n            ,cli.[Email]\n            ,cli.[Direccion]\n            ,cli.[Ciudad_1]\n            ,cli.[Ciudad_2]\n            ,cli.[File_name]  \n            ,fec.Fecha\n            --,ROW_NUMBER ()  OVER ( PARTITION BY Email order by fec.Fecha desc ) Incremental\n        --into \n        --    #Raw_Clientes\n        from \n        (\n            select \n                [Nombre]\n                ,[Email]\n                ,[Direccion]\n                ,[Ciudad_1]\n                ,[Ciudad_2]\n                ,[File_name]           \n            from stage.CuentaAhorros_Cliente\n            UNION ALL\n            select \n                [Nombre]\n                ,[Email]\n                ,[Direccion]\n                ,[Ciudad_1]\n                ,[Ciudad_2]\n                ,[File_name] \n            from stage.FondoInversion_Cliente\n            UNION ALL\n            select \n                [Nombre]\n                ,[Email]\n                ,[Direccion]\n                ,[Ciudad_1]\n                ,[Ciudad_2]\n                ,[File_name]\n            from stage.TarjetaCredito_Cliente\n        ) cli\n        INNER JOIN #Data_Fechas fec on (fec.File_name = cli.File_name)\n        --UNION ALL\n        --    select 'andres', 'adreacorreo@hotmail.com', 'clle flasa 123', 'boyaca', 'boyaca', 'file123.pdf', '2023-05-06' \n        --    UNION ALL\n        --    select 'pablo', 'pablocorreo@hotmail.com', 'clle flasa 123', 'boyaca', 'boyaca', 'file123.pdf', '2023-05-06' \n        --    UNION ALL\n        --    select 'andres', 'adreacorreo@hotmail.com', 'clle flasa 123', 'boyaca', 'boyaca', 'file123.pdf', '2023-05-06' \n        --    UNION ALL\n        --    select 'andres uppda', 'adreacorreo@hotmail.com', 'clle flasa 123', 'boyaca', 'boyaca', 'file123.pdf', '2023-05-07' \n    ) dat2\n\n\n    -- Insertar data si No existe\n\n    insert into modelo_transacciones.Cliente (Nombre, [User], Direccion, Ciudad, Departamento, Fecha_Insert, ValidoDesde, ValidoHasta)\n    SELECT   \n        [Nombre]\n        ,[Email]\n        ,[Direccion]\n        ,[Ciudad_1]\n        ,[Ciudad_2]        \n        ,DATEADD(HOUR, -5, GETUTCDATE())\n        ,DATEADD(HOUR, -5, GETUTCDATE())\n        ,null\n    FROM \n        #Raw_Clientes raw\n    where \n        raw.Incremental = 1 AND\n        not exists (select top 1 1 from modelo_transacciones.Cliente cli where cli.[User] = raw.[Email])\n\n    --Actualizar si existe las fechas de los registors vigentes anteriores\n\n    UPDATE \n        cli\n    SET \n        cli.ValidoHasta = DATEADD(HOUR, -5, GETUTCDATE())\n    FROM \n        modelo_transacciones.Cliente cli\n    INNER JOIN \n        #Raw_Clientes raw\n        on \n            (cli.[User] = raw.[Email])\n     where \n        exists (select top 1 1 from modelo_transacciones.Cliente cli where cli.[User] = raw.[Email])\n        and raw.Incremental = 1\n        and cli.validoHasta  is null\n        and (cli.[Nombre] <> raw.[Nombre] or cli.[Direccion] <> raw.[Direccion] or cli.[Ciudad] <> raw.Ciudad_1 or cli.[Departamento] <> raw.Ciudad_2)\n\n\n    -- insertar nuevo registro de cambio\n\n    insert into modelo_transacciones.Cliente (Nombre, [User], Direccion, Ciudad, Departamento, Fecha_Insert, ValidoDesde, ValidoHasta)\n    SELECT   \n        raw.[Nombre]\n        ,raw.[Email]\n        ,raw.[Direccion]\n        ,raw.[Ciudad_1]\n        ,raw.[Ciudad_2]        \n        ,DATEADD(HOUR, -5, GETUTCDATE())\n        ,DATEADD(HOUR, -5, GETUTCDATE())\n        ,null\n    FROM\n        modelo_transacciones.Cliente cli\n    INNER JOIN\n        #Raw_Clientes raw\n        on \n            (cli.[User] = raw.[Email])\n    where\n        exists (select top 1 1 from modelo_transacciones.Cliente cli where cli.[User] = raw.[Email])\n        and raw.Incremental = 1\n        and (cli.[Nombre] <> raw.[Nombre] or cli.[Direccion] <> raw.[Direccion] or cli.[Ciudad] <> raw.Ciudad_1 or cli.[Departamento] <> raw.Ciudad_2)\n\n\n\n    --select * from modelo_transacciones.Cliente\n\n\n\n\n\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "sqlpoolproyectomaestria",
-						"poolName": "sqlpoolproyectomaestria"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SCH_modelo_Transacciones')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "Schemas"
-				},
-				"content": {
-					"query": "create schema modelo_transacciones\npt 2",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "sqlpoolproyectomaestria",
-						"poolName": "sqlpoolproyectomaestria"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
 		}
 	]
 }
