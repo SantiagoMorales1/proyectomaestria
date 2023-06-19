@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "\nCreate table modelo_transacciones.Productos (\n    Producto_Key bigint identity (100,1) not null,\n    TipoProducto varchar(50) not null,\n    NumeroProducto varchar(50) not null,\n    Sucursal varchar(50) null,\n    Desde date null,\n    Hasta date null,\n    ValorUnidad float null,\n    Rentabilidad float null,\n    Comision float null,\n    TasaInteresMVCompra1Mes float null,\n    TasaInteresMVCompra2MesOMas float null,\n    TasaInteresMVImpuestos float null,\n    TasaInteresMVAvances float null,\n    TasaInteresMVMora float null,\n    TasaInteresEACompra1Mes float null,\n    TasaInteresEACompra2MesOMas float null,\n    TasaInteresEAImpuestos float null,\n    TasaInteresEAAvances float null,\n    TasaInteresEAMora float null,\n    Fecha_Insert DATETIME NOT NULL,\n    ValidoDesde DATETIME not null,\n    ValidoHasta DATETIME null\n    \n)\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
