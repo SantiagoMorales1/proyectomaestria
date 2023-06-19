@@ -1,0 +1,48 @@
+{
+	"name": "Synapse_ProyectoMaestria",
+	"properties": {
+		"annotations": [],
+		"type": "SqlPoolTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "usuario",
+				"type": "varchar"
+			},
+			{
+				"name": "fecha",
+				"type": "varchar"
+			},
+			{
+				"name": "type",
+				"type": "varchar"
+			},
+			{
+				"name": "pdfname",
+				"type": "varchar"
+			},
+			{
+				"name": "password",
+				"type": "varchar"
+			},
+			{
+				"name": "fecha_registro",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "params",
+			"table": "datausers"
+		},
+		"sqlPool": {
+			"referenceName": "sqlpoolproyectomaestria",
+			"type": "SqlPoolReference"
+		}
+	}
+}

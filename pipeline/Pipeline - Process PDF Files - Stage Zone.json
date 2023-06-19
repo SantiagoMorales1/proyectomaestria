@@ -5,7 +5,14 @@
 			{
 				"name": "Reading PDF Files - Stagefiles Zone",
 				"type": "SynapseNotebook",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Capturar ultima invocacion",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -59,14 +66,7 @@
 			{
 				"name": "Reading Raw Data - StageData Zone",
 				"type": "SynapseNotebook",
-				"dependsOn": [
-					{
-						"activity": "Reading PDF Files - Stagefiles Zone",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -111,6 +111,45 @@
 					},
 					"driverSize": "Small",
 					"numExecutors": 1
+				}
+			},
+			{
+				"name": "Validar Tipo Producto",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Reading PDF Files - Stagefiles Zone",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"cases": []
+				}
+			},
+			{
+				"name": "Capturar ultima invocacion",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlPoolSource",
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "Synapse_ProyectoMaestria",
+						"type": "DatasetReference"
+					}
 				}
 			}
 		],
