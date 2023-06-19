@@ -64,56 +64,6 @@
 				}
 			},
 			{
-				"name": "Reading Raw Data - StageData Zone",
-				"type": "SynapseNotebook",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebook": {
-						"referenceName": "Procesar Data Cruda PDF - Zona Data - Tarjeta Credito",
-						"type": "NotebookReference"
-					},
-					"parameters": {
-						"user": {
-							"value": "bsmoralesg@outlook.com",
-							"type": "string"
-						},
-						"type": {
-							"value": "Tarjeta Credito",
-							"type": "string"
-						},
-						"fecha": {
-							"value": "10012023",
-							"type": "string"
-						},
-						"name": {
-							"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
-							"type": "string"
-						}
-					},
-					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "spproymaestria",
-						"type": "BigDataPoolReference"
-					},
-					"executorSize": "Small",
-					"conf": {
-						"spark.dynamicAllocation.enabled": false,
-						"spark.dynamicAllocation.minExecutors": 1,
-						"spark.dynamicAllocation.maxExecutors": 1
-					},
-					"driverSize": "Small",
-					"numExecutors": 1
-				}
-			},
-			{
 				"name": "Validar Tipo Producto",
 				"type": "Switch",
 				"dependsOn": [
@@ -126,7 +76,125 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"cases": []
+					"on": {
+						"value": "@activity('Capturar ultima invocacion').output.firstRow.type",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "Tarjeta Credito",
+							"activities": [
+								{
+									"name": "Reading Raw Data - StageData Zone",
+									"type": "SynapseNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebook": {
+											"referenceName": "Procesar Data Cruda PDF - Zona Data - Tarjeta Credito",
+											"type": "NotebookReference"
+										},
+										"parameters": {
+											"user": {
+												"value": "bsmoralesg@outlook.com",
+												"type": "string"
+											},
+											"type": {
+												"value": "Tarjeta Credito",
+												"type": "string"
+											},
+											"fecha": {
+												"value": "10012023",
+												"type": "string"
+											},
+											"name": {
+												"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
+												"type": "string"
+											}
+										},
+										"snapshot": true,
+										"sparkPool": {
+											"referenceName": "spproymaestria",
+											"type": "BigDataPoolReference"
+										},
+										"executorSize": "Small",
+										"conf": {
+											"spark.dynamicAllocation.enabled": false,
+											"spark.dynamicAllocation.minExecutors": 1,
+											"spark.dynamicAllocation.maxExecutors": 1
+										},
+										"driverSize": "Small",
+										"numExecutors": 1
+									}
+								}
+							]
+						},
+						{
+							"value": "Cuenta Ahorros",
+							"activities": [
+								{
+									"name": "Reading Raw Data - StageData Zone - Cuenta Ahorro",
+									"type": "SynapseNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebook": {
+											"referenceName": "Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro",
+											"type": "NotebookReference"
+										},
+										"parameters": {
+											"user": {
+												"value": "bsmoralesg@outlook.com",
+												"type": "string"
+											},
+											"type": {
+												"value": "Tarjeta Credito",
+												"type": "string"
+											},
+											"fecha": {
+												"value": "10012023",
+												"type": "string"
+											},
+											"name": {
+												"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
+												"type": "string"
+											}
+										},
+										"snapshot": true,
+										"sparkPool": {
+											"referenceName": "spproymaestria",
+											"type": "BigDataPoolReference"
+										},
+										"executorSize": "Small",
+										"conf": {
+											"spark.dynamicAllocation.enabled": false,
+											"spark.dynamicAllocation.minExecutors": 1,
+											"spark.dynamicAllocation.maxExecutors": 1
+										},
+										"driverSize": "Small",
+										"numExecutors": 1
+									}
+								}
+							]
+						},
+						{
+							"value": "Fondos de Inversion"
+						}
+					]
 				}
 			},
 			{
@@ -144,7 +212,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlPoolSource",
-						"sqlReaderQuery": "select * from params.datausers",
+						"sqlReaderQuery": "select top 1 * from params.datausers \norder by fecha_registro desc",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
