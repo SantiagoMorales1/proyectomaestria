@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "83e17b52-f660-498b-ac04-2dabc398c850"
+				"spark.autotune.trackingId": "7a0a71e1-5bf2-4d88-8d7d-1cc4f0803cc9"
 			}
 		},
 		"metadata": {
@@ -63,7 +63,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 86
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -89,13 +89,13 @@
 					"fecha = \"10012023\"\r\n",
 					"\r\n",
 					"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
-					"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
+					"name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_392576648_202304_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
-					"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
+					"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 				],
-				"execution_count": 87
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -116,7 +116,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name\r\n",
 					""
 				],
-				"execution_count": 88
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -137,7 +137,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 89
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -165,7 +165,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 90
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -184,7 +184,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 91
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -223,7 +223,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 92
+				"execution_count": 20
 			},
 			{
 				"cell_type": "code",
@@ -336,7 +336,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 93
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
@@ -422,6 +422,7 @@
 					"            (df_formated.contenido != \"Pactada\") & \\\r\n",
 					"            (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
+					"df_TasaPactada = df_TasaPactada.withColumn(\"TasaPactada\", regexp_replace(df_TasaPactada.TasaPactada, ',', ''))\r\n",
 					"\r\n",
 					"# Completar datos Faltantes\r\n",
 					"\r\n",
@@ -449,6 +450,7 @@
 					"            (df_formated.contenido != \"Facturada\") & \\\r\n",
 					"            (df_formated.contenido != \"\")\r\n",
 					"    )\r\n",
+					"df_TasaFacturada = df_TasaFacturada.withColumn(\"TasaFacturada\", regexp_replace(df_TasaFacturada.TasaFacturada, ',', ''))\r\n",
 					"\r\n",
 					"# Completar datos Faltantes\r\n",
 					"\r\n",
@@ -564,7 +566,7 @@
 					"    df_producto = df_producto.union(newRow)\r\n",
 					""
 				],
-				"execution_count": 94
+				"execution_count": 22
 			},
 			{
 				"cell_type": "code",
@@ -590,7 +592,7 @@
 					"#df_SaldoADiferir.show(50)\r\n",
 					"#df_Cuotas.show(50)"
 				],
-				"execution_count": 95
+				"execution_count": 23
 			},
 			{
 				"cell_type": "code",
@@ -635,7 +637,7 @@
 					"                        df_producto.NumeroProducto \\\r\n",
 					"                        )"
 				],
-				"execution_count": 96
+				"execution_count": 24
 			},
 			{
 				"cell_type": "code",
@@ -656,7 +658,7 @@
 					"#display(df_Producto)\r\n",
 					"#display(df_Transacciones)"
 				],
-				"execution_count": 97
+				"execution_count": 25
 			},
 			{
 				"cell_type": "code",
@@ -687,7 +689,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 98
+				"execution_count": 26
 			},
 			{
 				"cell_type": "code",
