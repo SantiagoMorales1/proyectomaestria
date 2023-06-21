@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "81737823-09f6-488c-9336-73f8b9a0d626"
+				"spark.autotune.trackingId": "83e17b52-f660-498b-ac04-2dabc398c850"
 			}
 		},
 		"metadata": {
@@ -45,7 +45,8 @@
 				"sparkVersion": "3.3",
 				"nodeCount": 3,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -62,7 +63,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 186
+				"execution_count": 86
 			},
 			{
 				"cell_type": "code",
@@ -87,14 +88,14 @@
 					"type = \"Tarjeta Credito\"\r\n",
 					"fecha = \"10012023\"\r\n",
 					"\r\n",
-					"name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
+					"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_392576648_202304_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166\"\r\n",
 					"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
-					"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
+					"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 				],
-				"execution_count": 187
+				"execution_count": 87
 			},
 			{
 				"cell_type": "code",
@@ -115,7 +116,7 @@
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name\r\n",
 					""
 				],
-				"execution_count": 188
+				"execution_count": 88
 			},
 			{
 				"cell_type": "code",
@@ -136,7 +137,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 189
+				"execution_count": 89
 			},
 			{
 				"cell_type": "code",
@@ -164,7 +165,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 190
+				"execution_count": 90
 			},
 			{
 				"cell_type": "code",
@@ -183,7 +184,7 @@
 				"source": [
 					"display (df_formated)"
 				],
-				"execution_count": 191
+				"execution_count": 91
 			},
 			{
 				"cell_type": "code",
@@ -222,7 +223,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 192
+				"execution_count": 92
 			},
 			{
 				"cell_type": "code",
@@ -335,7 +336,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 193
+				"execution_count": 93
 			},
 			{
 				"cell_type": "code",
@@ -536,13 +537,34 @@
 					"\r\n",
 					"df_file_name = spark.createDataFrame([], schema_pdf_name)\r\n",
 					"\r\n",
+					"\r\n",
+					"schema_email = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"email\", StringType(), nullable=True)    \r\n",
+					"])\r\n",
+					"\r\n",
+					"df_email = spark.createDataFrame([], schema_email)\r\n",
+					"\r\n",
+					"schema_producto = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"TipoProducto\", StringType(), nullable=True),\r\n",
+					"    StructField(\"NumeroProducto\", StringType(), nullable=True)   \r\n",
+					"])\r\n",
+					"\r\n",
+					"df_producto = spark.createDataFrame([], schema_producto)\r\n",
+					"\r\n",
 					"for i in range (CantidadTransacciones):                \r\n",
 					"    newRow = spark.createDataFrame([(i+1,name)])\r\n",
-					"    df_file_name = df_file_name.union(newRow) \r\n",
+					"    df_file_name = df_file_name.union(newRow)\r\n",
 					"\r\n",
+					"    newRow = spark.createDataFrame([(i+1,user)])\r\n",
+					"    df_email = df_email.union(newRow)\r\n",
+					"\r\n",
+					"    newRow = spark.createDataFrame([(i+1,TipoProducto,NumeroTarjeta)])\r\n",
+					"    df_producto = df_producto.union(newRow)\r\n",
 					""
 				],
-				"execution_count": 194
+				"execution_count": 94
 			},
 			{
 				"cell_type": "code",
@@ -568,7 +590,7 @@
 					"#df_SaldoADiferir.show(50)\r\n",
 					"#df_Cuotas.show(50)"
 				],
-				"execution_count": 195
+				"execution_count": 95
 			},
 			{
 				"cell_type": "code",
@@ -595,6 +617,8 @@
 					"                  .join(df_SaldoADiferir, df_idTransacciones.id == df_SaldoADiferir.id, \"inner\") \\\r\n",
 					"                  .join(df_Cuotas, df_idTransacciones.id == df_Cuotas.id, \"inner\") \\\r\n",
 					"                  .join(df_file_name, df_idTransacciones.id == df_file_name.id, \"inner\") \\\r\n",
+					"                  .join(df_email, df_idTransacciones.id == df_email.id, \"inner\") \\\r\n",
+					"                  .join(df_producto, df_idTransacciones.id == df_producto.id, \"inner\") \\\r\n",
 					"                  .select( \\\r\n",
 					"                        df_idTransacciones.IdTransaccion, \\\r\n",
 					"                        df_FechaTransacciones.FechaTransaccion, \\\r\n",
@@ -605,10 +629,13 @@
 					"                        df_CargosYAbonos.CargosYAbonos, \\\r\n",
 					"                        df_SaldoADiferir.SaldoADiferir, \\\r\n",
 					"                        df_Cuotas.Cuotas, \\\r\n",
-					"                        df_file_name.pdfname\r\n",
+					"                        df_file_name.pdfname, \\\r\n",
+					"                        df_email.email, \\\r\n",
+					"                        df_producto.TipoProducto, \\\r\n",
+					"                        df_producto.NumeroProducto \\\r\n",
 					"                        )"
 				],
-				"execution_count": 196
+				"execution_count": 96
 			},
 			{
 				"cell_type": "code",
@@ -629,7 +656,7 @@
 					"#display(df_Producto)\r\n",
 					"#display(df_Transacciones)"
 				],
-				"execution_count": 197
+				"execution_count": 97
 			},
 			{
 				"cell_type": "code",
@@ -660,7 +687,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 198
+				"execution_count": 98
 			},
 			{
 				"cell_type": "code",
