@@ -1,5 +1,5 @@
 {
-	"name": "TBL_modelo_transacciones_Cliente",
+	"name": "TBL_modelo_transacciones_Dim_Cliente",
 	"properties": {
 		"content": {
 			"query": "\nCreate table modelo_transacciones.Cliente (\n    Cliente_Key bigint identity (100,1) not null,\n    Nombre varchar (100) not null,\n    [User] varchar(150) not null,\n    Direccion varchar(200) not null,\n    Ciudad varchar(150)  not null,\n    Departamento varchar(150) not null,\n    Fecha_Insert DATETIME NOT NULL,\n    ValidoDesde DATETIME not null,\n    ValidoHasta DATETIME null\n)\nWITH\n(\n    DISTRIBUTION = replicate,\n    CLUSTERED COLUMNSTORE INDEX\n)\n",
