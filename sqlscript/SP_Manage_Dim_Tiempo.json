@@ -2,13 +2,13 @@
 	"name": "SP_Manage_Dim_Tiempo",
 	"properties": {
 		"content": {
-			"query": "\n\nDECLARE @StartDate date = '2021-01-01';\nDECLARE @EndDate date = '2023-12-31';\n\nWHILE @StartDate <= @EndDate\nBEGIN\n    INSERT INTO DimDate ([Date], Year, [Quarter], Month, Day, Weekday, Weekday_Number, Is_Weekend, Day_Of_Year, Date_String)\n    VALUES (\n        @StartDate,\n        DATEPART(YEAR, @StartDate),\n        DATEPART(QUARTER, @StartDate),\n        DATEPART(MONTH, @StartDate),\n        DATEPART(DAY, @StartDate),\n        DATENAME(WEEKDAY, @StartDate),\n        DATEPART(WEEKDAY, @StartDate),\n        CASE WHEN DATEPART(WEEKDAY, @StartDate) IN (6, 7) THEN 1 ELSE 0 END,\n        DATEPART(DAYOFYEAR, @StartDate),\n        CONVERT(varchar(10), @StartDate, 120)\n    );\n    \n    SET @StartDate = DATEADD(DAY, 1, @StartDate);\nEND\n\n-- Verify the generated DimDate data\nSELECT * FROM DimDate;",
+			"query": "\nCREATE PROCEDURE modelo_transacciones.SP_Manage_Dim_Tiempo\nAS BEGIN\n\n    DECLARE @StartDate date = '2021-01-01';\n    DECLARE @EndDate date = '2023-12-31';\n\n    WHILE @StartDate <= @EndDate\n    BEGIN\n        INSERT INTO DimDate ([Date], Year, [Quarter], Month, Day, Weekday, Weekday_Number, Is_Weekend, Day_Of_Year, Date_String)\n        VALUES (\n            @StartDate,\n            DATEPART(YEAR, @StartDate),\n            DATEPART(QUARTER, @StartDate),\n            DATEPART(MONTH, @StartDate),\n            DATEPART(DAY, @StartDate),\n            DATENAME(WEEKDAY, @StartDate),\n            DATEPART(WEEKDAY, @StartDate),\n            CASE WHEN DATEPART(WEEKDAY, @StartDate) IN (6, 7) THEN 1 ELSE 0 END,\n            DATEPART(DAYOFYEAR, @StartDate),\n            CONVERT(varchar(10), @StartDate, 120)\n        );\n        \n        SET @StartDate = DATEADD(DAY, 1, @StartDate);\n    END\nEND\n\n\n--SELECT * FROM DimDate;",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
-				"poolName": "Built-in"
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
 			},
 			"resultLimit": 5000
 		},
