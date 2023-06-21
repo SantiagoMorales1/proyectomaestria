@@ -2,7 +2,7 @@
 	"name": "TBL_modelo_transacciones_Tiempo",
 	"properties": {
 		"content": {
-			"query": "CREATE TABLE DimDate (\n    Date date,\n    Year int,\n    Quarter int,\n    Month int,\n    Day int,\n    Weekday varchar(20),\n    Weekday_Number int,\n    Is_Weekend bit,\n    Day_Of_Year int,\n    Date_String varchar(10)\n)\nWITH\n(\n    DISTRIBUTION = replicate,\n    CLUSTERED COLUMNSTORE INDEX\n)\n",
+			"query": "\nCREATE TABLE modelo_transacciones.Dim_Tiempo (\n    Date date,\n    Year int,\n    Quarter int,\n    Month int,\n    Day int,\n    Weekday varchar(20),\n    Weekday_Number int,\n    Is_Weekend bit,\n    Day_Of_Year int,\n    Date_String varchar(10)\n)\nWITH\n(\n    DISTRIBUTION = replicate,\n    CLUSTERED COLUMNSTORE INDEX\n)\n",
 			"metadata": {
 				"language": "sql"
 			},
