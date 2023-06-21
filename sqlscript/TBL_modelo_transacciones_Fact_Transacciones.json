@@ -1,0 +1,17 @@
+{
+	"name": "TBL_modelo_transacciones_Fact_Transacciones",
+	"properties": {
+		"content": {
+			"query": "Create table modelo_transacciones.Fact_Transacciones (\n    Key_Transacciones bigint identity(1,1) not null,\n    Key_Date bigint not null,\n    Cliente_Key bigint not null,\n    Producto_Key bigint not null,\n    DescripcionTransaccion varchar(100) not null,\n    ValorTransaccion float not null,\n    ValorUnidades float null,\n    TasaPactada float null,\n    TasaFacturada float null,\n    CargosYAbonos float null,\n    SaldoADiferir float null,\n    Cuotas varchar(5)\n)\nWITH\n(\n    DISTRIBUTION = HASH (Key_Transacciones),\n    CLUSTERED COLUMNSTORE INDEX\n)\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
