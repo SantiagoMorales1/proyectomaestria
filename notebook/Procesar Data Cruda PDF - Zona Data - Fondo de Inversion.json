@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "0f40b283-4e00-413c-aede-2cb475380cb0"
+				"spark.autotune.trackingId": "fedad799-a902-4dda-ade9-28dc173b2437"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 80
+				"execution_count": 66
 			},
 			{
 				"cell_type": "code",
@@ -82,16 +82,16 @@
 					"type = \"Fondos de Inversion\"\r\n",
 					"fecha = \"10012023\"\r\n",
 					"\r\n",
-					"#name = \"Extracto_8791222_202108_FIDUCUENTA_3940\"\r\n",
+					"name = \"Extracto_8791222_202108_FIDUCUENTA_3940\"\r\n",
 					"#name = \"Extracto_36546412_202111_FIDUCUENTA_3940\"\r\n",
 					"#name = \"Extracto_212010590_202208_FIDUCUENTA_3940\"\r\n",
 					"#name = \"Extracto_254154275_202210_FIDUCUENTA_3940\"\r\n",
 					"#name = \"Extracto_333733883_202301_FIDUCUENTA_3940\"\r\n",
-					"name = \"Extracto_395097292_202304_FIDUCUENTA_3940\"\r\n",
+					"#name = \"Extracto_395097292_202304_FIDUCUENTA_3940\"\r\n",
 					"\r\n",
 					""
 				],
-				"execution_count": 81
+				"execution_count": 67
 			},
 			{
 				"cell_type": "code",
@@ -111,7 +111,7 @@
 					"\r\n",
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 				],
-				"execution_count": 82
+				"execution_count": 68
 			},
 			{
 				"cell_type": "code",
@@ -131,7 +131,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 83
+				"execution_count": 69
 			},
 			{
 				"cell_type": "code",
@@ -159,7 +159,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 84
+				"execution_count": 70
 			},
 			{
 				"cell_type": "code",
@@ -178,7 +178,7 @@
 				"source": [
 					"display(df_formated)"
 				],
-				"execution_count": 85
+				"execution_count": 71
 			},
 			{
 				"cell_type": "code",
@@ -229,7 +229,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": 86
+				"execution_count": 72
 			},
 			{
 				"cell_type": "code",
@@ -281,7 +281,7 @@
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)\r\n",
 					""
 				],
-				"execution_count": 87
+				"execution_count": 73
 			},
 			{
 				"cell_type": "code",
@@ -371,12 +371,34 @@
 					"\r\n",
 					"df_file_name = spark.createDataFrame([], schema_pdf_name)\r\n",
 					"\r\n",
+					"\r\n",
+					"schema_email = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"email\", StringType(), nullable=True)    \r\n",
+					"])\r\n",
+					"\r\n",
+					"df_email = spark.createDataFrame([], schema_email)\r\n",
+					"\r\n",
+					"schema_producto = StructType([\r\n",
+					"    StructField(\"id\", IntegerType(), nullable=True),\r\n",
+					"    StructField(\"TipoProducto\", StringType(), nullable=True),\r\n",
+					"    StructField(\"NumeroProducto\", StringType(), nullable=True)   \r\n",
+					"])\r\n",
+					"\r\n",
+					"df_producto = spark.createDataFrame([], schema_producto)\r\n",
+					"\r\n",
 					"for i in range (CantidadTransacciones):                \r\n",
 					"    newRow = spark.createDataFrame([(i+1,name)])\r\n",
-					"    df_file_name = df_file_name.union(newRow) \r\n",
+					"    df_file_name = df_file_name.union(newRow)\r\n",
+					"\r\n",
+					"    newRow = spark.createDataFrame([(i+1,user)])\r\n",
+					"    df_email = df_email.union(newRow)\r\n",
+					"\r\n",
+					"    newRow = spark.createDataFrame([(i+1,TipoProducto,NumeroProducto)])\r\n",
+					"    df_producto = df_producto.union(newRow)\r\n",
 					""
 				],
-				"execution_count": 88
+				"execution_count": 74
 			},
 			{
 				"cell_type": "code",
@@ -398,7 +420,7 @@
 					"#df_ValorUnidades.show()\r\n",
 					"#df_Saldo.show()"
 				],
-				"execution_count": 89
+				"execution_count": 75
 			},
 			{
 				"cell_type": "code",
@@ -419,16 +441,21 @@
 					"                  .join(df_ValorUnidades, df_Fecha.id == df_ValorUnidades.id, \"inner\") \\\r\n",
 					"                  .join(df_Saldo, df_Fecha.id == df_Saldo.id, \"inner\") \\\r\n",
 					"                  .join(df_file_name, df_Fecha.id == df_file_name.id, \"inner\") \\\r\n",
+					"                  .join(df_email, df_Fecha.id == df_email.id, \"inner\") \\\r\n",
+					"                  .join(df_producto, df_Fecha.id == df_producto.id, \"inner\") \\\r\n",
 					"                  .select( \\\r\n",
 					"                        df_Fecha.FechaTransaccion, \\\r\n",
 					"                        df_Descripcion.Descripcion, \\\r\n",
 					"                        df_ValorPesos.ValorPesos, \\\r\n",
 					"                        df_ValorUnidades.ValorUnidades, \\\r\n",
 					"                        df_Saldo.Saldo, \\\r\n",
-					"                        df_file_name.pdfname\r\n",
+					"                        df_file_name.pdfname, \\\r\n",
+					"                        df_email.email, \\\r\n",
+					"                        df_producto.TipoProducto, \\\r\n",
+					"                        df_producto.NumeroProducto \\\r\n",
 					"                        )"
 				],
-				"execution_count": 90
+				"execution_count": 76
 			},
 			{
 				"cell_type": "code",
@@ -449,7 +476,7 @@
 					"display(df_Producto)\r\n",
 					"#display(df_Transacciones)"
 				],
-				"execution_count": 91
+				"execution_count": 77
 			},
 			{
 				"cell_type": "code",
@@ -480,7 +507,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 92
+				"execution_count": 78
 			}
 		]
 	}
