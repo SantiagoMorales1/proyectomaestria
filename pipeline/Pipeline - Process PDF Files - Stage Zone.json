@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlPoolSource",
-						"sqlReaderQuery": "select * from params.datausers \n",
+						"sqlReaderQuery": "select * from params.datausers \nwhere password is not null",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
