@@ -42,7 +42,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlPoolSource",
-								"sqlReaderQuery": "select * from params.datausers \n",
+								"sqlReaderQuery": "select * from params.datausers \nwhere password is not null",
 								"queryTimeout": "02:00:00"
 							},
 							"dataset": {
@@ -142,7 +142,7 @@
 									}
 								},
 								{
-									"name": "Validar Tipo Producto_copy1",
+									"name": "Validar Tipo Producto",
 									"type": "Switch",
 									"dependsOn": [
 										{
@@ -1537,7 +1537,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a568a846-6529-45be-8f04-60399aa7e510"
+						"spark.autotune.trackingId": "350926a4-4aae-48f5-94f0-306a78f7a74a"
 					}
 				},
 				"metadata": {
@@ -1562,13 +1562,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -1590,7 +1592,10 @@
 								"transient": {
 									"deleting": false
 								}
-							}
+							},
+							"tags": [
+								"parameters"
+							]
 						},
 						"source": [
 							"#Configurar parametros aqui\r\n",
@@ -2102,7 +2107,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "fedad799-a902-4dda-ade9-28dc173b2437"
+						"spark.autotune.trackingId": "26c99c4d-581e-49f5-a424-ced073e9dce1"
 					}
 				},
 				"metadata": {
@@ -2127,13 +2132,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -2155,7 +2162,10 @@
 								"transient": {
 									"deleting": false
 								}
-							}
+							},
+							"tags": [
+								"parameters"
+							]
 						},
 						"source": [
 							"#Configurar parametros aqui\r\n",
