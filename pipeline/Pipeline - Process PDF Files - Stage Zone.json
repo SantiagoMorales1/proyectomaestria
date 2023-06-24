@@ -116,7 +116,7 @@
 							}
 						},
 						{
-							"name": "Validar Tipo Producto_copy1",
+							"name": "Validar Tipo Producto",
 							"type": "Switch",
 							"dependsOn": [
 								{
