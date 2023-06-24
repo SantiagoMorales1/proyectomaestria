@@ -338,7 +338,7 @@
 							}
 						},
 						{
-							"name": "Procesar Dim Cliente_copy1",
+							"name": "Procesar Dim Cliente",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -368,7 +368,7 @@
 							}
 						},
 						{
-							"name": "Procesar Dim Producto_copy1",
+							"name": "Procesar Dim Producto",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -398,17 +398,17 @@
 							}
 						},
 						{
-							"name": "Procesar Dim Fact transacciones_copy1",
+							"name": "Procesar Dim Fact transacciones",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Procesar Dim Cliente_copy1",
+									"activity": "Procesar Dim Cliente",
 									"dependencyConditions": [
 										"Succeeded"
 									]
 								},
 								{
-									"activity": "Procesar Dim Producto_copy1",
+									"activity": "Procesar Dim Producto",
 									"dependencyConditions": [
 										"Succeeded"
 									]
