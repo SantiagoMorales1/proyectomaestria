@@ -1,0 +1,17 @@
+{
+	"name": "FF_Parquet",
+	"properties": {
+		"content": {
+			"query": "CREATE EXTERNAL FILE FORMAT [SynapseParquetFormat] \nWITH (\n\tFORMAT_TYPE = PARQUET\n)\nGO\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
