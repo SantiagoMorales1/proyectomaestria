@@ -1,0 +1,17 @@
+{
+	"name": "EX_DS_BLOLB",
+	"properties": {
+		"content": {
+			"query": "CREATE EXTERNAL DATA SOURCE [stagedata_datalakeproyectomaestria_dfs_core_windows_net] WITH \n(\tTYPE = HADOOP,\n\tLOCATION = N'abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net'\n);\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "sqlpoolproyectomaestria",
+				"poolName": "sqlpoolproyectomaestria"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
