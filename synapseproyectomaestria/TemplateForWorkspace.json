@@ -1619,7 +1619,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f22e99e5-0cce-49ed-bb15-39c9dd0eeec9"
+						"spark.autotune.trackingId": "3062c8fa-37ef-4413-8224-6a2e544e6aa2"
 					}
 				},
 				"metadata": {
@@ -1644,13 +1644,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -1659,7 +1661,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 1
 					},
 					{
 						"cell_type": "code",
@@ -1690,7 +1692,7 @@
 							"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -1712,7 +1714,7 @@
 							"name = \"Extracto_240056997_202209_FIDUCUENTA_3940\""
 						],
 						"outputs": [],
-						"execution_count": 4
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -1733,7 +1735,7 @@
 							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -1754,7 +1756,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -1783,7 +1785,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 7
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -1800,10 +1802,10 @@
 							"collapsed": false
 						},
 						"source": [
-							"#display (df_formated)"
+							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 16
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -3827,7 +3829,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
+				"runtimeState": "Started",
 				"pipelines": [
 					{
 						"pipelineReference": {
