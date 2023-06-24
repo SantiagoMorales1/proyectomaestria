@@ -416,7 +416,10 @@
 											"scripts": [
 												{
 													"type": "Query",
-													"text": "update params.datausers\nset procesado = 2 \nwhere procesado = 1 \nand "
+													"text": {
+														"value": "update params.datausers\nset procesado = 2 \nwhere procesado = 1 \nand pdfname = item().pdfname",
+														"type": "Expression"
+													}
 												}
 											],
 											"scriptBlockExecutionTimeout": "02:00:00"
