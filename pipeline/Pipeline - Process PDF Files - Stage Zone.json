@@ -271,7 +271,7 @@
 										"value": "Fondos de Inversion",
 										"activities": [
 											{
-												"name": "Reading Raw Data - StageData Zone - Fondo de Inversion_copy1",
+												"name": "Reading Raw Data - StageData Zone - Fondo de Inversion",
 												"type": "SynapseNotebook",
 												"dependsOn": [],
 												"policy": {
@@ -289,19 +289,31 @@
 													},
 													"parameters": {
 														"user": {
-															"value": "bsmoralesg@outlook.com",
+															"value": {
+																"value": "@item().usuario",
+																"type": "Expression"
+															},
 															"type": "string"
 														},
 														"type": {
-															"value": "Tarjeta Credito",
+															"value": {
+																"value": "@item().type",
+																"type": "Expression"
+															},
 															"type": "string"
 														},
 														"fecha": {
-															"value": "10012023",
+															"value": {
+																"value": "@item().fecha",
+																"type": "Expression"
+															},
 															"type": "string"
 														},
 														"name": {
-															"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
+															"value": {
+																"value": "@replace(item().pdfname,'.pdf','')",
+																"type": "Expression"
+															},
 															"type": "string"
 														}
 													},
