@@ -336,104 +336,104 @@
 									}
 								]
 							}
-						},
-						{
-							"name": "Procesar Dim Cliente",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [
-								{
-									"activity": "Validar Tipo Producto_copy1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Cliente]"
-							},
-							"linkedServiceName": {
-								"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-								"type": "LinkedServiceReference",
-								"parameters": {
-									"DBName": "sqlpoolproyectomaestria"
-								}
-							}
-						},
-						{
-							"name": "Procesar Dim Producto",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [
-								{
-									"activity": "Validar Tipo Producto_copy1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
-							},
-							"linkedServiceName": {
-								"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-								"type": "LinkedServiceReference",
-								"parameters": {
-									"DBName": "sqlpoolproyectomaestria"
-								}
-							}
-						},
-						{
-							"name": "Procesar Dim Fact transacciones",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [
-								{
-									"activity": "Procesar Dim Cliente",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								},
-								{
-									"activity": "Procesar Dim Producto",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
-							},
-							"linkedServiceName": {
-								"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-								"type": "LinkedServiceReference",
-								"parameters": {
-									"DBName": "sqlpoolproyectomaestria"
-								}
-							}
 						}
 					]
+				}
+			},
+			{
+				"name": "Procesar Dim Cliente",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Para Cada Proceso",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Cliente]"
+				},
+				"linkedServiceName": {
+					"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": "sqlpoolproyectomaestria"
+					}
+				}
+			},
+			{
+				"name": "Procesar Dim Producto",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Para Cada Proceso",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
+				},
+				"linkedServiceName": {
+					"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": "sqlpoolproyectomaestria"
+					}
+				}
+			},
+			{
+				"name": "Procesar Dim Fact transacciones",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Procesar Dim Cliente",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Procesar Dim Producto",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
+				},
+				"linkedServiceName": {
+					"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": "sqlpoolproyectomaestria"
+					}
 				}
 			}
 		],
