@@ -1169,7 +1169,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "42f27315-9949-4a27-bc5e-676707f131eb"
+						"spark.autotune.trackingId": "819333d3-cc87-44d9-8e45-fc0fa26ec5f0"
 					}
 				},
 				"metadata": {
@@ -1217,7 +1217,7 @@
 							"import io"
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 15
 					},
 					{
 						"cell_type": "code",
@@ -1240,7 +1240,7 @@
 							"    .getOrCreate()"
 						],
 						"outputs": [],
-						"execution_count": 138
+						"execution_count": 16
 					},
 					{
 						"cell_type": "code",
@@ -1261,13 +1261,13 @@
 						"source": [
 							"#Capturar Parametros\r\n",
 							"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
-							"pdf_type = \"Tarjeta Credito\"\r\n",
-							"#pdf_type = \"Cuenta Ahorros\"\r\n",
+							"#pdf_type = \"Tarjeta Credito\"\r\n",
+							"pdf_type = \"Cuenta Ahorros\"\r\n",
 							"#pdf_type = \"Fondos de Inversion\"\r\n",
-							"pdf_fecha = \"10012023\"\r\n",
+							"pdf_fecha = \"2023-06-24\"\r\n",
 							"\r\n",
 							"#Tarjeta Credito\r\n",
-							"file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
+							"#file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
 							"#file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
 							"#file_name = \"Extracto_392576648_202304_TARJETA_VISA_2166.pdf\"\r\n",
 							"#file_name = \"Extracto_369280261_202303_TARJETA_VISA_2166.pdf\"\r\n",
@@ -1277,7 +1277,7 @@
 							"#Cuenta de Ahorrros\r\n",
 							"\r\n",
 							"#file_name = \"Extracto_49243429_202112_CTA_AHORROS_5557.pdf\"\r\n",
-							"#file_name = \"Extracto_240056999_202209_CTA_AHORROS_5557.pdf\"\r\n",
+							"file_name = \"Extracto_240056999_202209_CTA_AHORROS_5557.pdf\"\r\n",
 							"#file_name = \"Extracto_307612445_202212_CTA_AHORROS_5557.pdf\"\r\n",
 							"#file_name = \"Extracto_375992443_202303_CTA_AHORROS_5557.pdf\"\r\n",
 							"\r\n",
@@ -1294,7 +1294,7 @@
 							"pdf_password = \"1233491047\""
 						],
 						"outputs": [],
-						"execution_count": 139
+						"execution_count": 17
 					},
 					{
 						"cell_type": "code",
@@ -1320,7 +1320,7 @@
 							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_type+\"/Raw/\"+pdf_fecha+\"/\"+pdf_user+\"/\"+file_name+\"/\""
 						],
 						"outputs": [],
-						"execution_count": 140
+						"execution_count": 18
 					},
 					{
 						"cell_type": "code",
@@ -1340,7 +1340,7 @@
 							"print(path_sink)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 19
 					},
 					{
 						"cell_type": "code",
@@ -1374,7 +1374,7 @@
 							" "
 						],
 						"outputs": [],
-						"execution_count": 141
+						"execution_count": 20
 					},
 					{
 						"cell_type": "code",
@@ -1450,7 +1450,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 143
+						"execution_count": 21
 					},
 					{
 						"cell_type": "code",
@@ -1474,7 +1474,7 @@
 							"df_RawDat.repartition(1).write.mode(\"overwrite\").parquet(path_sink)"
 						],
 						"outputs": [],
-						"execution_count": 144
+						"execution_count": 22
 					},
 					{
 						"cell_type": "code",
@@ -1491,29 +1491,10 @@
 							"collapsed": false
 						},
 						"source": [
-							"display(df_RawDat)"
+							"#display(df_RawDat)"
 						],
 						"outputs": [],
-						"execution_count": null
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							""
-						],
-						"outputs": [],
-						"execution_count": null
+						"execution_count": 23
 					}
 				]
 			},
