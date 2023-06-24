@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "bbef0bbb-82de-4125-a86e-4aa13fa09a79"
+				"spark.autotune.trackingId": "dd91a498-4477-483f-94c1-50a6c2593bb5"
 			}
 		},
 		"metadata": {
@@ -314,7 +314,7 @@
 					"df_RawDat = spark.createDataFrame(ArrayRawData, schemarawdata)\r\n",
 					"\r\n",
 					"# crear parquet file\r\n",
-					"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
+					"df_RawDat.repartition(1).write.mode(\"overwrite\").parquet(path_sink)"
 				],
 				"execution_count": 144
 			},
