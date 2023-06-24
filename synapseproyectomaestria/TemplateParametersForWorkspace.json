@@ -10,6 +10,9 @@
 		},
 		"synapseproyectomaestria-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://datalakeproyectomaestria.dfs.core.windows.net"
+		},
+		"TRG porcesar datos_properties_typeProperties_scope": {
+			"value": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Storage/storageAccounts/datalakeproyectomaestria"
 		}
 	}
 }
