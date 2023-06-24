@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "909db499-dd5b-42e2-ae03-2d82151a8392"
+				"spark.autotune.trackingId": "f22e99e5-0cce-49ed-bb15-39c9dd0eeec9"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 82
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
@@ -90,7 +90,7 @@
 					"#name = \"Extracto_307612445_202212_CTA_AHORROS_5557\"\r\n",
 					"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 				],
-				"execution_count": 83
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -111,7 +111,7 @@
 					"fecha = \"2023-06-24\"\r\n",
 					"name = \"Extracto_240056997_202209_FIDUCUENTA_3940\""
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -131,7 +131,7 @@
 					"\r\n",
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 				],
-				"execution_count": 84
+				"execution_count": 5
 			},
 			{
 				"cell_type": "code",
@@ -151,7 +151,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": 85
+				"execution_count": 6
 			},
 			{
 				"cell_type": "code",
@@ -179,7 +179,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": 86
+				"execution_count": 7
 			},
 			{
 				"cell_type": "code",
@@ -198,7 +198,7 @@
 				"source": [
 					"#display (df_formated)"
 				],
-				"execution_count": 87
+				"execution_count": 16
 			},
 			{
 				"cell_type": "code",
@@ -221,10 +221,10 @@
 					"Email = user\r\n",
 					"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 3).first()[0]\r\n",
 					"\r\n",
-					"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 5).first()[0]\r\n",
+					"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
 					"CiudadData = CiudadData.replace(\"$\",\"\")\r\n",
 					"CiudadData = CiudadData.replace(\"D.C.\",\"\")\r\n",
-					"CiudadData = CiudadData.split(\"  \")\r\n",
+					"CiudadData = CiudadData.split(\" \")\r\n",
 					"\r\n",
 					"CiudadData[0] = CiudadData[0].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
 					"Ciudad_1 = CiudadData[0].strip()\r\n",
@@ -247,7 +247,26 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 88
+				"execution_count": 20
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"display(df_Cliente)"
+				],
+				"execution_count": 21
 			},
 			{
 				"cell_type": "code",
