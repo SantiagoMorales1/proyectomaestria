@@ -15,6 +15,10 @@
 		"synapseproyectomaestria-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakeproyectomaestria.dfs.core.windows.net"
+		},
+		"TGR_Procesar_Data_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Storage/storageAccounts/datalakeproyectomaestria"
 		}
 	},
 	"variables": {
@@ -3816,6 +3820,37 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/TGR_Procesar_Data')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Pipeline - Process PDF Files - Stage Zone",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/stagefiles/blobs/",
+					"blobPathEndsWith": ".pdf",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('TGR_Procesar_Data_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Pipeline - Process PDF Files - Stage Zone')]"
+			]
 		}
 	]
 }
