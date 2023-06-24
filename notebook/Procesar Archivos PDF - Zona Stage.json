@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fa0fb876-25a0-4acf-b853-b93493afc0d3"
+				"spark.autotune.trackingId": "ae3eaf8e-689c-48a8-8c32-0c35d0757d7e"
 			}
 		},
 		"metadata": {
@@ -217,7 +217,7 @@
 				"source": [
 					"#Procesar informacion - Capturar informacion\r\n",
 					"\r\n",
-					"\r\n",
+					"\"\"\"\r\n",
 					"# Leer the PDF file como bytes\r\n",
 					"pdf_bytes = spark.read \\\r\n",
 					"    .format(\"binaryFile\") \\\r\n",
@@ -253,7 +253,8 @@
 					"\r\n",
 					"# Cerrar el objeto StringIO\r\n",
 					"device.close()\r\n",
-					"retstr.close()"
+					"retstr.close()\r\n",
+					"\"\"\""
 				],
 				"execution_count": 142
 			},
