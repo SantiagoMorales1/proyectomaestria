@@ -1,5 +1,5 @@
 {
-	"name": "SQL script 2",
+	"name": "TBL_params_ConfigUser",
 	"properties": {
 		"content": {
 			"query": "CREATE TABLE params.ConfigUser (\n    id bigint identity(1,1) not null,\n    [user] varchar(80) not null,\n    PASSWORD varchar(80) null\n\n)\n",
