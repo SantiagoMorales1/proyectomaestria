@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlPoolSource",
-						"sqlReaderQuery": "select * from params.datausers \nwhere password is not null",
+						"sqlReaderQuery": "select * from params.datausers \nwhere password is not null and procesado = 0",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
@@ -32,7 +32,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Capturar ultima invocacion",
+						"activity": "Cambio status a en proceso",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -434,6 +434,43 @@
 					"parameters": {
 						"DBName": "sqlpoolproyectomaestria"
 					}
+				}
+			},
+			{
+				"name": "Cambio status a en proceso",
+				"description": "",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Capturar ultima invocacion",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": "sqlpoolproyectomaestria"
+					}
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "update params.datausers\nset procesado = 1 \nwhere procesado = 1 "
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
