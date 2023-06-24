@@ -1,0 +1,18 @@
+{
+	"name": "TGR Fondos de Inversion",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/stagedata/blobs/Fondos de Inversion/Raw/",
+			"blobPathEndsWith": ".parquet",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Storage/storageAccounts/datalakeproyectomaestria",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}
