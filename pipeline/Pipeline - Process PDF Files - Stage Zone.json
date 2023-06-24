@@ -137,7 +137,7 @@
 										"value": "Tarjeta Credito",
 										"activities": [
 											{
-												"name": "Reading Raw Data - StageData Zone - Tarjeta de Credito_copy1",
+												"name": "Reading Raw Data - StageData Zone - Tarjeta de Credito",
 												"type": "SynapseNotebook",
 												"dependsOn": [],
 												"policy": {
@@ -155,19 +155,31 @@
 													},
 													"parameters": {
 														"user": {
-															"value": "bsmoralesg@outlook.com",
+															"value": {
+																"value": "@item().usuario",
+																"type": "Expression"
+															},
 															"type": "string"
 														},
 														"type": {
-															"value": "Tarjeta Credito",
+															"value": {
+																"value": "@item().type",
+																"type": "Expression"
+															},
 															"type": "string"
 														},
 														"fecha": {
-															"value": "10012023",
+															"value": {
+																"value": "@item().password",
+																"type": "Expression"
+															},
 															"type": "string"
 														},
 														"name": {
-															"value": "Extracto_403340132_202305_TARJETA_VISA_2166",
+															"value": {
+																"value": "@replace(item().pdfname,'.pdf','')",
+																"type": "Expression"
+															},
 															"type": "string"
 														}
 													},
