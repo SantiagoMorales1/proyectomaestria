@@ -66,25 +66,37 @@
 								"parameters": {
 									"pdf_user": {
 										"value": {
-											"value": "bsmoralesg@outlook.com",
+											"value": "@item().usuario",
 											"type": "Expression"
 										},
 										"type": "string"
 									},
 									"pdf_type": {
-										"value": "Tarjeta Credito",
+										"value": {
+											"value": "@item().type",
+											"type": "Expression"
+										},
 										"type": "string"
 									},
 									"pdf_fecha": {
-										"value": "10012023",
+										"value": {
+											"value": "@item().fecha",
+											"type": "Expression"
+										},
 										"type": "string"
 									},
 									"file_name": {
-										"value": "Extracto_7358651_202108_TARJETA_VISA_2166.pdf",
+										"value": {
+											"value": "@item().pdfname",
+											"type": "Expression"
+										},
 										"type": "string"
 									},
 									"pdf_password": {
-										"value": "1233491047",
+										"value": {
+											"value": "@item().password",
+											"type": "Expression"
+										},
 										"type": "string"
 									}
 								},
@@ -117,7 +129,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"on": {
-									"value": "@activity('Capturar ultima invocacion').output.firstRow.type",
+									"value": "@item().type",
 									"type": "Expression"
 								},
 								"cases": [
