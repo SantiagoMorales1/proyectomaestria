@@ -28,11 +28,11 @@
 				}
 			},
 			{
-				"name": "Para Cada Proceso",
-				"type": "ForEach",
+				"name": "Valida Archivos a procesar",
+				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "Cambio status a en proceso",
+						"activity": "Capturar ultima invocacion",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -40,15 +40,357 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"items": {
-						"value": "@activity('Capturar ultima invocacion').output.value",
+					"expression": {
+						"value": "@greaterOrEquals(activity('Capturar ultima invocacion').output.count,1)",
 						"type": "Expression"
 					},
-					"isSequential": true,
-					"activities": [
+					"ifTrueActivities": [
 						{
-							"name": "Reading PDF Files - Stagefiles Zone",
-							"type": "SynapseNotebook",
+							"name": "Cambio status a en proceso",
+							"description": "",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"DBName": "sqlpoolproyectomaestria"
+								}
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": "update params.datausers\nset procesado = 1 \nwhere procesado = 1 "
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "Para Cada Proceso",
+							"type": "ForEach",
+							"dependsOn": [
+								{
+									"activity": "Cambio status a en proceso",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"items": {
+									"value": "@activity('Capturar ultima invocacion').output.value",
+									"type": "Expression"
+								},
+								"isSequential": true,
+								"activities": [
+									{
+										"name": "Reading PDF Files - Stagefiles Zone",
+										"type": "SynapseNotebook",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"notebook": {
+												"referenceName": "Procesar Archivos PDF - Zona Stage",
+												"type": "NotebookReference"
+											},
+											"parameters": {
+												"pdf_user": {
+													"value": {
+														"value": "@item().usuario",
+														"type": "Expression"
+													},
+													"type": "string"
+												},
+												"pdf_type": {
+													"value": {
+														"value": "@item().type",
+														"type": "Expression"
+													},
+													"type": "string"
+												},
+												"pdf_fecha": {
+													"value": {
+														"value": "@item().fecha",
+														"type": "Expression"
+													},
+													"type": "string"
+												},
+												"file_name": {
+													"value": {
+														"value": "@item().pdfname",
+														"type": "Expression"
+													},
+													"type": "string"
+												},
+												"pdf_password": {
+													"value": {
+														"value": "@item().password",
+														"type": "Expression"
+													},
+													"type": "string"
+												}
+											},
+											"snapshot": true,
+											"sparkPool": {
+												"referenceName": "spproymaestria",
+												"type": "BigDataPoolReference"
+											},
+											"executorSize": "Small",
+											"conf": {
+												"spark.dynamicAllocation.enabled": false,
+												"spark.dynamicAllocation.minExecutors": 1,
+												"spark.dynamicAllocation.maxExecutors": 1
+											},
+											"driverSize": "Small",
+											"numExecutors": 1
+										}
+									},
+									{
+										"name": "Validar Tipo Producto",
+										"type": "Switch",
+										"dependsOn": [
+											{
+												"activity": "Reading PDF Files - Stagefiles Zone",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"userProperties": [],
+										"typeProperties": {
+											"on": {
+												"value": "@item().type",
+												"type": "Expression"
+											},
+											"cases": [
+												{
+													"value": "Tarjeta Credito",
+													"activities": [
+														{
+															"name": "Reading Raw Data - StageData Zone - Tarjeta de Credito",
+															"type": "SynapseNotebook",
+															"dependsOn": [],
+															"policy": {
+																"timeout": "0.12:00:00",
+																"retry": 0,
+																"retryIntervalInSeconds": 30,
+																"secureOutput": false,
+																"secureInput": false
+															},
+															"userProperties": [],
+															"typeProperties": {
+																"notebook": {
+																	"referenceName": "Procesar Data Cruda PDF - Zona Data - Tarjeta Credito",
+																	"type": "NotebookReference"
+																},
+																"parameters": {
+																	"user": {
+																		"value": {
+																			"value": "@item().usuario",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	},
+																	"type": {
+																		"value": {
+																			"value": "@item().type",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	},
+																	"fecha": {
+																		"value": {
+																			"value": "@item().password",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	},
+																	"name": {
+																		"value": {
+																			"value": "@replace(item().pdfname,'.pdf','')",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	}
+																},
+																"snapshot": true,
+																"sparkPool": {
+																	"referenceName": "spproymaestria",
+																	"type": "BigDataPoolReference"
+																},
+																"executorSize": "Small",
+																"conf": {
+																	"spark.dynamicAllocation.enabled": false,
+																	"spark.dynamicAllocation.minExecutors": 1,
+																	"spark.dynamicAllocation.maxExecutors": 1
+																},
+																"driverSize": "Small",
+																"numExecutors": 1
+															}
+														}
+													]
+												},
+												{
+													"value": "Cuenta Ahorros",
+													"activities": [
+														{
+															"name": "Reading Raw Data - StageData Zone - Cuenta Ahorro",
+															"type": "SynapseNotebook",
+															"dependsOn": [],
+															"policy": {
+																"timeout": "0.12:00:00",
+																"retry": 0,
+																"retryIntervalInSeconds": 30,
+																"secureOutput": false,
+																"secureInput": false
+															},
+															"userProperties": [],
+															"typeProperties": {
+																"notebook": {
+																	"referenceName": "Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro",
+																	"type": "NotebookReference"
+																},
+																"parameters": {
+																	"user": {
+																		"value": {
+																			"value": "@item().usuario",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	},
+																	"type": {
+																		"value": {
+																			"value": "@item().type",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	},
+																	"fecha": {
+																		"value": {
+																			"value": "@item().fecha",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	},
+																	"name": {
+																		"value": {
+																			"value": "@replace(item().pdfname,'.pdf','')",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	}
+																},
+																"snapshot": true,
+																"sparkPool": {
+																	"referenceName": "spproymaestria",
+																	"type": "BigDataPoolReference"
+																},
+																"executorSize": "Small",
+																"conf": {
+																	"spark.dynamicAllocation.enabled": false,
+																	"spark.dynamicAllocation.minExecutors": 1,
+																	"spark.dynamicAllocation.maxExecutors": 1
+																},
+																"driverSize": "Small",
+																"numExecutors": 1
+															}
+														}
+													]
+												},
+												{
+													"value": "Fondos de Inversion",
+													"activities": [
+														{
+															"name": "Reading Raw Data - StageData Zone - Fondo de Inversion",
+															"type": "SynapseNotebook",
+															"dependsOn": [],
+															"policy": {
+																"timeout": "0.12:00:00",
+																"retry": 0,
+																"retryIntervalInSeconds": 30,
+																"secureOutput": false,
+																"secureInput": false
+															},
+															"userProperties": [],
+															"typeProperties": {
+																"notebook": {
+																	"referenceName": "Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro",
+																	"type": "NotebookReference"
+																},
+																"parameters": {
+																	"user": {
+																		"value": {
+																			"value": "@item().usuario",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	},
+																	"type": {
+																		"value": {
+																			"value": "@item().type",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	},
+																	"fecha": {
+																		"value": {
+																			"value": "@item().fecha",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	},
+																	"name": {
+																		"value": {
+																			"value": "@replace(item().pdfname,'.pdf','')",
+																			"type": "Expression"
+																		},
+																		"type": "string"
+																	}
+																},
+																"snapshot": true,
+																"sparkPool": {
+																	"referenceName": "spproymaestria",
+																	"type": "BigDataPoolReference"
+																},
+																"executorSize": "Small",
+																"conf": {
+																	"spark.dynamicAllocation.enabled": false,
+																	"spark.dynamicAllocation.minExecutors": 1,
+																	"spark.dynamicAllocation.maxExecutors": 1
+																},
+																"driverSize": "Small",
+																"numExecutors": 1
+															}
+														}
+													]
+												}
+											]
+										}
+									}
+								]
+							}
+						},
+						{
+							"name": "Procesar Dim Cliente",
+							"type": "SqlServerStoredProcedure",
 							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
@@ -59,418 +401,63 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"notebook": {
-									"referenceName": "Procesar Archivos PDF - Zona Stage",
-									"type": "NotebookReference"
-								},
+								"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Cliente]"
+							},
+							"linkedServiceName": {
+								"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+								"type": "LinkedServiceReference",
 								"parameters": {
-									"pdf_user": {
-										"value": {
-											"value": "@item().usuario",
-											"type": "Expression"
-										},
-										"type": "string"
-									},
-									"pdf_type": {
-										"value": {
-											"value": "@item().type",
-											"type": "Expression"
-										},
-										"type": "string"
-									},
-									"pdf_fecha": {
-										"value": {
-											"value": "@item().fecha",
-											"type": "Expression"
-										},
-										"type": "string"
-									},
-									"file_name": {
-										"value": {
-											"value": "@item().pdfname",
-											"type": "Expression"
-										},
-										"type": "string"
-									},
-									"pdf_password": {
-										"value": {
-											"value": "@item().password",
-											"type": "Expression"
-										},
-										"type": "string"
-									}
-								},
-								"snapshot": true,
-								"sparkPool": {
-									"referenceName": "spproymaestria",
-									"type": "BigDataPoolReference"
-								},
-								"executorSize": "Small",
-								"conf": {
-									"spark.dynamicAllocation.enabled": false,
-									"spark.dynamicAllocation.minExecutors": 1,
-									"spark.dynamicAllocation.maxExecutors": 1
-								},
-								"driverSize": "Small",
-								"numExecutors": 1
+									"DBName": "sqlpoolproyectomaestria"
+								}
 							}
 						},
 						{
-							"name": "Validar Tipo Producto",
-							"type": "Switch",
-							"dependsOn": [
-								{
-									"activity": "Reading PDF Files - Stagefiles Zone",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"name": "Procesar Dim Producto",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
-								"on": {
-									"value": "@item().type",
-									"type": "Expression"
-								},
-								"cases": [
-									{
-										"value": "Tarjeta Credito",
-										"activities": [
-											{
-												"name": "Reading Raw Data - StageData Zone - Tarjeta de Credito",
-												"type": "SynapseNotebook",
-												"dependsOn": [],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"notebook": {
-														"referenceName": "Procesar Data Cruda PDF - Zona Data - Tarjeta Credito",
-														"type": "NotebookReference"
-													},
-													"parameters": {
-														"user": {
-															"value": {
-																"value": "@item().usuario",
-																"type": "Expression"
-															},
-															"type": "string"
-														},
-														"type": {
-															"value": {
-																"value": "@item().type",
-																"type": "Expression"
-															},
-															"type": "string"
-														},
-														"fecha": {
-															"value": {
-																"value": "@item().password",
-																"type": "Expression"
-															},
-															"type": "string"
-														},
-														"name": {
-															"value": {
-																"value": "@replace(item().pdfname,'.pdf','')",
-																"type": "Expression"
-															},
-															"type": "string"
-														}
-													},
-													"snapshot": true,
-													"sparkPool": {
-														"referenceName": "spproymaestria",
-														"type": "BigDataPoolReference"
-													},
-													"executorSize": "Small",
-													"conf": {
-														"spark.dynamicAllocation.enabled": false,
-														"spark.dynamicAllocation.minExecutors": 1,
-														"spark.dynamicAllocation.maxExecutors": 1
-													},
-													"driverSize": "Small",
-													"numExecutors": 1
-												}
-											}
-										]
-									},
-									{
-										"value": "Cuenta Ahorros",
-										"activities": [
-											{
-												"name": "Reading Raw Data - StageData Zone - Cuenta Ahorro",
-												"type": "SynapseNotebook",
-												"dependsOn": [],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"notebook": {
-														"referenceName": "Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro",
-														"type": "NotebookReference"
-													},
-													"parameters": {
-														"user": {
-															"value": {
-																"value": "@item().usuario",
-																"type": "Expression"
-															},
-															"type": "string"
-														},
-														"type": {
-															"value": {
-																"value": "@item().type",
-																"type": "Expression"
-															},
-															"type": "string"
-														},
-														"fecha": {
-															"value": {
-																"value": "@item().fecha",
-																"type": "Expression"
-															},
-															"type": "string"
-														},
-														"name": {
-															"value": {
-																"value": "@replace(item().pdfname,'.pdf','')",
-																"type": "Expression"
-															},
-															"type": "string"
-														}
-													},
-													"snapshot": true,
-													"sparkPool": {
-														"referenceName": "spproymaestria",
-														"type": "BigDataPoolReference"
-													},
-													"executorSize": "Small",
-													"conf": {
-														"spark.dynamicAllocation.enabled": false,
-														"spark.dynamicAllocation.minExecutors": 1,
-														"spark.dynamicAllocation.maxExecutors": 1
-													},
-													"driverSize": "Small",
-													"numExecutors": 1
-												}
-											}
-										]
-									},
-									{
-										"value": "Fondos de Inversion",
-										"activities": [
-											{
-												"name": "Reading Raw Data - StageData Zone - Fondo de Inversion",
-												"type": "SynapseNotebook",
-												"dependsOn": [],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"notebook": {
-														"referenceName": "Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro",
-														"type": "NotebookReference"
-													},
-													"parameters": {
-														"user": {
-															"value": {
-																"value": "@item().usuario",
-																"type": "Expression"
-															},
-															"type": "string"
-														},
-														"type": {
-															"value": {
-																"value": "@item().type",
-																"type": "Expression"
-															},
-															"type": "string"
-														},
-														"fecha": {
-															"value": {
-																"value": "@item().fecha",
-																"type": "Expression"
-															},
-															"type": "string"
-														},
-														"name": {
-															"value": {
-																"value": "@replace(item().pdfname,'.pdf','')",
-																"type": "Expression"
-															},
-															"type": "string"
-														}
-													},
-													"snapshot": true,
-													"sparkPool": {
-														"referenceName": "spproymaestria",
-														"type": "BigDataPoolReference"
-													},
-													"executorSize": "Small",
-													"conf": {
-														"spark.dynamicAllocation.enabled": false,
-														"spark.dynamicAllocation.minExecutors": 1,
-														"spark.dynamicAllocation.maxExecutors": 1
-													},
-													"driverSize": "Small",
-													"numExecutors": 1
-												}
-											}
-										]
-									}
-								]
+								"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
+							},
+							"linkedServiceName": {
+								"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"DBName": "sqlpoolproyectomaestria"
+								}
+							}
+						},
+						{
+							"name": "Procesar Dim Fact transacciones",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
+							},
+							"linkedServiceName": {
+								"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"DBName": "sqlpoolproyectomaestria"
+								}
 							}
 						}
 					]
-				}
-			},
-			{
-				"name": "Procesar Dim Cliente",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Para Cada Proceso",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Cliente]"
-				},
-				"linkedServiceName": {
-					"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"DBName": "sqlpoolproyectomaestria"
-					}
-				}
-			},
-			{
-				"name": "Procesar Dim Producto",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Para Cada Proceso",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
-				},
-				"linkedServiceName": {
-					"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"DBName": "sqlpoolproyectomaestria"
-					}
-				}
-			},
-			{
-				"name": "Procesar Dim Fact transacciones",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Procesar Dim Cliente",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Procesar Dim Producto",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
-				},
-				"linkedServiceName": {
-					"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"DBName": "sqlpoolproyectomaestria"
-					}
-				}
-			},
-			{
-				"name": "Cambio status a en proceso",
-				"description": "",
-				"type": "Script",
-				"dependsOn": [
-					{
-						"activity": "Capturar ultima invocacion",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"linkedServiceName": {
-					"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"DBName": "sqlpoolproyectomaestria"
-					}
-				},
-				"typeProperties": {
-					"scripts": [
-						{
-							"type": "Query",
-							"text": "update params.datausers\nset procesado = 1 \nwhere procesado = 1 "
-						}
-					],
-					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
