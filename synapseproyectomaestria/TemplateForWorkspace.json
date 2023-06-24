@@ -15,6 +15,10 @@
 		"synapseproyectomaestria-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakeproyectomaestria.dfs.core.windows.net"
+		},
+		"Trigger 1_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Storage/storageAccounts/datalakeproyectomaestria"
 		}
 	},
 	"variables": {
@@ -1165,7 +1169,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "bbef0bbb-82de-4125-a86e-4aa13fa09a79"
+						"spark.autotune.trackingId": "42f27315-9949-4a27-bc5e-676707f131eb"
 					}
 				},
 				"metadata": {
@@ -1190,13 +1194,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Importando Librerias\r\n",
 							"\r\n",
@@ -1465,7 +1471,7 @@
 							"df_RawDat = spark.createDataFrame(ArrayRawData, schemarawdata)\r\n",
 							"\r\n",
 							"# crear parquet file\r\n",
-							"df_RawDat.write.mode(\"overwrite\").parquet(path_sink)"
+							"df_RawDat.repartition(1).write.mode(\"overwrite\").parquet(path_sink)"
 						],
 						"outputs": [],
 						"execution_count": 144
@@ -1537,7 +1543,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "350926a4-4aae-48f5-94f0-306a78f7a74a"
+						"spark.autotune.trackingId": "32696065-fac9-4499-b2a8-d5246584fd3a"
 					}
 				},
 				"metadata": {
@@ -1579,7 +1585,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 82
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -1610,7 +1616,7 @@
 							"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 						],
 						"outputs": [],
-						"execution_count": 83
+						"execution_count": 3
 					},
 					{
 						"cell_type": "code",
@@ -1631,7 +1637,7 @@
 							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": 84
+						"execution_count": 5
 					},
 					{
 						"cell_type": "code",
@@ -1652,7 +1658,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 85
+						"execution_count": 6
 					},
 					{
 						"cell_type": "code",
@@ -1681,7 +1687,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 86
+						"execution_count": 7
 					},
 					{
 						"cell_type": "code",
@@ -1701,7 +1707,7 @@
 							"#display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 87
+						"execution_count": 16
 					},
 					{
 						"cell_type": "code",
@@ -1724,10 +1730,10 @@
 							"Email = user\r\n",
 							"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 3).first()[0]\r\n",
 							"\r\n",
-							"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 5).first()[0]\r\n",
+							"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
 							"CiudadData = CiudadData.replace(\"$\",\"\")\r\n",
 							"CiudadData = CiudadData.replace(\"D.C.\",\"\")\r\n",
-							"CiudadData = CiudadData.split(\"  \")\r\n",
+							"CiudadData = CiudadData.split(\" \")\r\n",
 							"\r\n",
 							"CiudadData[0] = CiudadData[0].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
 							"Ciudad_1 = CiudadData[0].strip()\r\n",
@@ -1751,7 +1757,27 @@
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 88
+						"execution_count": 20
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display(df_Cliente)"
+						],
+						"outputs": [],
+						"execution_count": 21
 					},
 					{
 						"cell_type": "code",
@@ -3700,6 +3726,37 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Trigger 1')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Pipeline - Process PDF Files - Stage Zone",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/stagedata/blobs/Fondos de Inversion/Raw/",
+					"blobPathEndsWith": ".parquet",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('Trigger 1_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Pipeline - Process PDF Files - Stage Zone')]"
+			]
 		}
 	]
 }
