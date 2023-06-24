@@ -47,7 +47,7 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Reading PDF Files - Stagefiles Zone_copy1",
+							"name": "Reading PDF Files - Stagefiles Zone",
 							"type": "SynapseNotebook",
 							"dependsOn": [],
 							"policy": {
@@ -120,7 +120,7 @@
 							"type": "Switch",
 							"dependsOn": [
 								{
-									"activity": "Reading PDF Files - Stagefiles Zone_copy1",
+									"activity": "Reading PDF Files - Stagefiles Zone",
 									"dependencyConditions": [
 										"Succeeded"
 									]
