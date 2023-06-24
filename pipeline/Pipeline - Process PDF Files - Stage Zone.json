@@ -69,7 +69,7 @@
 								"scripts": [
 									{
 										"type": "Query",
-										"text": "update params.datausers\nset procesado = 1 \nwhere procesado = 1 "
+										"text": "update params.datausers\nset procesado = 1 \nwhere procesado = 0"
 									}
 								],
 								"scriptBlockExecutionTimeout": "02:00:00"
