@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlPoolSource",
-						"sqlReaderQuery": "select * from params.datausers \nwhere password is not null and procesado = 0",
+						"sqlReaderQuery": "select \n    prm.usuario,\n    prm.fecha,\n    prm.type,\n    prm.pdfname,\n    usr.password,\n    prm.procesado\nfrom params.datausers prm\ninner join params.ConfigUser usr on (prm.usuario = usr.[user])\nwhere usr.password is not null and prm.procesado = 0",
 						"queryTimeout": "02:00:00"
 					},
 					"dataset": {
