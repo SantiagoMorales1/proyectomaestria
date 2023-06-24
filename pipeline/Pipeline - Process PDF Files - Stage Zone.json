@@ -204,7 +204,7 @@
 										"value": "Cuenta Ahorros",
 										"activities": [
 											{
-												"name": "Reading Raw Data - StageData Zone - Cuenta Ahorro_copy1",
+												"name": "Reading Raw Data - StageData Zone - Cuenta Ahorro",
 												"type": "SynapseNotebook",
 												"dependsOn": [],
 												"policy": {
