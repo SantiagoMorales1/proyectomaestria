@@ -1027,7 +1027,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "\nselect * from params.datausers\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'",
+					"query": "\nselect * from params.datausers\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'\n\n\ndelete from params.datausers ",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1165,7 +1165,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f1823eee-8038-45df-b43e-82928582a18e"
+						"spark.autotune.trackingId": "bbef0bbb-82de-4125-a86e-4aa13fa09a79"
 					}
 				},
 				"metadata": {
@@ -1190,15 +1190,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importando Librerias\r\n",
 							"\r\n",
