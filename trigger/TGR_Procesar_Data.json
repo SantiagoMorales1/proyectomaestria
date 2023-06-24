@@ -2,7 +2,7 @@
 	"name": "TGR_Procesar_Data",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipelines": [
 			{
 				"pipelineReference": {
