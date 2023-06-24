@@ -15,10 +15,6 @@
 		"synapseproyectomaestria-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakeproyectomaestria.dfs.core.windows.net"
-		},
-		"Trigger 1_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/01c2d20c-2c85-4121-8018-3a801e74d84c/resourceGroups/ProyectoMaestria/providers/Microsoft.Storage/storageAccounts/datalakeproyectomaestria"
 		}
 	},
 	"variables": {
@@ -46,7 +42,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlPoolSource",
-								"sqlReaderQuery": "select * from params.datausers \nwhere password is not null",
+								"sqlReaderQuery": "select \n    prm.usuario,\n    prm.fecha,\n    prm.type,\n    prm.pdfname,\n    usr.password,\n    prm.procesado\nfrom params.datausers prm\ninner join params.ConfigUser usr on (prm.usuario = usr.[user])\nwhere usr.password is not null and prm.procesado = 0",
 								"queryTimeout": "02:00:00"
 							},
 							"dataset": {
@@ -58,11 +54,48 @@
 						}
 					},
 					{
+						"name": "Cambio status a en proceso",
+						"description": "",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Capturar ultima invocacion",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+							"type": "LinkedServiceReference",
+							"parameters": {
+								"DBName": "sqlpoolproyectomaestria"
+							}
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "update params.datausers\nset procesado = 1 \nwhere procesado = 0"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
 						"name": "Para Cada Proceso",
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Capturar ultima invocacion",
+								"activity": "Cambio status a en proceso",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -365,6 +398,46 @@
 												]
 											}
 										]
+									}
+								},
+								{
+									"name": "Cambio status a finalizado",
+									"description": "",
+									"type": "Script",
+									"dependsOn": [
+										{
+											"activity": "Validar Tipo Producto",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"linkedServiceName": {
+										"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"DBName": "sqlpoolproyectomaestria"
+										}
+									},
+									"typeProperties": {
+										"scripts": [
+											{
+												"type": "Query",
+												"text": {
+													"value": "update params.datausers\nset procesado = 2 \nwhere procesado = 1 \nand pdfname = item().pdfname",
+													"type": "Expression"
+												}
+											}
+										],
+										"scriptBlockExecutionTimeout": "02:00:00"
 									}
 								}
 							]
@@ -1031,7 +1104,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "\nselect * from params.datausers\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'\n\n\ndelete from params.datausers ",
+					"query": "\nselect * from params.datausers\nselect * from params.ConfigUser\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'\n\n\ndelete from params.datausers \n\n\nselect \n    prm.usuario,\n    prm.fecha,\n    prm.type,\n    prm.pdfname,\n    usr.password,\n    prm.procesado\nfrom params.datausers prm\ninner join params.ConfigUser usr on (prm.usuario = usr.[user])\nwhere usr.password is not null and prm.procesado = 0",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1126,12 +1199,32 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/TBL_params_ConfigUser')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "CREATE TABLE params.ConfigUser (\n    id bigint identity(1,1) not null,\n    [user] varchar(80) not null,\n    PASSWORD varchar(80) null\n\n)\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "sqlpoolproyectomaestria",
+						"poolName": "sqlpoolproyectomaestria"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/TBL_params_datausers')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "\n--drop table params.datausers \nCreate table params.datausers (\n    id bigint identity (1, 1),\n    usuario varchar(150) not null,\n    fecha varchar(12)  not null,\n    type varchar(20)  not null,\n    pdfname varchar(150)  not null,\n    password varchar(150) null,\n    fecha_registro datetime  not null\n)\n\n",
+					"query": "\n--drop table params.datausers \nCreate table params.datausers (\n    id bigint identity (1, 1),\n    usuario varchar(150) not null,\n    fecha varchar(12)  not null,\n    type varchar(20)  not null,\n    pdfname varchar(150)  not null,\n    procesado int default(0) not null,   \n    fecha_registro datetime  not null\n\n)\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1194,15 +1287,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importando Librerias\r\n",
 							"\r\n",
@@ -1524,7 +1615,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "32696065-fac9-4499-b2a8-d5246584fd3a"
+						"spark.autotune.trackingId": "f22e99e5-0cce-49ed-bb15-39c9dd0eeec9"
 					}
 				},
 				"metadata": {
@@ -1549,15 +1640,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -1598,6 +1687,28 @@
 						],
 						"outputs": [],
 						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"user = \"bsmoralesg@outlook.com\"\r\n",
+							"type = \"Fondos de Inversion\"\r\n",
+							"fecha = \"2023-06-24\"\r\n",
+							"name = \"Extracto_240056997_202209_FIDUCUENTA_3940\""
+						],
+						"outputs": [],
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
@@ -2139,15 +2250,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -3667,18 +3776,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "eastus2"
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/spproymaestria')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -3709,35 +3806,16 @@
 			"location": "eastus2"
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/Trigger 1')]",
-			"type": "Microsoft.Synapse/workspaces/triggers",
+			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Pipeline - Process PDF Files - Stage Zone",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/stagedata/blobs/Fondos de Inversion/Raw/",
-					"blobPathEndsWith": ".parquet",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('Trigger 1_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
 			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/Pipeline - Process PDF Files - Stage Zone')]"
-			]
+			"dependsOn": [],
+			"location": "eastus2"
 		}
 	]
 }
