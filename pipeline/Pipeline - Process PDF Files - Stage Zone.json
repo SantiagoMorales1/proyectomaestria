@@ -207,7 +207,7 @@
 														},
 														"fecha": {
 															"value": {
-																"value": "@item().password",
+																"value": "@item().fecha",
 																"type": "Expression"
 															},
 															"type": "string"
