@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d8bd4721-5661-4e9b-8a15-681addccb5f5"
+				"spark.autotune.trackingId": "8ea1b1ee-3ab2-40c3-a75b-25e34be9cf27"
 			}
 		},
 		"metadata": {
@@ -60,7 +60,7 @@
 					"from pyspark.sql.window import Window\r\n",
 					"from pyspark.sql.functions import *"
 				],
-				"execution_count": 3
+				"execution_count": 103
 			},
 			{
 				"cell_type": "code",
@@ -83,14 +83,14 @@
 					"\r\n",
 					"user = \"bsmoralesg@outlook.com\"\r\n",
 					"type = \"Cuenta Ahorros\"\r\n",
-					"fecha = \"10012023\"\r\n",
+					"fecha = \"2023-07-05\"\r\n",
 					"\r\n",
 					"#name = \"Extracto_49243429_202112_CTA_AHORROS_5557\"\r\n",
 					"#name = \"Extracto_240056999_202209_CTA_AHORROS_5557\"\r\n",
 					"#name = \"Extracto_307612445_202212_CTA_AHORROS_5557\"\r\n",
 					"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 				],
-				"execution_count": null
+				"execution_count": 104
 			},
 			{
 				"cell_type": "code",
@@ -106,12 +106,12 @@
 					}
 				},
 				"source": [
-					"user = \"bsmoralesg@outlook.com\"\r\n",
-					"type = \"Fondos de Inversion\"\r\n",
-					"fecha = \"2023-06-24\"\r\n",
-					"name = \"Extracto_240056997_202209_FIDUCUENTA_3940\""
+					"#user = \"bsmoralesg@outlook.com\"\r\n",
+					"#type = \"Fondos de Inversion\"\r\n",
+					"#fecha = \"2023-06-24\"\r\n",
+					"#name = \"Extracto_240056997_202209_FIDUCUENTA_3940\""
 				],
-				"execution_count": null
+				"execution_count": 105
 			},
 			{
 				"cell_type": "code",
@@ -131,7 +131,7 @@
 					"\r\n",
 					"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 				],
-				"execution_count": null
+				"execution_count": 106
 			},
 			{
 				"cell_type": "code",
@@ -151,7 +151,7 @@
 					"\r\n",
 					"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 				],
-				"execution_count": null
+				"execution_count": 107
 			},
 			{
 				"cell_type": "code",
@@ -179,7 +179,7 @@
 					"Incremental = Window.orderBy(\"pagenumber\",\"index\")\r\n",
 					"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 				],
-				"execution_count": null
+				"execution_count": 108
 			},
 			{
 				"cell_type": "code",
@@ -196,9 +196,9 @@
 					"collapsed": false
 				},
 				"source": [
-					"display (df_formated)"
+					"#display (df_formated)"
 				],
-				"execution_count": null
+				"execution_count": 109
 			},
 			{
 				"cell_type": "code",
@@ -221,10 +221,11 @@
 					"Email = user\r\n",
 					"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 3).first()[0]\r\n",
 					"\r\n",
-					"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
+					"CiudadData = df_formated.select(df_formated.contenido).where((df_formated.x1 >= 130.0) & (df_formated.x1 <= 131.0)).collect()[0].__getitem__('contenido')\r\n",
+					"#CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
 					"CiudadData = CiudadData.replace(\"$\",\"\")\r\n",
 					"CiudadData = CiudadData.replace(\"D.C.\",\"\")\r\n",
-					"CiudadData = CiudadData.split(\" \")\r\n",
+					"CiudadData = CiudadData.split(\"  \")\r\n",
 					"\r\n",
 					"CiudadData[0] = CiudadData[0].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
 					"Ciudad_1 = CiudadData[0].strip()\r\n",
@@ -247,7 +248,7 @@
 					"\r\n",
 					"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 				],
-				"execution_count": 20
+				"execution_count": 110
 			},
 			{
 				"cell_type": "code",
@@ -266,7 +267,7 @@
 				"source": [
 					"display(df_Cliente)"
 				],
-				"execution_count": 21
+				"execution_count": 111
 			},
 			{
 				"cell_type": "code",
@@ -311,7 +312,7 @@
 					"\r\n",
 					"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 				],
-				"execution_count": 89
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -471,7 +472,7 @@
 					"    df_producto = df_producto.union(newRow)\r\n",
 					""
 				],
-				"execution_count": 90
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -497,7 +498,7 @@
 					"#df_producto.show(200)\r\n",
 					""
 				],
-				"execution_count": 91
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -534,7 +535,7 @@
 					"                        df_producto.NumeroProducto \\\r\n",
 					"                        )"
 				],
-				"execution_count": 92
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -555,7 +556,7 @@
 					"#display(df_Producto)\r\n",
 					"#display(df_Transacciones)"
 				],
-				"execution_count": 93
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -586,7 +587,7 @@
 					"df_Transacciones.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Transacciones/\"+path_sink_comp)\r\n",
 					""
 				],
-				"execution_count": 94
+				"execution_count": null
 			}
 		]
 	}
