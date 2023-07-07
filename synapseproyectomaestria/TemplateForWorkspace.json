@@ -1074,12 +1074,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/SP_Manage_Dim_Producto')]",
+			"name": "[concat(parameters('workspaceName'), '/SP_Manage_Dim_Productos')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "-- Procesamiento informacion productos\n\nCREATE PROCEDURE modelo_transacciones.SP_Manage_Dim_Producto\nAS BEGIN\n\n    --Extraer Fechas de PDF - Todas las entidades de cliente\n\n    IF OBJECT_ID(N'tempdb..#Data_Fechas') IS NOT NULL\n    BEGIN\n        DROP TABLE #Data_Fechas\n    END\n\n    Select \n        File_name, \n        Fecha = convert(date,Fecha+'01')\n    into #Data_Fechas    \n    FROM \n        (\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha            \n            FROM    \n                stage.CuentaAhorros_Producto mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.FondoInversion_Producto mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.TarjetaCredito_Producto mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n        ) fechas\n    WHERE LEN(Fecha) = 6\n\n\n    --Consultar informacion de productos\n\n    IF OBJECT_ID(N'tempdb..#Raw_Productos') IS NOT NULL\n    BEGIN\n        DROP TABLE #Raw_Productos\n    END\n    \n    SELECT         \n        TipoProducto,\n        NumeroProducto,\n        Sucursal,\n        Desde,\n        Hasta,\n        ValorUnidad,\n        Rentabilidad,\n        Comision,\n        TasaInteresMVCompra1Mes,\n        TasaInteresMVCompra2MesOMas,\n        TasaInteresMVImpuestos,\n        TasaInteresMVAvances,\n        TasaInteresMVMora,\n        TasaInteresEACompra1Mes,\n        TasaInteresEACompra2MesOMas,\n        TasaInteresEAImpuestos,\n        TasaInteresEAAvances,\n        TasaInteresEAMora,\n        File_name,\n        Fecha,\n        ROW_NUMBER ()  OVER ( PARTITION BY TipoProducto order by Fecha desc ) Incremental\n    into \n        #Raw_Productos\n    from\n    (        \n        Select \n            prd.TipoProducto,\n            prd.NumeroProducto,\n            prd.Sucursal,\n            convert(date,prd.Desde) Desde,\n            convert(date,prd.Hasta) Hasta,\n            convert(float,prd.ValorUnidad) ValorUnidad,\n            convert(float,prd.Rentabilidad) Rentabilidad,\n            convert(float,CupoTotal) CupoTotal,\n            convert(float,prd.Comision) Comision,\n            convert(float,prd.TasaInteresMVCompra1Mes) TasaInteresMVCompra1Mes,\n            convert(float,prd.TasaInteresMVCompra2MesOMas) TasaInteresMVCompra2MesOMas,\n            convert(float,prd.TasaInteresMVImpuestos) TasaInteresMVImpuestos,\n            convert(float,prd.TasaInteresMVAvances) TasaInteresMVAvances,\n            convert(float,prd.TasaInteresMVMora) TasaInteresMVMora,\n            convert(float,prd.TasaInteresEACompra1Mes) TasaInteresEACompra1Mes,\n            convert(float,prd.TasaInteresEACompra2MesOMas) TasaInteresEACompra2MesOMas,\n            convert(float,prd.TasaInteresEAImpuestos) TasaInteresEAImpuestos,\n            convert(float,prd.TasaInteresEAAvances) TasaInteresEAAvances,\n            convert(float,prd.TasaInteresEAMora) TasaInteresEAMora,\n            prd.File_name,\n            fec.Fecha\n        from \n        (\n            select\n                TipoProducto = TipoProducto,\n                NumeroProducto = NumeroProducto,\n                Sucursal = sucursal,\n                Desde = Desde,\n                Hasta = Hasta,\n                ValorUnidad = null,\n                Rentabilidad = null,\n                Comision = null,\n                CupoTotal = null,\n                TasaInteresMVCompra1Mes = null,\n                TasaInteresMVCompra2MesOMas = null,\n                TasaInteresMVImpuestos = null, \n                TasaInteresMVAvances = null,\n                TasaInteresMVMora = null,\n                TasaInteresEACompra1Mes = null,\n                TasaInteresEACompra2MesOMas = null,\n                TasaInteresEAImpuestos = null,\n                TasaInteresEAAvances = null,\n                TasaInteresEAMora = null,\n                File_name = File_name\n            from stage.CuentaAhorros_Producto\n            UNION ALL\n            select \n                TipoProducto = TipoProducto,\n                NumeroProducto = NumeroProducto,\n                Sucursal = null,\n                Desde = convert(date,Desde),\n                Hasta = convert(date,Hasta),\n                ValorUnidad = ValorUnidad,\n                Rentabilidad = Rentabilidad,\n                Comision = Comision,\n                CupoTotal = null,\n                TasaInteresMVCompra1Mes = null,\n                TasaInteresMVCompra2MesOMas = null,\n                TasaInteresMVImpuestos = null, \n                TasaInteresMVAvances = null,\n                TasaInteresMVMora = null,\n                TasaInteresEACompra1Mes = null,\n                TasaInteresEACompra2MesOMas = null,\n                TasaInteresEAImpuestos = null,\n                TasaInteresEAAvances = null,\n                TasaInteresEAMora = null,\n                File_name = File_name\n            from stage.FondoInversion_Producto\n            UNION ALL\n            select \n                TipoProducto = TipoProducto,\n                NumeroProducto = NumeroTarjeta,\n                Sucursal = null,\n                Desde = convert(date, Desde, 103),\n                Hasta = convert(date, Hasta, 103),\n                ValorUnidad = null,\n                Rentabilidad = null,\n                Comision = null,\n                CupoTotal = CupoTotal,\n                TasaInteresMVCompra1Mes = TasaInteresMVCompra1Mes,\n                TasaInteresMVCompra2MesOMas = TasaInteresMVCompra2MesOMas,\n                TasaInteresMVImpuestos = TasaInteresMVImpuestos, \n                TasaInteresMVAvances = TasaInteresMVAvances,\n                TasaInteresMVMora = TasaInteresMVMora,\n                TasaInteresEACompra1Mes = TasaInteresEACompra1Mes,\n                TasaInteresEACompra2MesOMas =TasaInteresEACompra2MesOMas,\n                TasaInteresEAImpuestos = TasaInteresEAImpuestos,\n                TasaInteresEAAvances = TasaInteresEAAvances,\n                TasaInteresEAMora = TasaInteresEAMora,\n                File_name = File_name\n            from stage.TarjetaCredito_Producto\n        ) prd\n        INNER JOIN #Data_Fechas fec on (fec.File_name = prd.File_name)\n    ) dat2\n\n    -- Insertar data si No existe\n\n    insert into modelo_transacciones.Dim_Productos (TipoProducto, NumeroProducto, Sucursal, Desde, Hasta, ValorUnidad, Rentabilidad, Comision, TasaInteresMVCompra1Mes,\n            TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra2MesOMas,\n            TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, File_name, Fecha_Insert)\n    SELECT   \n        TipoProducto,\n        NumeroProducto,\n        Sucursal,\n        Desde,\n        Hasta,\n        ValorUnidad,\n        Rentabilidad,\n        Comision,\n        TasaInteresMVCompra1Mes,\n        TasaInteresMVCompra2MesOMas,\n        TasaInteresMVImpuestos,\n        TasaInteresMVAvances,\n        TasaInteresMVMora,\n        TasaInteresEACompra1Mes,\n        TasaInteresEACompra2MesOMas,\n        TasaInteresEAImpuestos,\n        TasaInteresEAAvances,\n        TasaInteresEAMora, \n        File_name,     \n        DATEADD(HOUR, -5, GETUTCDATE())       \n    FROM \n        #Raw_Productos raw\n    where \n        --raw.Incremental = 1 AND\n        not exists (select top 1 1 from modelo_transacciones.Dim_Productos prd where prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto\n        and prd.File_name = raw.File_name)\n\n\n    --Actualizar si existe las fechas de los registors vigentes anteriores\n    /*\n    UPDATE \n        prd\n    SET \n        prd.ValidoHasta = DATEADD(HOUR, -5, GETUTCDATE())\n    FROM \n        modelo_transacciones.Productos prd\n    INNER JOIN \n        #Raw_Productos raw\n        on \n            (prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto)\n     where \n        exists (select top 1 1 from modelo_transacciones.Productos prd where prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto)\n        and raw.Incremental = 1\n        and prd.validoHasta is null\n        and (\n                prd.Sucursal <> raw.Sucursal or\n                prd.Desde <> raw.Desde or\n                prd.Hasta <> raw.Hasta or\n                prd.ValorUnidad <> raw.ValorUnidad or\n                prd.Rentabilidad <> raw.Rentabilidad or\n                prd.Comision <> raw.Comision or\n                prd.TasaInteresMVCompra1Mes <> raw.TasaInteresMVCompra1Mes or\n                prd.TasaInteresMVCompra2MesOMas <> raw.TasaInteresMVCompra2MesOMas or\n                prd.TasaInteresMVImpuestos <> raw.TasaInteresMVImpuestos or\n                prd.TasaInteresMVAvances <> raw.TasaInteresMVAvances or\n                prd.TasaInteresMVMora <> raw.TasaInteresMVMora or\n                prd.TasaInteresEACompra1Mes <> raw.TasaInteresEACompra1Mes or\n                prd.TasaInteresEACompra2MesOMas <> raw.TasaInteresEACompra2MesOMas or\n                prd.TasaInteresEAImpuestos <> raw.TasaInteresEAImpuestos or\n                prd.TasaInteresEAAvances <> raw.TasaInteresEAAvances or\n                prd.TasaInteresEAMora <> raw.TasaInteresEAMora\n            )\n\n    --Insertar registor de cambio\n\n    INSERT INTO modelo_transacciones.Productos (TipoProducto, NumeroProducto, Sucursal, Desde, Hasta, ValorUnidad, Rentabilidad, Comision, TasaInteresMVCompra1Mes,\n            TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra2MesOMas,\n            TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, Fecha_Insert, ValidoDesde, ValidoHasta)\n    SELECT   \n        raw.TipoProducto,\n        raw.NumeroProducto,\n        raw.Sucursal,\n        raw.Desde,\n        raw.Hasta,\n        raw.ValorUnidad,\n        raw.Rentabilidad,\n        raw.Comision,\n        raw.TasaInteresMVCompra1Mes,\n        raw.TasaInteresMVCompra2MesOMas,\n        raw.TasaInteresMVImpuestos,\n        raw.TasaInteresMVAvances,\n        raw.TasaInteresMVMora,\n        raw.TasaInteresEACompra1Mes,\n        raw.TasaInteresEACompra2MesOMas,\n        raw.TasaInteresEAImpuestos,\n        raw.TasaInteresEAAvances,\n        raw.TasaInteresEAMora,      \n        DATEADD(HOUR, -5, GETUTCDATE()),\n        DATEADD(HOUR, -5, GETUTCDATE()),\n        null\n    FROM\n        modelo_transacciones.Productos prd\n    INNER JOIN\n        #Raw_Productos raw\n    on \n        (prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto)\n    WHERE\n        exists (select top 1 1 from modelo_transacciones.Productos prd where prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto)\n        and raw.Incremental = 1\n        and (\n                prd.Sucursal <> raw.Sucursal or\n                prd.Desde <> raw.Desde or\n                prd.Hasta <> raw.Hasta or\n                prd.ValorUnidad <> raw.ValorUnidad or\n                prd.Rentabilidad <> raw.Rentabilidad or\n                prd.Comision <> raw.Comision or\n                prd.TasaInteresMVCompra1Mes <> raw.TasaInteresMVCompra1Mes or\n                prd.TasaInteresMVCompra2MesOMas <> raw.TasaInteresMVCompra2MesOMas or\n                prd.TasaInteresMVImpuestos <> raw.TasaInteresMVImpuestos or\n                prd.TasaInteresMVAvances <> raw.TasaInteresMVAvances or\n                prd.TasaInteresMVMora <> raw.TasaInteresMVMora or\n                prd.TasaInteresEACompra1Mes <> raw.TasaInteresEACompra1Mes or\n                prd.TasaInteresEACompra2MesOMas <> raw.TasaInteresEACompra2MesOMas or\n                prd.TasaInteresEAImpuestos <> raw.TasaInteresEAImpuestos or\n                prd.TasaInteresEAAvances <> raw.TasaInteresEAAvances or\n                prd.TasaInteresEAMora <> raw.TasaInteresEAMora\n            )\n            */\n\nEND\n\n    --truncate table modelo_transacciones.Productos\n    --select * from modelo_transacciones.Dim_Productos\n",
+					"query": "-- Procesamiento informacion productos\n--exec  modelo_transacciones.SP_Manage_Dim_Producto\nCREATE PROCEDURE modelo_transacciones.SP_Manage_Dim_Producto\nAS BEGIN\n\n    --Extraer Fechas de PDF - Todas las entidades de cliente\n\n    IF OBJECT_ID(N'tempdb..#Data_Fechas') IS NOT NULL\n    BEGIN\n        DROP TABLE #Data_Fechas\n    END\n\n    Select \n        File_name, \n        Fecha = convert(date,Fecha+'01')\n    into #Data_Fechas    \n    FROM \n        (\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha            \n            FROM    \n                stage.CuentaAhorros_Producto mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.FondoInversion_Producto mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n            UNION ALL\n            SELECT \n                mt.File_name,\n                ss.value AS Fecha\n            FROM \n                stage.TarjetaCredito_Producto mt\n            CROSS APPLY STRING_SPLIT(mt.File_name, '_') ss\n        ) fechas\n    WHERE LEN(Fecha) = 6\n\n\n    --Consultar informacion de productos\n\n    IF OBJECT_ID(N'tempdb..#Raw_Productos') IS NOT NULL\n    BEGIN\n        DROP TABLE #Raw_Productos\n    END\n    \n    SELECT         \n        TipoProducto,\n        NumeroProducto,\n        Sucursal,\n        Desde,\n        Hasta,\n        ValorUnidad,\n        Rentabilidad,\n        Comision,\n        TasaInteresMVCompra1Mes,\n        TasaInteresMVCompra2MesOMas,\n        TasaInteresMVImpuestos,\n        TasaInteresMVAvances,\n        TasaInteresMVMora,\n        TasaInteresEACompra1Mes,\n        TasaInteresEACompra2MesOMas,\n        TasaInteresEAImpuestos,\n        TasaInteresEAAvances,\n        TasaInteresEAMora,\n        File_name,\n        Fecha,\n        ROW_NUMBER ()  OVER ( PARTITION BY TipoProducto order by Fecha desc ) Incremental\n    into \n        #Raw_Productos\n    from\n    (        \n        Select \n            prd.TipoProducto,\n            prd.NumeroProducto,\n            prd.Sucursal,\n            convert(date,prd.Desde) Desde,\n            convert(date,prd.Hasta) Hasta,\n            convert(float,prd.ValorUnidad) ValorUnidad,\n            convert(float,prd.Rentabilidad) Rentabilidad,\n            convert(float,CupoTotal) CupoTotal,\n            convert(float,prd.Comision) Comision,\n            convert(float,prd.TasaInteresMVCompra1Mes) TasaInteresMVCompra1Mes,\n            convert(float,prd.TasaInteresMVCompra2MesOMas) TasaInteresMVCompra2MesOMas,\n            convert(float,prd.TasaInteresMVImpuestos) TasaInteresMVImpuestos,\n            convert(float,prd.TasaInteresMVAvances) TasaInteresMVAvances,\n            convert(float,prd.TasaInteresMVMora) TasaInteresMVMora,\n            convert(float,prd.TasaInteresEACompra1Mes) TasaInteresEACompra1Mes,\n            convert(float,prd.TasaInteresEACompra2MesOMas) TasaInteresEACompra2MesOMas,\n            convert(float,prd.TasaInteresEAImpuestos) TasaInteresEAImpuestos,\n            convert(float,prd.TasaInteresEAAvances) TasaInteresEAAvances,\n            convert(float,prd.TasaInteresEAMora) TasaInteresEAMora,\n            prd.File_name,\n            fec.Fecha\n        from \n        (\n            select\n                TipoProducto = TipoProducto,\n                NumeroProducto = NumeroProducto,\n                Sucursal = sucursal,\n                Desde = Desde,\n                Hasta = Hasta,\n                ValorUnidad = null,\n                Rentabilidad = null,\n                Comision = null,\n                CupoTotal = null,\n                TasaInteresMVCompra1Mes = null,\n                TasaInteresMVCompra2MesOMas = null,\n                TasaInteresMVImpuestos = null, \n                TasaInteresMVAvances = null,\n                TasaInteresMVMora = null,\n                TasaInteresEACompra1Mes = null,\n                TasaInteresEACompra2MesOMas = null,\n                TasaInteresEAImpuestos = null,\n                TasaInteresEAAvances = null,\n                TasaInteresEAMora = null,\n                File_name = File_name\n            from stage.CuentaAhorros_Producto\n            UNION ALL\n            select \n                TipoProducto = TipoProducto,\n                NumeroProducto = NumeroProducto,\n                Sucursal = null,\n                Desde = convert(date,Desde),\n                Hasta = convert(date,Hasta),\n                ValorUnidad = ValorUnidad,\n                Rentabilidad = Rentabilidad,\n                Comision = Comision,\n                CupoTotal = null,\n                TasaInteresMVCompra1Mes = null,\n                TasaInteresMVCompra2MesOMas = null,\n                TasaInteresMVImpuestos = null, \n                TasaInteresMVAvances = null,\n                TasaInteresMVMora = null,\n                TasaInteresEACompra1Mes = null,\n                TasaInteresEACompra2MesOMas = null,\n                TasaInteresEAImpuestos = null,\n                TasaInteresEAAvances = null,\n                TasaInteresEAMora = null,\n                File_name = File_name\n            from stage.FondoInversion_Producto\n            UNION ALL\n            select \n                TipoProducto = TipoProducto,\n                NumeroProducto = NumeroTarjeta,\n                Sucursal = null,\n                Desde = convert(date, Desde, 103),\n                Hasta = convert(date, Hasta, 103),\n                ValorUnidad = null,\n                Rentabilidad = null,\n                Comision = null,\n                CupoTotal = CupoTotal,\n                TasaInteresMVCompra1Mes = TasaInteresMVCompra1Mes,\n                TasaInteresMVCompra2MesOMas = TasaInteresMVCompra2MesOMas,\n                TasaInteresMVImpuestos = TasaInteresMVImpuestos, \n                TasaInteresMVAvances = TasaInteresMVAvances,\n                TasaInteresMVMora = TasaInteresMVMora,\n                TasaInteresEACompra1Mes = TasaInteresEACompra1Mes,\n                TasaInteresEACompra2MesOMas =TasaInteresEACompra2MesOMas,\n                TasaInteresEAImpuestos = TasaInteresEAImpuestos,\n                TasaInteresEAAvances = TasaInteresEAAvances,\n                TasaInteresEAMora = TasaInteresEAMora,\n                File_name = File_name\n            from stage.TarjetaCredito_Producto\n        ) prd\n        INNER JOIN #Data_Fechas fec on (fec.File_name = prd.File_name)\n    ) dat2\n\n    -- Insertar data si No existe\n\n    insert into modelo_transacciones.Dim_Productos (TipoProducto, NumeroProducto, Sucursal, Desde, Hasta, ValorUnidad, Rentabilidad, Comision, TasaInteresMVCompra1Mes,\n            TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra2MesOMas,\n            TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, File_name, Fecha_Insert)\n    SELECT   \n        TipoProducto,\n        NumeroProducto,\n        Sucursal,\n        Desde,\n        Hasta,\n        ValorUnidad,\n        Rentabilidad,\n        Comision,\n        TasaInteresMVCompra1Mes,\n        TasaInteresMVCompra2MesOMas,\n        TasaInteresMVImpuestos,\n        TasaInteresMVAvances,\n        TasaInteresMVMora,\n        TasaInteresEACompra1Mes,\n        TasaInteresEACompra2MesOMas,\n        TasaInteresEAImpuestos,\n        TasaInteresEAAvances,\n        TasaInteresEAMora, \n        File_name,     \n        DATEADD(HOUR, -5, GETUTCDATE())       \n    FROM \n        #Raw_Productos raw\n    where \n        --raw.Incremental = 1 AND\n        not exists (select top 1 1 from modelo_transacciones.Dim_Productos prd where prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto\n        and prd.File_name = raw.File_name)\n\n\n    --Actualizar si existe las fechas de los registors vigentes anteriores\n    /*\n    UPDATE \n        prd\n    SET \n        prd.ValidoHasta = DATEADD(HOUR, -5, GETUTCDATE())\n    FROM \n        modelo_transacciones.Productos prd\n    INNER JOIN \n        #Raw_Productos raw\n        on \n            (prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto)\n     where \n        exists (select top 1 1 from modelo_transacciones.Productos prd where prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto)\n        and raw.Incremental = 1\n        and prd.validoHasta is null\n        and (\n                prd.Sucursal <> raw.Sucursal or\n                prd.Desde <> raw.Desde or\n                prd.Hasta <> raw.Hasta or\n                prd.ValorUnidad <> raw.ValorUnidad or\n                prd.Rentabilidad <> raw.Rentabilidad or\n                prd.Comision <> raw.Comision or\n                prd.TasaInteresMVCompra1Mes <> raw.TasaInteresMVCompra1Mes or\n                prd.TasaInteresMVCompra2MesOMas <> raw.TasaInteresMVCompra2MesOMas or\n                prd.TasaInteresMVImpuestos <> raw.TasaInteresMVImpuestos or\n                prd.TasaInteresMVAvances <> raw.TasaInteresMVAvances or\n                prd.TasaInteresMVMora <> raw.TasaInteresMVMora or\n                prd.TasaInteresEACompra1Mes <> raw.TasaInteresEACompra1Mes or\n                prd.TasaInteresEACompra2MesOMas <> raw.TasaInteresEACompra2MesOMas or\n                prd.TasaInteresEAImpuestos <> raw.TasaInteresEAImpuestos or\n                prd.TasaInteresEAAvances <> raw.TasaInteresEAAvances or\n                prd.TasaInteresEAMora <> raw.TasaInteresEAMora\n            )\n\n    --Insertar registor de cambio\n\n    INSERT INTO modelo_transacciones.Productos (TipoProducto, NumeroProducto, Sucursal, Desde, Hasta, ValorUnidad, Rentabilidad, Comision, TasaInteresMVCompra1Mes,\n            TasaInteresMVCompra2MesOMas, TasaInteresMVImpuestos, TasaInteresMVAvances, TasaInteresMVMora, TasaInteresEACompra1Mes, TasaInteresEACompra2MesOMas,\n            TasaInteresEAImpuestos, TasaInteresEAAvances, TasaInteresEAMora, Fecha_Insert, ValidoDesde, ValidoHasta)\n    SELECT   \n        raw.TipoProducto,\n        raw.NumeroProducto,\n        raw.Sucursal,\n        raw.Desde,\n        raw.Hasta,\n        raw.ValorUnidad,\n        raw.Rentabilidad,\n        raw.Comision,\n        raw.TasaInteresMVCompra1Mes,\n        raw.TasaInteresMVCompra2MesOMas,\n        raw.TasaInteresMVImpuestos,\n        raw.TasaInteresMVAvances,\n        raw.TasaInteresMVMora,\n        raw.TasaInteresEACompra1Mes,\n        raw.TasaInteresEACompra2MesOMas,\n        raw.TasaInteresEAImpuestos,\n        raw.TasaInteresEAAvances,\n        raw.TasaInteresEAMora,      \n        DATEADD(HOUR, -5, GETUTCDATE()),\n        DATEADD(HOUR, -5, GETUTCDATE()),\n        null\n    FROM\n        modelo_transacciones.Productos prd\n    INNER JOIN\n        #Raw_Productos raw\n    on \n        (prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto)\n    WHERE\n        exists (select top 1 1 from modelo_transacciones.Productos prd where prd.TipoProducto = raw.TipoProducto and prd.NumeroProducto = raw.NumeroProducto)\n        and raw.Incremental = 1\n        and (\n                prd.Sucursal <> raw.Sucursal or\n                prd.Desde <> raw.Desde or\n                prd.Hasta <> raw.Hasta or\n                prd.ValorUnidad <> raw.ValorUnidad or\n                prd.Rentabilidad <> raw.Rentabilidad or\n                prd.Comision <> raw.Comision or\n                prd.TasaInteresMVCompra1Mes <> raw.TasaInteresMVCompra1Mes or\n                prd.TasaInteresMVCompra2MesOMas <> raw.TasaInteresMVCompra2MesOMas or\n                prd.TasaInteresMVImpuestos <> raw.TasaInteresMVImpuestos or\n                prd.TasaInteresMVAvances <> raw.TasaInteresMVAvances or\n                prd.TasaInteresMVMora <> raw.TasaInteresMVMora or\n                prd.TasaInteresEACompra1Mes <> raw.TasaInteresEACompra1Mes or\n                prd.TasaInteresEACompra2MesOMas <> raw.TasaInteresEACompra2MesOMas or\n                prd.TasaInteresEAImpuestos <> raw.TasaInteresEAImpuestos or\n                prd.TasaInteresEAAvances <> raw.TasaInteresEAAvances or\n                prd.TasaInteresEAMora <> raw.TasaInteresEAMora\n            )\n            */\n\nEND\n\n    --truncate table modelo_transacciones.Productos\n    --select * from modelo_transacciones.Dim_Productos order by tipoproducto\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1119,7 +1119,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "\nCREATE PROCEDURE modelo_transacciones.SP_Manage_Fact_Transacciones \n    @user varchar(100), @TipoProducto varchar(50), @pdfname varchar(150), @fullload int\nAS\nBEGIN\n\n    if @fullload is NULL\n    BEGIN\n        set @fullload = 1\n    END\n\n --Extraer Fechas de PDF - Todas las entidades de cliente\n    --declare @user varchar(100) = 'bsmoralesg@outlook.com'\n    --declare @TipoProducto varchar(50) = 'Cuenta Ahorros'\n    --declare @pdfname varchar(150) = 'Extracto_375992443_202303_CTA_AHORROS_5557'\n    --declare @fullload int = 1\n\n    Select \n        FechaTransaccion = Case WHEN TipoProducto = 'Cuenta Ahorros' then convert(date,right('0'+FechaTransaccion + '/' + substring(Fecha,0,5), 10), 103)\n                                WHEN TipoProducto = 'Fiducuenta' then convert(date,FechaTransaccion)\n                                WHEN TipoProducto = 'Tarjeta Credito' then convert(date,FechaTransaccion, 103)\n                            END,\n        DescripcionTransaccion,\n        ValorTransaccion,\n        ValorUnidades,\n        TasaPactada,\n        TasaFacturada,\n        CargosYAbonos,\n        SaldoADiferir,\n        Cuotas,\n        email,\n        TipoProducto,\n        NumeroProducto,\n        pdfname\n    into #Data_Transacciones\n    FROM \n        (   \n            SELECT \n                Fecha = Fecha,\n                FechaTransaccion,\n                DescripcionTransaccion,\n                ValorTransaccion,\n                ValorUnidades,\n                TasaPactada,\n                TasaFacturada,\n                CargosYAbonos,\n                SaldoADiferir,\n                Cuotas,\n                email,\n                TipoProducto,\n                NumeroProducto,\n                pdfname\n            FROM\n            (\n                SELECT                \n                    mt.FechaTransaccion,\n                    mt.DescripcionTransaccion,              \n                    ValorTransaccion = mt.ValorTransaccion,\n                    ValorUnidades = null,                    \n                    TasaPactada = null,\n                    TasaFacturada = null,\n                    CargosYAbonos = null,\n                    SaldoADiferir = null,\n                    Cuotas = null,\n                    email,\n                    mt.TipoProducto,\n                    mt.NumeroProducto,\n                    mt.pdfname,\n                    ss.value AS Fecha\n               FROM \n                    stage.CuentaAhorros_Transacciones mt\n                CROSS APPLY STRING_SPLIT(mt.pdfname, '_') ss\n                ) Dat\n            Where LEN(dat.Fecha) = 6\n        \n            UNION ALL\n            SELECT\n                Fecha = null,\n                mt.FechaTransaccion,\n                DescripcionTransaccion= Descripcion,\n                ValorTransaccion = mt.ValorPesos,\n                ValorUnidades = mt.ValorUnidades,\n                TasaPactada = null,\n                TasaFacturada = null,\n                CargosYAbonos = null,\n                SaldoADiferir = null,\n                Cuotas = null,\n                email,\n                mt.TipoProducto,\n                mt.NumeroProducto,\n                mt.pdfname            \n            FROM\n                stage.FondoInversion_Transacciones mt            \n\n            UNION ALL\n            SELECT \n                Fecha = null,\n                mt.FechaTransaccion,\n                DescripcionTransaccion,\n                ValorTransaccion = mt.CostoTransaccion,\n                ValorUnidades = null,\n                TasaPactada = Case when mt.TasaPactada = '' then NULL else mt.TasaPactada end,\n                TasaFacturada = Case when mt.TasaFacturada = '' then NULL else mt.TasaFacturada end,\n                CargosYAbonos = mt.CargosYAbonos,\n                SaldoADiferir = mt.SaldoAdiferir,\n                Cuotas = mt.Cuotas,\n                email,\n                mt.TipoProducto,\n                mt.NumeroProducto,\n                mt.pdfname\n            FROM \n                stage.TarjetaCredito_Transacciones mt\n        ) DataTransacciones \n    \n\n    --Obtener datos Cruzando con DImensiones\n\n    select \n        tr.FechaTransaccion, \n        tr.DescripcionTransaccion,\n        tr.ValorTransaccion,\n        tr.ValorUnidades,\n        tr.TasaPactada,\n        tr.TasaFacturada,\n        tr.CargosYAbonos,\n        tr.SaldoADiferir,\n        tr.Cuotas,\n        tie.Key_Date,\n        cli.[user],\n        cli.Cliente_Key,\n        prd.TipoProducto,\n        prd.NumeroProducto,\n        prd.Producto_Key\n    into \n        #DataFinalModelo    \n    FROM \n        #Data_Transacciones tr\n    INNER JOIN \n        modelo_transacciones.Dim_Tiempo tie ON (tie.[Date] = tr.FechaTransaccion)\n    INNER JOIN \n        modelo_transacciones.cliente cli ON (cli.[user] = tr.email and cli.validohasta is NULL)\n    INNER JOIN \n        modelo_transacciones.Productos prd ON (prd.TipoProducto = tr.TipoProducto and prd.NumeroProducto = tr.NumeroProducto and prd.File_name = tr.pdfname)\n    WHERE\n        (@fullload = 1)\n        OR\n        (\n            @fullload <> 1 AND\n            tr.email = @user AND       \n            tr.TipoProducto = @TipoProducto AND\n            tr.pdfname = @pdfname AND\n            tr.FechaTransaccion between prd.Desde AND prd.Hasta\n        )\n    \n    --select * from  #DataFinalModelo  \n\n    --Limpiar datos para procesmaiento\n\n    Delete \n        Modelo\n    FROM \n        modelo_transacciones.Fact_Transacciones Modelo\n    INNER JOIN \n        modelo_transacciones.Dim_Tiempo tie ON (tie.Key_Date = Modelo.Key_Date)\n    INNER JOIN \n        modelo_transacciones.cliente cli ON (cli.Cliente_Key = Modelo.Cliente_Key)\n    INNER JOIN \n        modelo_transacciones.Productos prd ON (prd.Producto_Key  = Modelo.Producto_Key)\n    WHERE\n        (@fullload = 1)\n        OR\n        (\n            @fullload <> 1 AND\n            cli.[User] = @user AND        \n            prd.TipoProducto = @TipoProducto AND\n            prd.File_name = @pdfname AND\n            tie.[Date] between prd.Desde AND prd.Hasta\n        )\n\n    --Insertar datos\n\n    INSERT INTO modelo_transacciones.Fact_Transacciones ( Key_Date, Cliente_Key, Producto_Key, DescripcionTransaccion, \n    ValorTransaccion, ValorUnidades, TasaPactada, TasaFacturada, CargosYAbonos, SaldoADiferir, Cuotas)\n\n    Select \n        Key_Date, \n        Cliente_Key, \n        Producto_Key, \n        DescripcionTransaccion, \n        ValorTransaccion, \n        ValorUnidades, \n        TasaPactada, \n        TasaFacturada, \n        CargosYAbonos, \n        SaldoADiferir, \n        Cuotas\n    FROM \n        #DataFinalModelo df\n\nEND\n\n\n----EXEC modelo_transacciones.SP_Manage_Dim_Tiempo @user = null, @TipoProducto = null, @pdfname = null,  @fullload = null\n-- select * from  modelo_transacciones.Fact_Transacciones\n",
+					"query": "-- exec modelo_transacciones.SP_Manage_Fact_Transacciones 'bsmoralesg@outlook.com', 'Cuenta Ahorros', 'Extracto_375992443_202303_CTA_AHORROS_5557', 1\nCREATE PROCEDURE modelo_transacciones.SP_Manage_Fact_Transacciones \n    @user varchar(100), @TipoProducto varchar(50), @pdfname varchar(150), @fullload int\nAS\nBEGIN\n\n    if @fullload is NULL\n    BEGIN\n        set @fullload = 1\n    END\n\n --Extraer Fechas de PDF - Todas las entidades de cliente\n    --declare @user varchar(100) = 'bsmoralesg@outlook.com'\n    --declare @TipoProducto varchar(50) = 'Cuenta Ahorros'\n    --declare @pdfname varchar(150) = 'Extracto_375992443_202303_CTA_AHORROS_5557'\n    --declare @fullload int = 1\n\n    Select \n        FechaTransaccion = Case WHEN TipoProducto = 'Cuenta Ahorros' then convert(date,right('0'+FechaTransaccion + '/' + substring(Fecha,0,5), 10), 103)\n                                WHEN TipoProducto = 'Fiducuenta' then convert(date,FechaTransaccion)\n                                WHEN TipoProducto = 'Tarjeta Credito' then convert(date,FechaTransaccion, 103)\n                            END,\n        DescripcionTransaccion,\n        ValorTransaccion,\n        ValorUnidades,\n        TasaPactada,\n        TasaFacturada,\n        CargosYAbonos,\n        SaldoADiferir,\n        Cuotas,\n        email,\n        TipoProducto,\n        NumeroProducto,\n        pdfname\n    into #Data_Transacciones\n    FROM \n        (   \n            SELECT \n                Fecha = Fecha,\n                FechaTransaccion,\n                DescripcionTransaccion,\n                ValorTransaccion,\n                ValorUnidades,\n                TasaPactada,\n                TasaFacturada,\n                CargosYAbonos,\n                SaldoADiferir,\n                Cuotas,\n                email,\n                TipoProducto,\n                NumeroProducto,\n                pdfname\n            FROM\n            (\n                SELECT                \n                    mt.FechaTransaccion,\n                    mt.DescripcionTransaccion,              \n                    ValorTransaccion = mt.ValorTransaccion,\n                    ValorUnidades = null,                    \n                    TasaPactada = null,\n                    TasaFacturada = null,\n                    CargosYAbonos = null,\n                    SaldoADiferir = null,\n                    Cuotas = null,\n                    email,\n                    mt.TipoProducto,\n                    mt.NumeroProducto,\n                    mt.pdfname,\n                    ss.value AS Fecha\n               FROM \n                    stage.CuentaAhorros_Transacciones mt\n                CROSS APPLY STRING_SPLIT(mt.pdfname, '_') ss\n                ) Dat\n            Where LEN(dat.Fecha) = 6\n        \n            UNION ALL\n            SELECT\n                Fecha = null,\n                mt.FechaTransaccion,\n                DescripcionTransaccion= Descripcion,\n                ValorTransaccion = mt.ValorPesos,\n                ValorUnidades = mt.ValorUnidades,\n                TasaPactada = null,\n                TasaFacturada = null,\n                CargosYAbonos = null,\n                SaldoADiferir = null,\n                Cuotas = null,\n                email,\n                mt.TipoProducto,\n                mt.NumeroProducto,\n                mt.pdfname            \n            FROM\n                stage.FondoInversion_Transacciones mt            \n\n            UNION ALL\n            SELECT \n                Fecha = null,\n                mt.FechaTransaccion,\n                DescripcionTransaccion,\n                ValorTransaccion = mt.CostoTransaccion,\n                ValorUnidades = null,\n                TasaPactada = Case when mt.TasaPactada = '' then NULL else mt.TasaPactada end,\n                TasaFacturada = Case when mt.TasaFacturada = '' then NULL else mt.TasaFacturada end,\n                CargosYAbonos = mt.CargosYAbonos,\n                SaldoADiferir = mt.SaldoAdiferir,\n                Cuotas = mt.Cuotas,\n                email,\n                mt.TipoProducto,\n                mt.NumeroProducto,\n                mt.pdfname\n            FROM \n                stage.TarjetaCredito_Transacciones mt\n        ) DataTransacciones \n    \n\n    --Obtener datos Cruzando con DImensiones\n\n    select \n        tr.FechaTransaccion, \n        tr.DescripcionTransaccion,\n        tr.ValorTransaccion,\n        tr.ValorUnidades,\n        tr.TasaPactada,\n        tr.TasaFacturada,\n        tr.CargosYAbonos,\n        tr.SaldoADiferir,\n        tr.Cuotas,\n        tie.Key_Date,\n        cli.[user],\n        cli.Cliente_Key,\n        prd.TipoProducto,\n        prd.NumeroProducto,\n        prd.Producto_Key\n    into \n        #DataFinalModelo    \n    FROM \n        #Data_Transacciones tr\n    INNER JOIN \n        modelo_transacciones.Dim_Tiempo tie ON (tie.[Date] = tr.FechaTransaccion)\n    INNER JOIN \n        modelo_transacciones.Dim_Cliente cli ON (cli.[user] = tr.email and cli.validohasta is NULL)\n    INNER JOIN \n        modelo_transacciones.Dim_Productos prd ON (prd.TipoProducto = tr.TipoProducto and prd.NumeroProducto = tr.NumeroProducto and prd.File_name = tr.pdfname)\n    WHERE\n        (@fullload = 1)\n        OR\n        (\n            @fullload <> 1 AND\n            tr.email = @user AND       \n            tr.TipoProducto = @TipoProducto AND\n            tr.pdfname = @pdfname AND\n            tr.FechaTransaccion between prd.Desde AND prd.Hasta\n        )\n    \n    --select * from  #DataFinalModelo  \n\n    --Limpiar datos para procesmaiento\n\n    Delete \n        Modelo\n    FROM \n        modelo_transacciones.Fact_Transacciones Modelo\n    INNER JOIN \n        modelo_transacciones.Dim_Tiempo tie ON (tie.Key_Date = Modelo.Key_Date)\n    INNER JOIN \n        modelo_transacciones.Dim_Cliente cli ON (cli.Cliente_Key = Modelo.Cliente_Key)\n    INNER JOIN \n        modelo_transacciones.Dim_Productos prd ON (prd.Producto_Key  = Modelo.Producto_Key)\n    WHERE\n        (@fullload = 1)\n        OR\n        (\n            @fullload <> 1 AND\n            cli.[User] = @user AND        \n            prd.TipoProducto = @TipoProducto AND\n            prd.File_name = @pdfname AND\n            tie.[Date] between prd.Desde AND prd.Hasta\n        )\n\n    --Insertar datos\n\n    INSERT INTO modelo_transacciones.Fact_Transacciones ( Key_Date, Cliente_Key, Producto_Key, DescripcionTransaccion, \n    ValorTransaccion, ValorUnidades, TasaPactada, TasaFacturada, CargosYAbonos, SaldoADiferir, Cuotas)\n\n    Select \n        Key_Date, \n        Cliente_Key, \n        Producto_Key, \n        DescripcionTransaccion, \n        ValorTransaccion, \n        ValorUnidades, \n        TasaPactada, \n        TasaFacturada, \n        CargosYAbonos, \n        SaldoADiferir, \n        Cuotas\n    FROM \n        #DataFinalModelo df\n\nEND\n\n\n----EXEC modelo_transacciones.SP_Manage_Dim_Tiempo @user = null, @TipoProducto = null, @pdfname = null,  @fullload = null\n-- select * from  modelo_transacciones.Fact_Transacciones where producto_key = 101\n-- select * from  modelo_transacciones.Dim_Cliente\n-- select * from  modelo_transacciones.Dim_Productos\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1297,7 +1297,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "819333d3-cc87-44d9-8e45-fc0fa26ec5f0"
+						"spark.autotune.trackingId": "004e2d29-bede-4404-9ca1-07df17a6bfd7"
 					}
 				},
 				"metadata": {
@@ -1343,7 +1343,7 @@
 							"import io"
 						],
 						"outputs": [],
-						"execution_count": 15
+						"execution_count": 138
 					},
 					{
 						"cell_type": "code",
@@ -1366,7 +1366,7 @@
 							"    .getOrCreate()"
 						],
 						"outputs": [],
-						"execution_count": 16
+						"execution_count": 139
 					},
 					{
 						"cell_type": "code",
@@ -1388,13 +1388,12 @@
 							"#Capturar Parametros\r\n",
 							"pdf_user = \"bsmoralesg@outlook.com\"\r\n",
 							"#pdf_type = \"Tarjeta Credito\"\r\n",
-							"pdf_type = \"Cuenta Ahorros\"\r\n",
-							"#pdf_type = \"Fondos de Inversion\"\r\n",
-							"pdf_fecha = \"2023-06-24\"\r\n",
+							"#pdf_type = \"Cuenta Ahorros\"\r\n",
+							"pdf_type = \"Fondos de Inversion\"\r\n",
+							"pdf_fecha = \"2023-07-05\"\r\n",
 							"\r\n",
 							"#Tarjeta Credito\r\n",
-							"#file_name = \"Extracto_403340132_202305_TARJETA_VISA_2166.pdf\"\r\n",
-							"#file_name = \"Extracto_7358651_202108_TARJETA_VISA_2166.pdf\"\r\n",
+							"#file_name = \"Extracto_410326343_202306_TARJETA_VISA_2166.pdf\"\r\n",
 							"#file_name = \"Extracto_392576648_202304_TARJETA_VISA_2166.pdf\"\r\n",
 							"#file_name = \"Extracto_369280261_202303_TARJETA_VISA_2166.pdf\"\r\n",
 							"#file_name = \"Extracto_231339919_202209_TARJETA_VISA_2166.pdf\"\r\n",
@@ -1403,7 +1402,7 @@
 							"#Cuenta de Ahorrros\r\n",
 							"\r\n",
 							"#file_name = \"Extracto_49243429_202112_CTA_AHORROS_5557.pdf\"\r\n",
-							"file_name = \"Extracto_240056999_202209_CTA_AHORROS_5557.pdf\"\r\n",
+							"#file_name = \"Extracto_240056999_202209_CTA_AHORROS_5557.pdf\"\r\n",
 							"#file_name = \"Extracto_307612445_202212_CTA_AHORROS_5557.pdf\"\r\n",
 							"#file_name = \"Extracto_375992443_202303_CTA_AHORROS_5557.pdf\"\r\n",
 							"\r\n",
@@ -1414,13 +1413,13 @@
 							"#file_name = \"Extracto_212010590_202208_FIDUCUENTA_3940.pdf\"\r\n",
 							"#file_name = \"Extracto_254154275_202210_FIDUCUENTA_3940.pdf\"\r\n",
 							"#file_name = \"Extracto_333733883_202301_FIDUCUENTA_3940.pdf\"\r\n",
-							"#file_name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
+							"file_name = \"Extracto_395097292_202304_FIDUCUENTA_3940.pdf\"\r\n",
 							"\r\n",
 							"\r\n",
 							"pdf_password = \"1233491047\""
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 140
 					},
 					{
 						"cell_type": "code",
@@ -1446,7 +1445,7 @@
 							"path_sink = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+pdf_type+\"/Raw/\"+pdf_fecha+\"/\"+pdf_user+\"/\"+file_name+\"/\""
 						],
 						"outputs": [],
-						"execution_count": 18
+						"execution_count": 141
 					},
 					{
 						"cell_type": "code",
@@ -1466,7 +1465,7 @@
 							"print(path_sink)"
 						],
 						"outputs": [],
-						"execution_count": 19
+						"execution_count": 142
 					},
 					{
 						"cell_type": "code",
@@ -1500,7 +1499,7 @@
 							" "
 						],
 						"outputs": [],
-						"execution_count": 20
+						"execution_count": 143
 					},
 					{
 						"cell_type": "code",
@@ -1576,7 +1575,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 21
+						"execution_count": 144
 					},
 					{
 						"cell_type": "code",
@@ -1600,7 +1599,7 @@
 							"df_RawDat.repartition(1).write.mode(\"overwrite\").parquet(path_sink)"
 						],
 						"outputs": [],
-						"execution_count": 22
+						"execution_count": 145
 					},
 					{
 						"cell_type": "code",
@@ -1620,7 +1619,7 @@
 							"#display(df_RawDat)"
 						],
 						"outputs": [],
-						"execution_count": 23
+						"execution_count": 146
 					}
 				]
 			},
@@ -1650,7 +1649,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d8bd4721-5661-4e9b-8a15-681addccb5f5"
+						"spark.autotune.trackingId": "8ea1b1ee-3ab2-40c3-a75b-25e34be9cf27"
 					}
 				},
 				"metadata": {
@@ -1690,7 +1689,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 103
 					},
 					{
 						"cell_type": "code",
@@ -1713,7 +1712,7 @@
 							"\r\n",
 							"user = \"bsmoralesg@outlook.com\"\r\n",
 							"type = \"Cuenta Ahorros\"\r\n",
-							"fecha = \"10012023\"\r\n",
+							"fecha = \"2023-07-05\"\r\n",
 							"\r\n",
 							"#name = \"Extracto_49243429_202112_CTA_AHORROS_5557\"\r\n",
 							"#name = \"Extracto_240056999_202209_CTA_AHORROS_5557\"\r\n",
@@ -1721,7 +1720,7 @@
 							"name = \"Extracto_375992443_202303_CTA_AHORROS_5557\""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 104
 					},
 					{
 						"cell_type": "code",
@@ -1737,13 +1736,13 @@
 							}
 						},
 						"source": [
-							"user = \"bsmoralesg@outlook.com\"\r\n",
-							"type = \"Fondos de Inversion\"\r\n",
-							"fecha = \"2023-06-24\"\r\n",
-							"name = \"Extracto_240056997_202209_FIDUCUENTA_3940\""
+							"#user = \"bsmoralesg@outlook.com\"\r\n",
+							"#type = \"Fondos de Inversion\"\r\n",
+							"#fecha = \"2023-06-24\"\r\n",
+							"#name = \"Extracto_240056997_202209_FIDUCUENTA_3940\""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 105
 					},
 					{
 						"cell_type": "code",
@@ -1764,7 +1763,7 @@
 							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 106
 					},
 					{
 						"cell_type": "code",
@@ -1785,7 +1784,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 107
 					},
 					{
 						"cell_type": "code",
@@ -1814,7 +1813,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 108
 					},
 					{
 						"cell_type": "code",
@@ -1831,10 +1830,10 @@
 							"collapsed": false
 						},
 						"source": [
-							"display (df_formated)"
+							"#display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 109
 					},
 					{
 						"cell_type": "code",
@@ -1857,10 +1856,11 @@
 							"Email = user\r\n",
 							"Direccion = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 3).first()[0]\r\n",
 							"\r\n",
-							"CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
+							"CiudadData = df_formated.select(df_formated.contenido).where((df_formated.x1 >= 130.0) & (df_formated.x1 <= 131.0)).collect()[0].__getitem__('contenido')\r\n",
+							"#CiudadData = df_formated.select(df_formated.contenido).where(df_formated.UniqueId == 4).first()[0]\r\n",
 							"CiudadData = CiudadData.replace(\"$\",\"\")\r\n",
 							"CiudadData = CiudadData.replace(\"D.C.\",\"\")\r\n",
-							"CiudadData = CiudadData.split(\" \")\r\n",
+							"CiudadData = CiudadData.split(\"  \")\r\n",
 							"\r\n",
 							"CiudadData[0] = CiudadData[0].replace(\"BOGOTA\",\"BOGOTA D.C\")\r\n",
 							"Ciudad_1 = CiudadData[0].strip()\r\n",
@@ -1884,7 +1884,7 @@
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 20
+						"execution_count": 110
 					},
 					{
 						"cell_type": "code",
@@ -1904,7 +1904,7 @@
 							"display(df_Cliente)"
 						],
 						"outputs": [],
-						"execution_count": 21
+						"execution_count": 111
 					},
 					{
 						"cell_type": "code",
@@ -1950,7 +1950,7 @@
 							"df_Producto = spark.createDataFrame(data=data_Producto,schema=schemaProducto)"
 						],
 						"outputs": [],
-						"execution_count": 89
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2111,7 +2111,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 90
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2138,7 +2138,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 91
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2176,7 +2176,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 92
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2198,7 +2198,7 @@
 							"#display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 93
+						"execution_count": null
 					},
 					{
 						"cell_type": "code",
@@ -2230,7 +2230,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 94
+						"execution_count": null
 					}
 				]
 			},
@@ -2792,7 +2792,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "31357490-56b0-4cb9-a75b-3a24422a74fd"
+						"spark.autotune.trackingId": "f9ac1a7e-fb12-4944-b632-846070a49014"
 					}
 				},
 				"metadata": {
@@ -2836,7 +2836,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 14
+						"execution_count": 54
 					},
 					{
 						"cell_type": "code",
@@ -2859,17 +2859,16 @@
 							"\r\n",
 							"user = \"bsmoralesg@outlook.com\"\r\n",
 							"type = \"Tarjeta Credito\"\r\n",
-							"fecha = \"10012023\"\r\n",
+							"fecha = \"2023-07-05\"\r\n",
 							"\r\n",
-							"#name = \"Extracto_403340132_202305_TARJETA_VISA_2166\"\r\n",
-							"name = \"Extracto_7358651_202108_TARJETA_VISA_2166\"\r\n",
+							"#name = \"Extracto_410326343_202306_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_392576648_202304_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_369280261_202303_TARJETA_VISA_2166\"\r\n",
 							"#name = \"Extracto_231339919_202209_TARJETA_VISA_2166\"\r\n",
-							"#name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
+							"name = \"Extracto_204864725_202207_TARJETA_VISA_2166\""
 						],
 						"outputs": [],
-						"execution_count": 15
+						"execution_count": 55
 					},
 					{
 						"cell_type": "code",
@@ -2891,7 +2890,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 16
+						"execution_count": 56
 					},
 					{
 						"cell_type": "code",
@@ -2913,7 +2912,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 57
 					},
 					{
 						"cell_type": "code",
@@ -2942,7 +2941,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 18
+						"execution_count": 58
 					},
 					{
 						"cell_type": "code",
@@ -2962,7 +2961,7 @@
 							"display (df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 19
+						"execution_count": 59
 					},
 					{
 						"cell_type": "code",
@@ -3002,7 +3001,7 @@
 							"df_Cliente = spark.createDataFrame(data=data_Cliente,schema=schemaCliente)"
 						],
 						"outputs": [],
-						"execution_count": 20
+						"execution_count": 60
 					},
 					{
 						"cell_type": "code",
@@ -3116,7 +3115,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 21
+						"execution_count": 61
 					},
 					{
 						"cell_type": "code",
@@ -3347,7 +3346,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 22
+						"execution_count": 62
 					},
 					{
 						"cell_type": "code",
@@ -3374,7 +3373,7 @@
 							"#df_Cuotas.show(50)"
 						],
 						"outputs": [],
-						"execution_count": 23
+						"execution_count": 63
 					},
 					{
 						"cell_type": "code",
@@ -3420,7 +3419,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 24
+						"execution_count": 64
 					},
 					{
 						"cell_type": "code",
@@ -3442,7 +3441,7 @@
 							"#display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 25
+						"execution_count": 65
 					},
 					{
 						"cell_type": "code",
@@ -3466,7 +3465,7 @@
 							"# crear parquet file para cliente\r\n",
 							"df_Cliente.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Cliente/\"+path_sink_comp)\r\n",
 							"\r\n",
-							"# crear parquet file para porducto\r\n",
+							"# crear parquet file para producto\r\n",
 							"df_Producto.write.mode(\"overwrite\").parquet(Routeadl+\"/\"+type+\"/Producto/\"+path_sink_comp)\r\n",
 							"\r\n",
 							"# crear parquet file para transacciones\r\n",
@@ -3474,7 +3473,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 26
+						"execution_count": 66
 					},
 					{
 						"cell_type": "code",
