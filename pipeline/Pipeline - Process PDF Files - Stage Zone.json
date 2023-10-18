@@ -485,7 +485,7 @@
 							}
 						},
 						{
-							"name": "Procesar Dim Fact transacciones",
+							"name": "Procesar Fact transacciones",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -510,7 +510,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
+								"storedProcedureName": "[modelo_transacciones].[SP_Manage_Fact_Transacciones]"
 							},
 							"linkedServiceName": {
 								"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
