@@ -406,7 +406,7 @@
 									{
 										"type": "Query",
 										"text": {
-											"value": "update params.datausers\nset procesado = 2 \nwhere procesado = 1 \nand pdfname = item().pdfname",
+											"value": "@concat('update params.datausers set procesado = 2 where procesado = 1 and pdfname = ', item().pdfname\n)\n\n\n",
 											"type": "Expression"
 										}
 									}
