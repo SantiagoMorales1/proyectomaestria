@@ -436,7 +436,7 @@
 											{
 												"type": "Query",
 												"text": {
-													"value": "@concat('update params.datausers set procesado = 2 where procesado = 1 and pdfname = ', item().pdfname\n)\n\n\n",
+													"value": "@concat('update params.datausers set procesado = 2 where procesado = 1 and pdfname = ', '''', item().pdfname, ''''\n)\n\n\n",
 													"type": "Expression"
 												}
 											}
@@ -448,8 +448,8 @@
 						}
 					},
 					{
-						"name": "Procesar Dim Cliente",
-						"type": "SqlServerStoredProcedure",
+						"name": "Valida Archivos aprocesart",
+						"type": "IfCondition",
 						"dependsOn": [
 							{
 								"activity": "Para Cada Proceso",
@@ -458,89 +458,96 @@
 								]
 							}
 						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Cliente]"
-						},
-						"linkedServiceName": {
-							"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-							"type": "LinkedServiceReference",
-							"parameters": {
-								"DBName": "sqlpoolproyectomaestria"
-							}
-						}
-					},
-					{
-						"name": "Procesar Dim Producto",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Para Cada Proceso",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
-						},
-						"linkedServiceName": {
-							"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-							"type": "LinkedServiceReference",
-							"parameters": {
-								"DBName": "sqlpoolproyectomaestria"
-							}
-						}
-					},
-					{
-						"name": "Procesar Dim Fact transacciones",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Procesar Dim Cliente",
-								"dependencyConditions": [
-									"Succeeded"
-								]
+							"expression": {
+								"value": "@greater(activity('Capturar ultima invocacion').output.count, 0) ",
+								"type": "Expression"
 							},
-							{
-								"activity": "Procesar Dim Producto",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
-						},
-						"linkedServiceName": {
-							"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
-							"type": "LinkedServiceReference",
-							"parameters": {
-								"DBName": "sqlpoolproyectomaestria"
-							}
+							"ifTrueActivities": [
+								{
+									"name": "Procesar Dim Cliente",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Cliente]"
+									},
+									"linkedServiceName": {
+										"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"DBName": "sqlpoolproyectomaestria"
+										}
+									}
+								},
+								{
+									"name": "Procesar Dim Producto",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
+									},
+									"linkedServiceName": {
+										"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"DBName": "sqlpoolproyectomaestria"
+										}
+									}
+								},
+								{
+									"name": "Procesar Dim Fact transacciones",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Procesar Dim Cliente",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Procesar Dim Producto",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[modelo_transacciones].[SP_Manage_Dim_Producto]"
+									},
+									"linkedServiceName": {
+										"referenceName": "synapseproyectomaestria-WorkspaceDefaultSqlServer",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"DBName": "sqlpoolproyectomaestria"
+										}
+									}
+								}
+							]
 						}
 					}
 				],
@@ -1151,7 +1158,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "-- exec modelo_transacciones.SP_Manage_Fact_Transacciones 'bsmoralesg@outlook.com', 'Cuenta Ahorros', 'Extracto_375992443_202303_CTA_AHORROS_5557', 1\nCREATE PROCEDURE modelo_transacciones.SP_Manage_Fact_Transacciones \n    @user varchar(100), @TipoProducto varchar(50), @pdfname varchar(150), @fullload int\nAS\nBEGIN\n\n    if @fullload is NULL\n    BEGIN\n        set @fullload = 1\n    END\n\n --Extraer Fechas de PDF - Todas las entidades de cliente\n    --declare @user varchar(100) = 'bsmoralesg@outlook.com'\n    --declare @TipoProducto varchar(50) = 'Cuenta Ahorros'\n    --declare @pdfname varchar(150) = 'Extracto_375992443_202303_CTA_AHORROS_5557'\n    --declare @fullload int = 1\n\n    Select \n        FechaTransaccion = Case WHEN TipoProducto = 'Cuenta Ahorros' then convert(date,right('0'+FechaTransaccion + '/' + substring(Fecha,0,5), 10), 103)\n                                WHEN TipoProducto = 'Fiducuenta' then convert(date,FechaTransaccion)\n                                WHEN TipoProducto = 'Tarjeta Credito' then convert(date,FechaTransaccion, 103)\n                            END,\n        DescripcionTransaccion,\n        ValorTransaccion,\n        ValorUnidades,\n        TasaPactada,\n        TasaFacturada,\n        CargosYAbonos,\n        SaldoADiferir,\n        Cuotas,\n        email,\n        TipoProducto,\n        NumeroProducto,\n        pdfname\n    into #Data_Transacciones\n    FROM \n        (   \n            SELECT \n                Fecha = Fecha,\n                FechaTransaccion,\n                DescripcionTransaccion,\n                ValorTransaccion,\n                ValorUnidades,\n                TasaPactada,\n                TasaFacturada,\n                CargosYAbonos,\n                SaldoADiferir,\n                Cuotas,\n                email,\n                TipoProducto,\n                NumeroProducto,\n                pdfname\n            FROM\n            (\n                SELECT                \n                    mt.FechaTransaccion,\n                    mt.DescripcionTransaccion,              \n                    ValorTransaccion = mt.ValorTransaccion,\n                    ValorUnidades = null,                    \n                    TasaPactada = null,\n                    TasaFacturada = null,\n                    CargosYAbonos = null,\n                    SaldoADiferir = null,\n                    Cuotas = null,\n                    email,\n                    mt.TipoProducto,\n                    mt.NumeroProducto,\n                    mt.pdfname,\n                    ss.value AS Fecha\n               FROM \n                    stage.CuentaAhorros_Transacciones mt\n                CROSS APPLY STRING_SPLIT(mt.pdfname, '_') ss\n                ) Dat\n            Where LEN(dat.Fecha) = 6\n        \n            UNION ALL\n            SELECT\n                Fecha = null,\n                mt.FechaTransaccion,\n                DescripcionTransaccion= Descripcion,\n                ValorTransaccion = mt.ValorPesos,\n                ValorUnidades = mt.ValorUnidades,\n                TasaPactada = null,\n                TasaFacturada = null,\n                CargosYAbonos = null,\n                SaldoADiferir = null,\n                Cuotas = null,\n                email,\n                mt.TipoProducto,\n                mt.NumeroProducto,\n                mt.pdfname            \n            FROM\n                stage.FondoInversion_Transacciones mt            \n\n            UNION ALL\n            SELECT \n                Fecha = null,\n                mt.FechaTransaccion,\n                DescripcionTransaccion,\n                ValorTransaccion = mt.CostoTransaccion,\n                ValorUnidades = null,\n                TasaPactada = Case when mt.TasaPactada = '' then NULL else mt.TasaPactada end,\n                TasaFacturada = Case when mt.TasaFacturada = '' then NULL else mt.TasaFacturada end,\n                CargosYAbonos = mt.CargosYAbonos,\n                SaldoADiferir = mt.SaldoAdiferir,\n                Cuotas = mt.Cuotas,\n                email,\n                mt.TipoProducto,\n                mt.NumeroProducto,\n                mt.pdfname\n            FROM \n                stage.TarjetaCredito_Transacciones mt\n        ) DataTransacciones \n    \n\n    --Obtener datos Cruzando con DImensiones\n\n    select \n        tr.FechaTransaccion, \n        tr.DescripcionTransaccion,\n        tr.ValorTransaccion,\n        tr.ValorUnidades,\n        tr.TasaPactada,\n        tr.TasaFacturada,\n        tr.CargosYAbonos,\n        tr.SaldoADiferir,\n        tr.Cuotas,\n        tie.Key_Date,\n        cli.[user],\n        cli.Cliente_Key,\n        prd.TipoProducto,\n        prd.NumeroProducto,\n        prd.Producto_Key\n    into \n        #DataFinalModelo    \n    FROM \n        #Data_Transacciones tr\n    INNER JOIN \n        modelo_transacciones.Dim_Tiempo tie ON (tie.[Date] = tr.FechaTransaccion)\n    INNER JOIN \n        modelo_transacciones.Dim_Cliente cli ON (cli.[user] = tr.email and cli.validohasta is NULL)\n    INNER JOIN \n        modelo_transacciones.Dim_Productos prd ON (prd.TipoProducto = tr.TipoProducto and prd.NumeroProducto = tr.NumeroProducto and prd.File_name = tr.pdfname)\n    WHERE\n        (@fullload = 1)\n        OR\n        (\n            @fullload <> 1 AND\n            tr.email = @user AND       \n            tr.TipoProducto = @TipoProducto AND\n            tr.pdfname = @pdfname AND\n            tr.FechaTransaccion between prd.Desde AND prd.Hasta\n        )\n    \n    --select * from  #DataFinalModelo  \n\n    --Limpiar datos para procesmaiento\n\n    Delete \n        Modelo\n    FROM \n        modelo_transacciones.Fact_Transacciones Modelo\n    INNER JOIN \n        modelo_transacciones.Dim_Tiempo tie ON (tie.Key_Date = Modelo.Key_Date)\n    INNER JOIN \n        modelo_transacciones.Dim_Cliente cli ON (cli.Cliente_Key = Modelo.Cliente_Key)\n    INNER JOIN \n        modelo_transacciones.Dim_Productos prd ON (prd.Producto_Key  = Modelo.Producto_Key)\n    WHERE\n        (@fullload = 1)\n        OR\n        (\n            @fullload <> 1 AND\n            cli.[User] = @user AND        \n            prd.TipoProducto = @TipoProducto AND\n            prd.File_name = @pdfname AND\n            tie.[Date] between prd.Desde AND prd.Hasta\n        )\n\n    --Insertar datos\n\n    INSERT INTO modelo_transacciones.Fact_Transacciones ( Key_Date, Cliente_Key, Producto_Key, DescripcionTransaccion, \n    ValorTransaccion, ValorUnidades, TasaPactada, TasaFacturada, CargosYAbonos, SaldoADiferir, Cuotas)\n\n    Select \n        Key_Date, \n        Cliente_Key, \n        Producto_Key, \n        DescripcionTransaccion, \n        ValorTransaccion, \n        ValorUnidades, \n        TasaPactada, \n        TasaFacturada, \n        CargosYAbonos, \n        SaldoADiferir, \n        Cuotas\n    FROM \n        #DataFinalModelo df\n\nEND\n\n\n----EXEC modelo_transacciones.SP_Manage_Dim_Tiempo @user = null, @TipoProducto = null, @pdfname = null,  @fullload = null\n-- select * from  modelo_transacciones.Fact_Transacciones where producto_key = 101\n-- select * from  modelo_transacciones.Dim_Cliente\n-- select * from  modelo_transacciones.Dim_Productos\n",
+					"query": "-- exec modelo_transacciones.SP_Manage_Fact_Transacciones 'bsmoralesg@outlook.com', 'Cuenta Ahorros', 'Extracto_375992443_202303_CTA_AHORROS_5557', 1\nCREATE PROCEDURE modelo_transacciones.SP_Manage_Fact_Transacciones \n    @user varchar(100), @TipoProducto varchar(50), @pdfname varchar(150), @fullload int\nAS\nBEGIN\n\n    if @fullload is NULL\n    BEGIN\n        set @fullload = 1\n    END\n\n --Extraer Fechas de PDF - Todas las entidades de cliente\n    --declare @user varchar(100) = 'bsmoralesg@outlook.com'\n    --declare @TipoProducto varchar(50) = 'Cuenta Ahorros'\n    --declare @pdfname varchar(150) = 'Extracto_375992443_202303_CTA_AHORROS_5557'\n    --declare @fullload int = 1\n\n    Select \n        FechaTransaccion = Case WHEN TipoProducto = 'Cuenta Ahorros' then convert(date,right('0'+FechaTransaccion + '/' + substring(Fecha,0,5), 10), 103)\n                                WHEN TipoProducto = 'Fiducuenta' then convert(date,FechaTransaccion)\n                                WHEN TipoProducto = 'Tarjeta Credito' then convert(date,FechaTransaccion, 103)\n                            END,\n        DescripcionTransaccion,\n        ValorTransaccion,\n        ValorUnidades,\n        TasaPactada,\n        TasaFacturada,\n        CargosYAbonos,\n        SaldoADiferir,\n        Cuotas,\n        email,\n        TipoProducto,\n        NumeroProducto,\n        pdfname\n    into #Data_Transacciones\n    FROM \n        (   \n            SELECT \n                Fecha = Fecha,\n                FechaTransaccion,\n                DescripcionTransaccion,\n                ValorTransaccion,\n                ValorUnidades,\n                TasaPactada,\n                TasaFacturada,\n                CargosYAbonos,\n                SaldoADiferir,\n                Cuotas,\n                email,\n                TipoProducto,\n                NumeroProducto,\n                pdfname\n            FROM\n            (\n                SELECT                \n                    mt.FechaTransaccion,\n                    mt.DescripcionTransaccion,              \n                    ValorTransaccion = mt.ValorTransaccion,\n                    ValorUnidades = null,                    \n                    TasaPactada = null,\n                    TasaFacturada = null,\n                    CargosYAbonos = null,\n                    SaldoADiferir = null,\n                    Cuotas = null,\n                    email,\n                    mt.TipoProducto,\n                    mt.NumeroProducto,\n                    mt.pdfname,\n                    ss.value AS Fecha\n               FROM \n                    stage.CuentaAhorros_Transacciones mt\n                CROSS APPLY STRING_SPLIT(mt.pdfname, '_') ss\n                ) Dat\n            Where LEN(dat.Fecha) = 6\n        \n            UNION ALL\n            SELECT\n                Fecha = null,\n                mt.FechaTransaccion,\n                DescripcionTransaccion= Descripcion,\n                ValorTransaccion = mt.ValorPesos,\n                ValorUnidades = mt.ValorUnidades,\n                TasaPactada = null,\n                TasaFacturada = null,\n                CargosYAbonos = null,\n                SaldoADiferir = null,\n                Cuotas = null,\n                email,\n                mt.TipoProducto,\n                mt.NumeroProducto,\n                mt.pdfname            \n            FROM\n                stage.FondoInversion_Transacciones mt            \n\n            UNION ALL\n            SELECT \n                Fecha = null,\n                mt.FechaTransaccion,\n                DescripcionTransaccion,\n                ValorTransaccion = mt.CostoTransaccion,\n                ValorUnidades = null,\n                TasaPactada = Case when mt.TasaPactada = '' then NULL else mt.TasaPactada end,\n                TasaFacturada = Case when mt.TasaFacturada = '' then NULL else mt.TasaFacturada end,\n                CargosYAbonos = mt.CargosYAbonos,\n                SaldoADiferir = mt.SaldoAdiferir,\n                Cuotas = mt.Cuotas,\n                email,\n                mt.TipoProducto,\n                mt.NumeroProducto,\n                mt.pdfname\n            FROM \n                stage.TarjetaCredito_Transacciones mt\n        ) DataTransacciones \n    \n\n    --Obtener datos Cruzando con DImensiones\n\n    select \n        tr.FechaTransaccion, \n        tr.DescripcionTransaccion,\n        tr.ValorTransaccion,\n        tr.ValorUnidades,\n        tr.TasaPactada,\n        tr.TasaFacturada,\n        tr.CargosYAbonos,\n        tr.SaldoADiferir,\n        tr.Cuotas,\n        tie.Key_Date,\n        cli.[user],\n        cli.Cliente_Key,\n        prd.TipoProducto,\n        prd.NumeroProducto,\n        prd.Producto_Key\n    into \n        #DataFinalModelo    \n    FROM \n        #Data_Transacciones tr\n    INNER JOIN \n        modelo_transacciones.Dim_Tiempo tie ON (tie.[Date] = tr.FechaTransaccion)\n    INNER JOIN \n        modelo_transacciones.Dim_Cliente cli ON (cli.[user] = tr.email and cli.validohasta is NULL)\n    INNER JOIN \n        modelo_transacciones.Dim_Productos prd ON (prd.TipoProducto = tr.TipoProducto and prd.NumeroProducto = tr.NumeroProducto and prd.File_name = tr.pdfname)\n    WHERE\n        (@fullload = 1)\n        OR\n        (\n            @fullload <> 1 AND\n            tr.email = @user AND       \n            tr.TipoProducto = @TipoProducto AND\n            tr.pdfname = @pdfname AND\n            tr.FechaTransaccion between prd.Desde AND prd.Hasta\n        )\n    \n    --select * from  #DataFinalModelo  \n\n    --Limpiar datos para procesmaiento\n\n    Delete \n        Modelo\n    FROM \n        modelo_transacciones.Fact_Transacciones Modelo\n    INNER JOIN \n        modelo_transacciones.Dim_Tiempo tie ON (tie.Key_Date = Modelo.Key_Date)\n    INNER JOIN \n        modelo_transacciones.Dim_Cliente cli ON (cli.Cliente_Key = Modelo.Cliente_Key)\n    INNER JOIN \n        modelo_transacciones.Dim_Productos prd ON (prd.Producto_Key  = Modelo.Producto_Key)\n    WHERE\n        (@fullload = 1)\n        OR\n        (\n            @fullload <> 1 AND\n            cli.[User] = @user AND        \n            prd.TipoProducto = @TipoProducto AND\n            prd.File_name = @pdfname AND\n            tie.[Date] between prd.Desde AND prd.Hasta\n        )\n\n    --Insertar datos\n\n    INSERT INTO modelo_transacciones.Fact_Transacciones ( Key_Date, Cliente_Key, Producto_Key, DescripcionTransaccion, \n    ValorTransaccion, ValorUnidades, TasaPactada, TasaFacturada, CargosYAbonos, SaldoADiferir, Cuotas)\n\n    Select \n        Key_Date, \n        Cliente_Key, \n        Producto_Key, \n        DescripcionTransaccion, \n        ValorTransaccion, \n        ValorUnidades, \n        TasaPactada, \n        TasaFacturada, \n        CargosYAbonos, \n        SaldoADiferir, \n        Cuotas\n    FROM \n        #DataFinalModelo df\n\nEND\n\n\n----EXEC modelo_transacciones.SP_Manage_Dim_Tiempo @user = null, @TipoProducto = null, @pdfname = null,  @fullload = null\n-- select * from  modelo_transacciones.Fact_Transacciones where producto_key = 101\n-- select * from  modelo_transacciones.Dim_Cliente -- 1 \n-- select * from  modelo_transacciones.Dim_Productos order by desde -- 273 code\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -3847,18 +3854,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "eastus2"
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/spproymaestria')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -3883,6 +3878,18 @@
 				},
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": true,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "eastus2"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
