@@ -351,7 +351,7 @@
 														"userProperties": [],
 														"typeProperties": {
 															"notebook": {
-																"referenceName": "Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro",
+																"referenceName": "Procesar Data Cruda PDF - Zona Data - Fondo de Inversion",
 																"type": "NotebookReference"
 															},
 															"parameters": {
@@ -556,7 +556,8 @@
 				"[concat(variables('workspaceId'), '/notebooks/Procesar Archivos PDF - Zona Stage')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/spproymaestria')]",
 				"[concat(variables('workspaceId'), '/notebooks/Procesar Data Cruda PDF - Zona Data - Tarjeta Credito')]",
-				"[concat(variables('workspaceId'), '/notebooks/Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro')]"
+				"[concat(variables('workspaceId'), '/notebooks/Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro')]",
+				"[concat(variables('workspaceId'), '/notebooks/Procesar Data Cruda PDF - Zona Data - Fondo de Inversion')]"
 			]
 		},
 		{
@@ -1328,7 +1329,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "4ea2aa48-ebab-4a47-a09e-916b094544c8"
+						"spark.autotune.trackingId": "a062f191-32be-43aa-b44a-cac670354db2"
 					}
 				},
 				"metadata": {
@@ -2293,7 +2294,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "26c99c4d-581e-49f5-a424-ced073e9dce1"
+						"spark.autotune.trackingId": "8db59128-9b5b-4443-b8a3-981dc6cda9d8"
 					}
 				},
 				"metadata": {
@@ -2318,13 +2319,15 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -2333,7 +2336,7 @@
 							"from pyspark.sql.functions import *"
 						],
 						"outputs": [],
-						"execution_count": 66
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
@@ -2354,21 +2357,26 @@
 						"source": [
 							"#Configurar parametros aqui\r\n",
 							"\r\n",
-							"user = \"bsmoralesg@outlook.com\"\r\n",
-							"type = \"Fondos de Inversion\"\r\n",
-							"fecha = \"10012023\"\r\n",
+							"#user = \"bsmoralesg@outlook.com\"\r\n",
+							"#type = \"Fondos de Inversion\"\r\n",
+							"#fecha = \"10012023\"\r\n",
 							"\r\n",
-							"name = \"Extracto_8791222_202108_FIDUCUENTA_3940\"\r\n",
+							"#name = \"Extracto_8791222_202108_FIDUCUENTA_3940\"\r\n",
 							"#name = \"Extracto_36546412_202111_FIDUCUENTA_3940\"\r\n",
 							"#name = \"Extracto_212010590_202208_FIDUCUENTA_3940\"\r\n",
 							"#name = \"Extracto_254154275_202210_FIDUCUENTA_3940\"\r\n",
 							"#name = \"Extracto_333733883_202301_FIDUCUENTA_3940\"\r\n",
 							"#name = \"Extracto_395097292_202304_FIDUCUENTA_3940\"\r\n",
 							"\r\n",
+							"user = \"bsmoralesg@outlook.com\"\r\n",
+							"type = \"Fondos de Inversion\"\r\n",
+							"fecha = \"2023-10-18\"\r\n",
+							"name = \"Extracto_461173115_202309_FIDUCUENTA_3940\"\r\n",
+							"\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": 67
+						"execution_count": 7
 					},
 					{
 						"cell_type": "code",
@@ -2389,7 +2397,7 @@
 							"pathsource = \"abfss://stagedata@datalakeproyectomaestria.dfs.core.windows.net/\"+type+\"/Raw/\"+fecha+\"/\"+user+\"/\"+name"
 						],
 						"outputs": [],
-						"execution_count": 68
+						"execution_count": 8
 					},
 					{
 						"cell_type": "code",
@@ -2410,7 +2418,7 @@
 							"DataCruda = spark.read.load(pathsource+\"/*.parquet\", format='parquet')"
 						],
 						"outputs": [],
-						"execution_count": 69
+						"execution_count": 9
 					},
 					{
 						"cell_type": "code",
@@ -2439,7 +2447,7 @@
 							"df_formated = df_formated.withColumn(\"UniqueId\", row_number().over(Incremental))"
 						],
 						"outputs": [],
-						"execution_count": 70
+						"execution_count": 10
 					},
 					{
 						"cell_type": "code",
@@ -2459,7 +2467,7 @@
 							"display(df_formated)"
 						],
 						"outputs": [],
-						"execution_count": 71
+						"execution_count": 11
 					},
 					{
 						"cell_type": "code",
@@ -2511,7 +2519,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 72
+						"execution_count": 12
 					},
 					{
 						"cell_type": "code",
@@ -2564,7 +2572,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 73
+						"execution_count": 13
 					},
 					{
 						"cell_type": "code",
@@ -2682,7 +2690,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 74
+						"execution_count": 14
 					},
 					{
 						"cell_type": "code",
@@ -2705,7 +2713,7 @@
 							"#df_Saldo.show()"
 						],
 						"outputs": [],
-						"execution_count": 75
+						"execution_count": 15
 					},
 					{
 						"cell_type": "code",
@@ -2741,7 +2749,7 @@
 							"                        )"
 						],
 						"outputs": [],
-						"execution_count": 76
+						"execution_count": 16
 					},
 					{
 						"cell_type": "code",
@@ -2763,7 +2771,7 @@
 							"#display(df_Transacciones)"
 						],
 						"outputs": [],
-						"execution_count": 77
+						"execution_count": 17
 					},
 					{
 						"cell_type": "code",
