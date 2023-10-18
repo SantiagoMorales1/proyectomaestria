@@ -321,7 +321,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"notebook": {
-														"referenceName": "Procesar Data Cruda PDF - Zona Data - Cuenta Ahorro",
+														"referenceName": "Procesar Data Cruda PDF - Zona Data - Fondo de Inversion",
 														"type": "NotebookReference"
 													},
 													"parameters": {
