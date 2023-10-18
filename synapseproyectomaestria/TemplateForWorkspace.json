@@ -679,6 +679,37 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/TGR - Procesar Datos - Tumbling')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "Pipeline - Process PDF Files - Stage Zone",
+						"type": "PipelineReference"
+					},
+					"parameters": {}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Minute",
+					"interval": 5,
+					"startTime": "2023-10-18T04:29:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/Pipeline - Process PDF Files - Stage Zone')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/TGR - Procesar Datos')]",
 			"type": "Microsoft.Synapse/workspaces/triggers",
 			"apiVersion": "2019-06-01-preview",
@@ -1140,7 +1171,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "\nselect * from params.datausers\nselect * from params.ConfigUser\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'\n\n\ndelete from params.datausers \nwhere fecha = '2023-10-18'\n\nselect \n    prm.usuario,\n    prm.fecha,\n    prm.type,\n    prm.pdfname,\n    usr.password,\n    prm.procesado\nfrom params.datausers prm\ninner join params.ConfigUser usr on (prm.usuario = usr.[user])\nwhere usr.password is not null and prm.procesado = 0\n\n\nselect * from params.datausers\n\n\n",
+					"query": "\nselect * from params.datausers\nselect * from params.ConfigUser\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'\n\n\ndelete from params.datausers \nwhere fecha = '2023-10-18'\n\nselect \n    prm.usuario,\n    prm.fecha,\n    prm.type,\n    prm.pdfname,\n    usr.password,\n    prm.procesado\nfrom params.datausers prm\ninner join params.ConfigUser usr on (prm.usuario = usr.[user])\nwhere usr.password is not null and prm.procesado = 0\n\n\nselect * from params.datausers\nupdate params.datausers set procesado = 0 where fecha = '2023-10-18'\n\n",
 					"metadata": {
 						"language": "sql"
 					},
