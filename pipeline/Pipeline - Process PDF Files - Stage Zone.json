@@ -418,7 +418,7 @@
 				}
 			},
 			{
-				"name": "Valida Archivos aprocesar",
+				"name": "Valida Archivos Procesar",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
