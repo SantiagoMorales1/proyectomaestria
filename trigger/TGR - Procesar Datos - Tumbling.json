@@ -3,6 +3,12 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
+		"pipeline": {
+			"pipelineReference": {
+				"referenceName": "Pipeline - Process PDF Files - Stage Zone",
+				"type": "PipelineReference"
+			}
+		},
 		"type": "TumblingWindowTrigger",
 		"typeProperties": {
 			"frequency": "Minute",
