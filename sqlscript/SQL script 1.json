@@ -2,7 +2,7 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "\nselect * from params.datausers\nselect * from params.ConfigUser\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'\n\n\ndelete from params.datausers \nwhere fecha = '2023-10-18'\n\nselect \n    prm.usuario,\n    prm.fecha,\n    prm.type,\n    prm.pdfname,\n    usr.password,\n    prm.procesado\nfrom params.datausers prm\ninner join params.ConfigUser usr on (prm.usuario = usr.[user])\nwhere usr.password is not null and prm.procesado = 0\n\n\nselect * from params.datausers\n\n",
+			"query": "\nselect * from params.datausers\nselect * from params.ConfigUser\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'\n\n\ndelete from params.datausers \nwhere fecha = '2023-10-18'\n\nselect \n    prm.usuario,\n    prm.fecha,\n    prm.type,\n    prm.pdfname,\n    usr.password,\n    prm.procesado\nfrom params.datausers prm\ninner join params.ConfigUser usr on (prm.usuario = usr.[user])\nwhere usr.password is not null and prm.procesado = 0\n\n\nselect * from params.datausers\n\n\n",
 			"metadata": {
 				"language": "sql"
 			},
