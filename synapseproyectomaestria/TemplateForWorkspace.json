@@ -1171,7 +1171,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "\nselect * from params.datausers\nselect * from params.ConfigUser\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'\n\n\ndelete from params.datausers \nwhere fecha = '2023-10-18'\n\nselect \n    prm.usuario,\n    prm.fecha,\n    prm.type,\n    prm.pdfname,\n    usr.password,\n    prm.procesado\nfrom params.datausers prm\ninner join params.ConfigUser usr on (prm.usuario = usr.[user])\nwhere usr.password is not null and prm.procesado = 0\n\n\nselect * from params.datausers\n\n",
+					"query": "\nselect * from params.datausers\nselect * from params.ConfigUser\n\ninsert into params.datausers (usuario, fecha, type, pdfname, password, )\n\nupdate params.datausers\nset password = '1233491047'\n\n\ndelete from params.datausers \nwhere fecha = '2023-10-18'\n\nselect \n    prm.usuario,\n    prm.fecha,\n    prm.type,\n    prm.pdfname,\n    usr.password,\n    prm.procesado\nfrom params.datausers prm\ninner join params.ConfigUser usr on (prm.usuario = usr.[user])\nwhere usr.password is not null and prm.procesado = 0\n\n\nselect * from params.datausers\n\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1329,7 +1329,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a062f191-32be-43aa-b44a-cac670354db2"
+						"spark.autotune.trackingId": "004e2d29-bede-4404-9ca1-07df17a6bfd7"
 					}
 				},
 				"metadata": {
@@ -1354,15 +1354,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importando Librerias\r\n",
 							"\r\n",
@@ -1683,7 +1681,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8ea1b1ee-3ab2-40c3-a75b-25e34be9cf27"
+						"spark.autotune.trackingId": "4be5ed85-f16f-410f-8361-c9ec1059fafc"
 					}
 				},
 				"metadata": {
@@ -1864,7 +1862,7 @@
 							"collapsed": false
 						},
 						"source": [
-							"#display (df_formated)"
+							"##display (df_formated)"
 						],
 						"outputs": [],
 						"execution_count": 109
@@ -1935,7 +1933,7 @@
 							"collapsed": false
 						},
 						"source": [
-							"display(df_Cliente)"
+							"#display(df_Cliente)"
 						],
 						"outputs": [],
 						"execution_count": 111
@@ -2294,7 +2292,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "8db59128-9b5b-4443-b8a3-981dc6cda9d8"
+						"spark.autotune.trackingId": "5c23237d-bf2d-4d94-a346-507e62a499b9"
 					}
 				},
 				"metadata": {
@@ -2319,15 +2317,13 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"#Importar Librerias Necesarias\r\n",
 							"\r\n",
@@ -2464,7 +2460,7 @@
 							"collapsed": false
 						},
 						"source": [
-							"display(df_formated)"
+							"#display(df_formated)"
 						],
 						"outputs": [],
 						"execution_count": 11
@@ -2766,8 +2762,8 @@
 							"collapsed": false
 						},
 						"source": [
-							"display(df_Cliente)\r\n",
-							"display(df_Producto)\r\n",
+							"#display(df_Cliente)\r\n",
+							"#display(df_Producto)\r\n",
 							"#display(df_Transacciones)"
 						],
 						"outputs": [],
@@ -2833,7 +2829,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f9ac1a7e-fb12-4944-b632-846070a49014"
+						"spark.autotune.trackingId": "3f229652-575f-46f1-8060-08eb82af0aff"
 					}
 				},
 				"metadata": {
@@ -2998,7 +2994,7 @@
 							"collapsed": false
 						},
 						"source": [
-							"display (df_formated)"
+							"#display (df_formated)"
 						],
 						"outputs": [],
 						"execution_count": 59
@@ -3851,6 +3847,18 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "eastus2"
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/spproymaestria')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -3875,18 +3883,6 @@
 				},
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": true,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "eastus2"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/sqlpoolproyectomaestria')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
