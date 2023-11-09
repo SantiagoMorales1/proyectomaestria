@@ -2,7 +2,7 @@
 	"name": "TGR - Procesar Datos - Tumbling",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Stopped",
+		"runtimeState": "Started",
 		"pipeline": {
 			"pipelineReference": {
 				"referenceName": "Pipeline - Process PDF Files - Stage Zone",
